@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "hmo_full_needle_8192": {
+      "method": "hmo_full",
+      "dataset": "needle",
+      "context_length": 8192,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 2399.5185546875,
+      "mean_tracked_bytes": 55345152.0
+    }
+  },
+  "timestamp": "2026-06-21T13:46:35.289839"
+}

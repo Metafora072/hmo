@@ -1,0 +1,75 @@
+{
+  "summary": {
+    "hmo_full_needle_8192": {
+      "method": "hmo_full",
+      "dataset": "needle",
+      "context_length": 8192,
+      "n": 50,
+      "primary_metric": "accuracy",
+      "mean_primary": 0.92,
+      "std_primary": 0.2712931993250107,
+      "mean_acc": 0.92,
+      "std_acc": 0.2712931993250107,
+      "mean_f1": 0.96,
+      "mean_vram": 2399.258203125,
+      "mean_tracked_bytes": 52209008.64
+    },
+    "hmo_full_longbench_narrativeqa_8192": {
+      "method": "hmo_full",
+      "dataset": "longbench_narrativeqa",
+      "context_length": 8192,
+      "n": 49,
+      "primary_metric": "f1",
+      "mean_primary": 0.14845926949960284,
+      "std_primary": 0.21724441782337517,
+      "mean_acc": 0.08163265306122448,
+      "std_acc": 0.2738042421428314,
+      "mean_f1": 0.14845926949960284,
+      "mean_vram": 2391.473712531888,
+      "mean_tracked_bytes": 53221584.97959184
+    },
+    "hmo_full_longbench_gov_report_8192": {
+      "method": "hmo_full",
+      "dataset": "longbench_gov_report",
+      "context_length": 8192,
+      "n": 50,
+      "primary_metric": "rouge_l",
+      "mean_primary": 0.1781370876453935,
+      "std_primary": 0.031910801582837094,
+      "mean_acc": 0.0,
+      "std_acc": 0.0,
+      "mean_f1": 0.19490744837150267,
+      "mean_vram": 2184.7171875,
+      "mean_tracked_bytes": 43186667.52
+    },
+    "hmo_full_longbench_lcc_8192": {
+      "method": "hmo_full",
+      "dataset": "longbench_lcc",
+      "context_length": 8192,
+      "n": 50,
+      "primary_metric": "accuracy",
+      "mean_primary": 0.16,
+      "std_primary": 0.36660605559646714,
+      "mean_acc": 0.16,
+      "std_acc": 0.36660605559646714,
+      "mean_f1": 0.07393850328507655,
+      "mean_vram": 1951.4164453125,
+      "mean_tracked_bytes": 28434923.52
+    },
+    "hmo_full_longeval_lines_8192": {
+      "method": "hmo_full",
+      "dataset": "longeval_lines",
+      "context_length": 8192,
+      "n": 50,
+      "primary_metric": "accuracy",
+      "mean_primary": 0.6,
+      "std_primary": 0.4898979485566356,
+      "mean_acc": 0.6,
+      "std_acc": 0.4898979485566356,
+      "mean_f1": 0.6,
+      "mean_vram": 2396.338251953125,
+      "mean_tracked_bytes": 51961036.8
+    }
+  },
+  "timestamp": "2026-06-21T23:58:51.175317"
+}

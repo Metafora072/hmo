@@ -1,0 +1,68 @@
+# Python bytecode and test/tool caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Local Python/Conda environments
+.venv/
+venv/
+env/
+.conda/
+conda-env/
+
+# Machine-local configuration and secrets
+.env
+.env.*
+!.env.example
+env.pz.sh
+env.local.sh
+env.*.local.sh
+
+# Editors and operating-system metadata
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Model weights and model caches
+models/*
+!models/README.md
+*.safetensors
+*.ckpt
+*.pth
+*.pt
+*.gguf
+pytorch_model*.bin
+huggingface/
+modelscope/
+
+# Experiment runtime output. Commit summaries/tables, not per-sample traces.
+experiments/results/**/*.jsonl
+experiments/results/**/*.log
+experiments/results/**/*.out
+experiments/results/**/*.err
+experiments/results_smoke/
+experiments/logs/
+logs/
+wandb/
+/*.jsonl
+
+# Locally downloaded papers are reproducible from docs/learning/papers/README.md.
+docs/learning/papers/*.pdf
+
+# Independent tooling checkout; it has its own Git history and remote.
+AI_Production/
+
+# General temporary/build output
+build/
+dist/
+tmp/
+cache/
+*.tmp

@@ -1,0 +1,89 @@
+{
+  "summary": {
+    "full_kv_needle_1024": {
+      "method": "full_kv",
+      "dataset": "needle",
+      "context_length": 1024,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 1571.591796875,
+      "mean_tracked_bytes": 12214272.0
+    },
+    "snapkv_needle_1024": {
+      "method": "snapkv",
+      "dataset": "needle",
+      "context_length": 1024,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 1571.59619140625,
+      "mean_tracked_bytes": 12214272.0
+    },
+    "pyramidkv_lite_needle_1024": {
+      "method": "pyramidkv_lite",
+      "dataset": "needle",
+      "context_length": 1024,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 1571.59228515625,
+      "mean_tracked_bytes": 12214272.0
+    },
+    "quest_lite_needle_1024": {
+      "method": "quest_lite",
+      "dataset": "needle",
+      "context_length": 1024,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 1571.59228515625,
+      "mean_tracked_bytes": 11427840.0
+    },
+    "sagekv_lite_needle_1024": {
+      "method": "sagekv_lite",
+      "dataset": "needle",
+      "context_length": 1024,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 1571.59228515625,
+      "mean_tracked_bytes": 12214272.0
+    },
+    "hmo_full_needle_1024": {
+      "method": "hmo_full",
+      "dataset": "needle",
+      "context_length": 1024,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 1571.59228515625,
+      "mean_tracked_bytes": 12214272.0
+    }
+  },
+  "timestamp": "2026-06-17T19:28:08.164674"
+}

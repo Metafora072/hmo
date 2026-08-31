@@ -1,0 +1,61 @@
+{
+  "summary": {
+    "full_kv_needle_8192": {
+      "method": "full_kv",
+      "dataset": "needle",
+      "context_length": 8192,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 2328.962890625,
+      "mean_tracked_bytes": 99385344.0
+    },
+    "budgeted_recent_kv_needle_8192": {
+      "method": "budgeted_recent_kv",
+      "dataset": "needle",
+      "context_length": 8192,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 0.0,
+      "std_primary": 0.0,
+      "mean_acc": 0.0,
+      "std_acc": 0.0,
+      "mean_f1": 0.0,
+      "mean_vram": 2328.96337890625,
+      "mean_tracked_bytes": 55345152.0
+    },
+    "budgeted_uniform_kv_needle_8192": {
+      "method": "budgeted_uniform_kv",
+      "dataset": "needle",
+      "context_length": 8192,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 0.0,
+      "std_primary": 0.0,
+      "mean_acc": 0.0,
+      "std_acc": 0.0,
+      "mean_f1": 0.0,
+      "mean_vram": 2328.96337890625,
+      "mean_tracked_bytes": 55345152.0
+    },
+    "hmo_full_needle_8192": {
+      "method": "hmo_full",
+      "dataset": "needle",
+      "context_length": 8192,
+      "n": 1,
+      "primary_metric": "accuracy",
+      "mean_primary": 1.0,
+      "std_primary": 0.0,
+      "mean_acc": 1.0,
+      "std_acc": 0.0,
+      "mean_f1": 1.0,
+      "mean_vram": 2328.96337890625,
+      "mean_tracked_bytes": 55345152.0
+    }
+  },
+  "timestamp": "2026-06-20T23:18:27.955754"
+}
