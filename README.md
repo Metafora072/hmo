@@ -11,12 +11,13 @@ Hybrid Memory Orchestration(HMO) 是一个面向 hybrid-attention LLM 的无训�
 ├── docs/                 # 论文规划、设计、版本历史与学习材料
 ├── experiments/          # 原型、Phase 2 正式实验、工具和轻量结果
 ├── models/               # 本地模型入口；权重和缓存不进入 Git
+├── openchat/             # PZ 与多模型的证据优先协作记录
 ├── references/           # 参考实现快照，不是运行时依赖
 ├── AGENTS.md             # 研究与协作约定
 └── env.example.sh        # 可移植环境变量模板
 ```
 
-更细的文档索引见 [docs/README.md](docs/README.md)，实验结果保存规则见 [experiments/results/README.md](experiments/results/README.md)。
+更细的文档索引见 [docs/README.md](docs/README.md)，实验结果保存规则见 [experiments/results/README.md](experiments/results/README.md)，研究评审与跨模型决策见 [openchat/README.md](openchat/README.md)。
 
 ## 环境
 
