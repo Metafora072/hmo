@@ -105,6 +105,12 @@ def collect_environment() -> dict[str, Any]:
 
 
 def metric_protocol() -> dict[str, Any]:
+    from experiments.phase2.e3_v2.protocol import (
+        P0B_ANSWER_PREFIX,
+        P0B_EXECUTION_EVENTS,
+        P0B_PROTOCOL_VERSION,
+    )
+
     return {
         "longbench": {
             "revision": LONG_BENCH_REVISION,
@@ -121,6 +127,15 @@ def metric_protocol() -> dict[str, Any]:
         "synthetic": {
             "needle": "normalized_answer_contains",
             "longeval_lines": "normalized_answer_contains",
+        },
+        "post_intervention": {
+            "version": P0B_PROTOCOL_VERSION,
+            "prompt_split": "single_tokenization_verified_offset_boundary",
+            "execution_order": list(P0B_EXECUTION_EVENTS),
+            "primary_quality": "mean_gold_answer_logprob_per_token",
+            "answer_prefix": P0B_ANSWER_PREFIX,
+            "rotary_positions": "original_logical_positions",
+            "causal_mask_positions": "resident_kv_order",
         },
     }
 

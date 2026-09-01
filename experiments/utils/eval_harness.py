@@ -83,6 +83,22 @@ LONG_BENCH_NO_CHAT_DATASETS = {
     "trec", "triviaqa", "samsum", "lsht", "lcc", "repobench-p",
 }
 
+CONTEXT_QUERY_BOUNDARY_MARKER = "<|hmo_context_query_boundary_7f3c1d|>"
+
+
+class PromptBoundaryError(ValueError):
+    """Raised when a prompt cannot be serialized into an exact context/query split."""
+
+
+@dataclass(frozen=True)
+class PromptTextParts:
+    memory_context: str
+    query_suffix: str
+
+    @property
+    def full_prompt(self) -> str:
+        return self.memory_context + self.query_suffix
+
 
 def get_benchmark_key(dataset: str) -> str:
     """Map internal dataset names to the official LongBench subset key when applicable."""
@@ -160,35 +176,67 @@ def score_prediction(prediction: str, sample: EvalSample) -> PredictionScores:
     )
 
 
-def build_prompt(sample: EvalSample, tokenizer) -> str:
-    """
-    Build a prompt from an EvalSample.
-
-    For LongBench subsets we align to the official benchmark prompt templates.
-    For tasks where the official LongBench code avoids chat wrapping (e.g. LCC),
-    we return the raw prompt directly. Otherwise we wrap with the model's chat
-    template while disabling thinking mode when supported.
-    """
+def _build_raw_prompt_parts(sample: EvalSample) -> PromptTextParts:
     dataset_key = get_benchmark_key(sample.dataset)
     if dataset_key in LONG_BENCH_PROMPTS:
-        prompt = LONG_BENCH_PROMPTS[dataset_key].format(
-            context=sample.context,
-            input=sample.question,
+        template = LONG_BENCH_PROMPTS[dataset_key]
+        if template.count("{context}") != 1:
+            raise PromptBoundaryError(
+                f"Expected exactly one context slot for {dataset_key}"
+            )
+        prefix_template, suffix_template = template.split("{context}", 1)
+        values = {"context": "", "input": sample.question}
+        return PromptTextParts(
+            memory_context=prefix_template.format(**values) + sample.context,
+            query_suffix=suffix_template.format(**values),
         )
-        if dataset_key in LONG_BENCH_NO_CHAT_DATASETS:
-            return prompt
-    else:
-        prompt = f"{sample.context}\n\nQuestion: {sample.question}\nAnswer directly in a few words:"
 
-    messages = [{"role": "user", "content": prompt}]
+    return PromptTextParts(
+        memory_context=sample.context,
+        query_suffix=(
+            f"\n\nQuestion: {sample.question}\nAnswer directly in a few words:"
+        ),
+    )
+
+
+def _apply_chat_template(tokenizer, content: str) -> str:
+    messages = [{"role": "user", "content": content}]
     kwargs = dict(tokenize=False, add_generation_prompt=True)
-    # Disable thinking mode if supported (Qwen3.5)
     try:
         return tokenizer.apply_chat_template(messages, enable_thinking=False, **kwargs)
     except TypeError:
         return tokenizer.apply_chat_template(messages, **kwargs)
 
 
+def build_prompt_parts(sample: EvalSample, tokenizer) -> PromptTextParts:
+    """Serialize an exact memory-context/query-suffix prompt boundary."""
+    raw_parts = _build_raw_prompt_parts(sample)
+    dataset_key = get_benchmark_key(sample.dataset)
+    if (
+        dataset_key in LONG_BENCH_PROMPTS
+        and dataset_key in LONG_BENCH_NO_CHAT_DATASETS
+    ):
+        return raw_parts
+
+    marker = CONTEXT_QUERY_BOUNDARY_MARKER
+    if marker in raw_parts.full_prompt:
+        raise PromptBoundaryError("Boundary marker unexpectedly occurs in prompt content")
+
+    marked_content = raw_parts.memory_context + marker + raw_parts.query_suffix
+    marked_prompt = _apply_chat_template(tokenizer, marked_content)
+    if marked_prompt.count(marker) != 1:
+        raise PromptBoundaryError("Chat template did not preserve the context/query marker")
+    memory_context, query_suffix = marked_prompt.split(marker, 1)
+
+    full_prompt = _apply_chat_template(tokenizer, raw_parts.full_prompt)
+    if memory_context + query_suffix != full_prompt:
+        raise PromptBoundaryError("Removing the boundary marker changed prompt serialization")
+    return PromptTextParts(memory_context=memory_context, query_suffix=query_suffix)
+
+
+def build_prompt(sample: EvalSample, tokenizer) -> str:
+    """Build the exact full prompt used by generation and P0-B splitting."""
+    return build_prompt_parts(sample, tokenizer).full_prompt
 @torch.no_grad()
 def generate_and_evaluate(
     model,

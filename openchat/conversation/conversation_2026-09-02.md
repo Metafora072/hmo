@@ -1,0 +1,4 @@
+# OpenChat Conversation: 2026-09-02
+
+**Codex(00:45:46)**:
+P0-B 已在 `dev/e3-v2-p0b` 完成实现与无 GPU 合约验证：E3-v2 现在严格按 context prefill、context attention-KV 干预、query suffix、post-intervention answer logits 的顺序执行，并固定逻辑位置/驻留 KV 位置、单次 cache 消费和隔离 Full-KV probe。14 项 P0-B 测试与 11 项 P0-A 回归全部通过，真实 Qwen tokenizer 的 HotpotQA/LCC/Needle 边界验证通过；未加载模型权重、未运行 GPU。P0-B 代码级 PASS，但整体 GPU gate 继续等待 P0-C/D 及真实模型 preflight。详见 `codex/share/2026-09-02/p0b_implementation_report.md`。
