@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 import numpy as np
 import torch
@@ -38,7 +39,13 @@ from experiments.utils.prototype_runner import (
     select_triggered_refresh_segments,
     run_forced_actions,
 )
-from experiments.utils.eval_harness import score_prediction, resolve_max_new_tokens
+from experiments.utils.eval_harness import (
+    get_primary_metric_name as _eval_primary_metric_name,
+    score_prediction,
+    resolve_max_new_tokens,
+)
+from experiments.utils.model_loader import get_model_provenance
+from experiments.utils.run_manifest import ensure_run_manifest, read_manifest_id
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RESULTS_ROOT = Path(
@@ -49,9 +56,37 @@ RESULTS_DIR = RESULTS_ROOT  # backward-compat alias for older scripts
 
 def get_results_dir(experiment_name: str) -> Path:
     """Return the dedicated result directory for one formal Phase-2 experiment."""
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", experiment_name):
+        raise ValueError("experiment_name must be a simple filename component")
     path = RESULTS_ROOT / experiment_name
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def get_named_results_dir(experiment_name: str, run_name: str | None) -> Path:
+    """Return an experiment directory or a validated per-run subdirectory."""
+    base_dir = get_results_dir(experiment_name)
+    if not run_name:
+        return base_dir
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", run_name) or run_name in {".", ".."}:
+        raise ValueError("run_name must be a simple filename component")
+    run_dir = base_dir / run_name
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_dir
+
+
+def initialize_formal_run(
+    run_dir: Path, experiment: str, args, selections: dict,
+) -> dict:
+    """Create or validate the immutable manifest before loading a model."""
+    return ensure_run_manifest(
+        run_dir,
+        experiment=experiment,
+        args=args,
+        selections=selections,
+        model=get_model_provenance(args.model),
+        project_root=PROJECT_ROOT,
+    )
 
 
 @dataclass
@@ -65,6 +100,7 @@ class ExperimentCell:
     accuracy: float = 0.0
     f1: float = 0.0
     rouge_l: float = 0.0
+    code_sim: float = 0.0
     primary_metric: str = "accuracy"
     primary_score: float = 0.0
     ttft_ms: float = 0.0
@@ -80,30 +116,24 @@ class ExperimentCell:
     generated_text: str = ""
     answer: str = ""
     error: str = ""
+    manifest_id: str = ""
 
 
 def get_primary_metric_name(dataset: str) -> str:
-    """
-    Return the benchmark's official primary metric when we support it.
-
-    For LongBench subsets, the README specifies:
-      - HotpotQA / NarrativeQA: F1
-      - GovReport: Rouge-L
-    Everything else currently falls back to accuracy / exact match.
-    """
-    if dataset in ("longbench_hotpotqa", "longbench_narrativeqa"):
-        return "f1"
-    if dataset == "longbench_gov_report":
-        return "rouge_l"
-    return "accuracy"
+    """Return the preregistered primary metric for a dataset."""
+    return _eval_primary_metric_name(dataset)
 
 
-def get_primary_score(dataset: str, accuracy: float, f1: float, rouge_l: float) -> float:
+def get_primary_score(
+    dataset: str, accuracy: float, f1: float, rouge_l: float, code_sim: float = 0.0,
+) -> float:
     metric = get_primary_metric_name(dataset)
     if metric == "f1":
         return f1
     if metric == "rouge_l":
         return rouge_l
+    if metric == "code_sim":
+        return code_sim
     return accuracy
 
 
@@ -258,22 +288,19 @@ def result_to_cell(
     """Convert an HMOResult + sample into an ExperimentCell."""
     gen = hmo_result.generated_text or ""
     ans = sample.answer or ""
-    is_summary = sample.dataset in ("longbench_gov_report",)
-    accuracy, f1, rouge_l_full = score_prediction(gen, sample)
-    rouge_l = rouge_l_full if is_summary else 0.0
-    primary_metric = get_primary_metric_name(sample.dataset)
-    primary_score = get_primary_score(sample.dataset, accuracy, f1, rouge_l)
+    scores = score_prediction(gen, sample)
     return ExperimentCell(
         experiment=experiment,
         method=method,
         dataset=sample.dataset,
         context_length=context_length,
         sample_id=sample.sample_id,
-        accuracy=accuracy,
-        f1=f1,
-        rouge_l=rouge_l,
-        primary_metric=primary_metric,
-        primary_score=primary_score,
+        accuracy=scores.accuracy,
+        f1=scores.f1,
+        rouge_l=scores.rouge_l,
+        code_sim=scores.code_sim,
+        primary_metric=scores.primary_metric,
+        primary_score=scores.primary_score,
         peak_vram_mb=hmo_result.peak_vram_mb,
         tracked_bytes=hmo_result.total_tracked_bytes,
         budget_limit_bytes=hmo_result.budget_limit_bytes,
@@ -287,10 +314,15 @@ def result_to_cell(
 
 
 def save_cell(cell: ExperimentCell, output_path: Path):
-    """Append one cell to JSONL (crash-safe incremental save)."""
+    """Append one cell, bound to the directory immutable manifest."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_id = read_manifest_id(output_path.parent)
+    if cell.manifest_id and cell.manifest_id != manifest_id:
+        raise ValueError("Cell manifest_id does not match the run directory")
+    row = asdict(cell)
+    row["manifest_id"] = manifest_id
     with open(output_path, "a") as f:
-        f.write(json.dumps(asdict(cell), ensure_ascii=False) + "\n")
+        f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
 def load_completed_cells(output_path: Path) -> set[tuple[str, str, int, str]]:
@@ -337,7 +369,16 @@ def summarize_cells(output_path: Path) -> dict:
         f1s = [r["f1"] for r in rows]
         vrams = [r["peak_vram_mb"] for r in rows]
         primary_metric = rows[0].get("primary_metric", get_primary_metric_name(dataset))
-        primary_scores = [r.get("primary_score", get_primary_score(dataset, r["accuracy"], r["f1"], r.get("rouge_l", 0.0))) for r in rows]
+        primary_scores = [
+            r.get(
+                "primary_score",
+                get_primary_score(
+                    dataset, r["accuracy"], r["f1"],
+                    r.get("rouge_l", 0.0), r.get("code_sim", 0.0),
+                ),
+            )
+            for r in rows
+        ]
         summary[f"{method}_{dataset}_{ctx}"] = {
             "method": method,
             "dataset": dataset,

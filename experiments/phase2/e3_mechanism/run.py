@@ -40,7 +40,7 @@ from experiments.utils.prototype_runner import (
     default_shared_budget_limit,
 )
 from experiments.utils.saturation import compute_segment_saturation
-from experiments.phase2.runner import get_results_dir
+from experiments.phase2.runner import get_results_dir, initialize_formal_run
 
 
 def parse_args():
@@ -58,6 +58,10 @@ def parse_args():
     p.add_argument("--run-name", type=str, default="e3_mechanism",
                    help="Results subdirectory name")
     p.add_argument("--resume", action="store_true")
+    p.add_argument(
+        "--allow-legacy-protocol", action="store_true",
+        help="Explicitly override the E3-v2 preregistration gate for code auditing only",
+    )
     return p.parse_args()
 
 
@@ -148,7 +152,9 @@ def run_sample_mechanism(controller, tokenizer, sample, args):
         max_new_tokens=args.max_new_tokens,
         budget_limit_bytes=budget, segment_costs=segment_costs,
     )
-    baseline_acc, baseline_f1, _ = score_prediction(baseline_result.generated_text, sample)
+    baseline_scores = score_prediction(baseline_result.generated_text, sample)
+    baseline_acc = baseline_scores.accuracy
+    baseline_f1 = baseline_scores.f1
 
     # Oracle: test single-segment refresh on stratified subset of middle segments
     mid = middle_segments(n_segs)
@@ -166,8 +172,8 @@ def run_sample_mechanism(controller, tokenizer, sample, args):
                 max_new_tokens=args.max_new_tokens,
                 budget_limit_bytes=budget, segment_costs=segment_costs,
             )
-            _, refresh_f1, _ = score_prediction(refresh_result.generated_text, sample)
-            oracle_gains[seg_idx] = refresh_f1 - baseline_f1
+            refresh_scores = score_prediction(refresh_result.generated_text, sample)
+            oracle_gains[seg_idx] = refresh_scores.primary_score - baseline_scores.primary_score
         except Exception as e:
             logger.warning(f"Oracle refresh failed for seg {seg_idx}: {e}")
             oracle_gains[seg_idx] = 0.0
@@ -209,7 +215,23 @@ def run_sample_mechanism(controller, tokenizer, sample, args):
 
 def main():
     args = parse_args()
+    if not args.allow_legacy_protocol:
+        raise RuntimeError(
+            "Legacy E3 is blocked by the E3-v2 preregistration; do not run it as evidence"
+        )
     logger.info(f"E3 Mechanism — {args.model}, n={args.n_samples}, ctx={args.context_length}")
+
+    results_dir = get_results_dir(args.run_name)
+    manifest = initialize_formal_run(
+        results_dir, "e3_mechanism_legacy", args,
+        {
+            "benchmarks": ["longbench_hotpotqa", "needle"],
+            "context_lengths": [args.context_length],
+            "oracle_sample_rate": args.oracle_sample_rate,
+        },
+    )
+    logger.warning("This is the legacy E3 protocol; E3-v2 remains the preregistered mechanism test")
+    logger.info(f"Run manifest: {manifest['manifest_id']}")
 
     model, tokenizer, config = load_model_and_tokenizer(args.model, device="cuda", gpu_id=args.gpu_id)
     controller = HMOController(
@@ -219,7 +241,6 @@ def main():
     )
 
     samples = build_samples(tokenizer, args)
-    results_dir = get_results_dir(args.run_name)
     output_path = results_dir / "e3_mechanism.jsonl"
 
     completed_ids = set()
@@ -236,6 +257,7 @@ def main():
         try:
             reset_vram_stats(args.gpu_id)
             result = run_sample_mechanism(controller, tokenizer, sample, args)
+            result["manifest_id"] = manifest["manifest_id"]
             with open(output_path, "a") as f:
                 f.write(json.dumps(result, ensure_ascii=False) + "\n")
         except torch.cuda.OutOfMemoryError:

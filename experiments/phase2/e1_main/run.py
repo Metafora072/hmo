@@ -29,9 +29,11 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from experiments.utils.model_loader import load_model_and_tokenizer
+from experiments.utils.run_manifest import read_manifest_id
 from experiments.utils.hmo_controller import HMOController, HMOConfig
 from experiments.phase2.runner import (
-    get_results_dir,
+    get_named_results_dir,
+    initialize_formal_run,
     load_benchmark_samples,
     run_sample_all_methods,
     save_cell,
@@ -86,12 +88,7 @@ def parse_args():
 
 def resolve_results_dir(args):
     """Return the output directory for this E1 run."""
-    base_dir = get_results_dir("e1_main")
-    if args.run_name:
-        run_dir = base_dir / args.run_name
-        run_dir.mkdir(parents=True, exist_ok=True)
-        return run_dir
-    return base_dir
+    return get_named_results_dir("e1_main", args.run_name)
 
 
 def run_timing_test(controller, tokenizer, args):
@@ -161,12 +158,25 @@ def run_timing_test(controller, tokenizer, args):
 
     # Save timing results
     with open(results_dir / "e1_timing_test.json", "w") as f:
-        json.dump({"timing": timing_results, "total_est_gpuh": total_est, "timestamp": datetime.now().isoformat()}, f, indent=2)
+        json.dump({"manifest_id": read_manifest_id(results_dir), "timing": timing_results, "total_est_gpuh": total_est, "timestamp": datetime.now().isoformat()}, f, indent=2)
 
 
 def main():
     args = parse_args()
     logger.info(f"E1 Main Experiment — model={args.model}, n={args.n_samples}")
+
+    benchmarks = args.benchmarks.split(",") if args.benchmarks else BENCHMARKS
+    ctx_lengths = [int(x) for x in args.context_lengths.split(",")] if args.context_lengths else CONTEXT_LENGTHS
+    methods = args.methods.split(",") if args.methods else METHODS
+    results_dir = resolve_results_dir(args)
+    selections = {
+        "benchmarks": ["needle"] if args.timing_test else benchmarks,
+        "context_lengths": ctx_lengths,
+        "methods": ["hmo_full"] if args.timing_test else methods,
+        "samples_per_benchmark": 10 if args.timing_test else args.n_samples,
+    }
+    manifest = initialize_formal_run(results_dir, "e1_timing" if args.timing_test else "e1_main", args, selections)
+    logger.info(f"Run manifest: {manifest['manifest_id']}")
 
     model, tokenizer, config = load_model_and_tokenizer(
         args.model, device="cuda", gpu_id=args.gpu_id,
@@ -193,11 +203,6 @@ def main():
         return
 
     # Full run
-    benchmarks = args.benchmarks.split(",") if args.benchmarks else BENCHMARKS
-    ctx_lengths = [int(x) for x in args.context_lengths.split(",")] if args.context_lengths else CONTEXT_LENGTHS
-    methods = args.methods.split(",") if args.methods else METHODS
-
-    results_dir = resolve_results_dir(args)
     output_path = results_dir / "e1_main.jsonl"
     completed = load_completed_cells(output_path) if args.resume else set()
     if completed:
@@ -257,7 +262,7 @@ def main():
     summary = summarize_cells(output_path)
     summary_path = results_dir / "e1_summary.json"
     with open(summary_path, "w") as f:
-        json.dump({"summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2, ensure_ascii=False)
+        json.dump({"manifest_id": manifest["manifest_id"], "summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2, ensure_ascii=False)
     logger.info(f"Summary saved to {summary_path}")
 
     for key, stats in sorted(summary.items()):

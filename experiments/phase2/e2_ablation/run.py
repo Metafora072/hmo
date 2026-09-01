@@ -25,7 +25,8 @@ from experiments.utils.model_loader import load_model_and_tokenizer
 from experiments.utils.hmo_controller import HMOController, HMOConfig
 from experiments.utils.dataset_utils import make_needle_samples, load_longbench_subset
 from experiments.phase2.runner import (
-    get_results_dir,
+    get_named_results_dir,
+    initialize_formal_run,
     run_sample_all_methods,
     save_cell,
     load_completed_cells,
@@ -46,6 +47,7 @@ def parse_args():
     p.add_argument("--max_new_tokens", type=int, default=64)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--resume", action="store_true")
+    p.add_argument("--run-name", type=str, default=None)
     return p.parse_args()
 
 
@@ -74,6 +76,18 @@ def main():
     args = parse_args()
     logger.info(f"E2 Ablation — {args.model}, n={args.n_samples}, ctx={args.context_length}")
 
+    results_dir = get_named_results_dir("e2_ablation", args.run_name)
+    manifest = initialize_formal_run(
+        results_dir, "e2_ablation", args,
+        {
+            "benchmarks": ["longbench_hotpotqa", "needle"],
+            "context_lengths": [args.context_length],
+            "methods": METHODS,
+            "mixture": {"longbench_hotpotqa": 0.8, "needle": 0.2},
+        },
+    )
+    logger.info(f"Run manifest: {manifest['manifest_id']}")
+
     model, tokenizer, config = load_model_and_tokenizer(args.model, device="cuda", gpu_id=args.gpu_id)
     controller = HMOController(
         model, tokenizer, config,
@@ -82,7 +96,6 @@ def main():
     )
 
     samples = build_samples(tokenizer, args)
-    results_dir = get_results_dir("e2_ablation")
     output_path = results_dir / "e2_ablation.jsonl"
     completed = load_completed_cells(output_path) if args.resume else set()
 
@@ -103,7 +116,7 @@ def main():
     summary = summarize_cells(output_path)
     summary_path = results_dir / "e2_summary.json"
     with open(summary_path, "w") as f:
-        json.dump({"summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2, ensure_ascii=False)
+        json.dump({"manifest_id": manifest["manifest_id"], "summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2, ensure_ascii=False)
     logger.info(f"E2 complete. Summary: {summary_path}")
     for key, stats in sorted(summary.items()):
         logger.info(f"  {key}: acc={stats['mean_acc']:.3f}±{stats['std_acc']:.3f}")

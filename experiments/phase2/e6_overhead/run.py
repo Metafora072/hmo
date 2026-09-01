@@ -32,7 +32,7 @@ from experiments.utils.prototype_runner import (
     collect_sigma_and_segment_costs,
     default_shared_budget_limit,
 )
-from experiments.phase2.runner import get_results_dir
+from experiments.phase2.runner import get_named_results_dir, initialize_formal_run
 
 
 def parse_args():
@@ -46,6 +46,7 @@ def parse_args():
     p.add_argument("--max_new_tokens", type=int, default=64)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--resume", action="store_true")
+    p.add_argument("--run-name", type=str, default=None)
     return p.parse_args()
 
 
@@ -164,6 +165,19 @@ def main():
     args = parse_args()
     logger.info(f"E6 Overhead — {args.model}, n={args.n_samples}, repeats={args.n_repeats}")
 
+    context_lengths = [32768, 65536]
+    results_dir = get_named_results_dir("e6_overhead", args.run_name)
+    manifest = initialize_formal_run(
+        results_dir, "e6_overhead", args,
+        {
+            "benchmarks": ["longbench_hotpotqa", "needle"],
+            "context_lengths": context_lengths,
+            "methods": ["full_kv", "h2o", "hmo_full"],
+            "repeats": args.n_repeats,
+        },
+    )
+    logger.info(f"Run manifest: {manifest['manifest_id']}")
+
     model, tokenizer, config = load_model_and_tokenizer(args.model, device="cuda", gpu_id=args.gpu_id)
     controller = HMOController(
         model, tokenizer, config,
@@ -171,7 +185,6 @@ def main():
         gpu_id=args.gpu_id,
     )
 
-    results_dir = get_results_dir("e6_overhead")
     output_path = results_dir / "e6_overhead.jsonl"
 
     completed = set()
@@ -180,8 +193,6 @@ def main():
             for line in f:
                 row = json.loads(line.strip())
                 completed.add((row["sample_id"], row["context_length"], row.get("repeat", 0)))
-
-    context_lengths = [32768, 65536]
 
     for ctx_len in context_lengths:
         logger.info(f"\n{'='*40} Context: {ctx_len} {'='*40}")
@@ -199,6 +210,7 @@ def main():
                 try:
                     result = profile_sample(controller, tokenizer, sample, ctx_len, args.max_new_tokens, args.gpu_id)
                     result["repeat"] = rep
+                    result["manifest_id"] = manifest["manifest_id"]
                     with open(output_path, "a") as f:
                         f.write(json.dumps(result, ensure_ascii=False) + "\n")
                 except torch.cuda.OutOfMemoryError:
@@ -245,7 +257,7 @@ def main():
 
         summary_path = results_dir / "e6_summary.json"
         with open(summary_path, "w") as f:
-            json.dump({"summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2)
+            json.dump({"manifest_id": manifest["manifest_id"], "summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2)
         logger.info(f"E6 complete. Summary: {summary_path}")
 
 

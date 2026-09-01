@@ -127,6 +127,8 @@ case "${TARGET}" in
       experiments/utils/model_loader.py \
       experiments/utils/dataset_utils.py \
       experiments/utils/eval_harness.py \
+      experiments/utils/run_manifest.py \
+      experiments/vendor/longbench_metrics.py \
       experiments/utils/hmo_controller.py
     ;;
 
@@ -134,6 +136,7 @@ case "${TARGET}" in
     run_py experiments/phase2/e1_main/run.py \
       --timing-test \
       --gpu_id 0 \
+      --run-name a100_timing \
       "$@"
     ;;
 
@@ -149,6 +152,7 @@ case "${TARGET}" in
     run_py experiments/phase2/e2_ablation/run.py \
       --resume \
       --gpu_id 0 \
+      --run-name a100_formal \
       "$@"
     ;;
 
@@ -167,6 +171,7 @@ case "${TARGET}" in
     run_py experiments/phase2/e4_sensitivity/run.py \
       --resume \
       --gpu_id 0 \
+      --run-name a100_formal \
       "$@"
     ;;
 
@@ -176,6 +181,7 @@ case "${TARGET}" in
       --gpu_id 0 \
       --n_samples 2 \
       --methods full_kv \
+      --run-name smoke_check \
       "$@"
     ;;
 
@@ -183,6 +189,7 @@ case "${TARGET}" in
     run_py experiments/phase2/e5_kimi/run.py \
       --resume \
       --gpu_id 0 \
+      --run-name a100_formal \
       "$@"
     ;;
 
@@ -190,6 +197,7 @@ case "${TARGET}" in
     run_py experiments/phase2/e6_overhead/run.py \
       --resume \
       --gpu_id 0 \
+      --run-name a100_formal \
       "$@"
     ;;
 

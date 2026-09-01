@@ -367,7 +367,7 @@ export PIP_RETRIES=10
 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir \
   transformers accelerate datasets huggingface_hub tokenizers sentencepiece \
   numpy scipy pandas matplotlib seaborn scikit-learn pyarrow \
-  einops tqdm loguru tiktoken rouge \
+  einops tqdm loguru tiktoken rouge fuzzywuzzy==0.18.0 \
   optimum bitsandbytes compressed-tensors==0.15.0.1 modelscope
 ```
 
@@ -553,6 +553,10 @@ export HMO_RESULTS_ROOT=/data/hmo/dsf_llm/experiments/results_smoke
 mkdir -p "$HMO_RESULTS_ROOT"
 ```
 
+每次运行必须使用新的 `--run-name`；只有参数、代码、模型和环境完全一致时才能在同一目录 `--resume`。
+
+当前 E1/E3 及全部 GPU smoke 仍受 E3-v2 预注册的 P0-A-D gate 约束；本节命令只在 P0-B、P0-C、P0-D 完成后执行。
+
 ### 9.2 E1 smoke
 
 用最小 benchmark / 最小 context / 最小方法集合先确认主循环能走通：
@@ -583,35 +587,19 @@ cd "$HMO_PROJECT_ROOT"
 python experiments/phase2/e2_ablation/run.py \
   --gpu_id 0 \
   --n_samples 2 \
-  --context_length 8192
+  --context_length 8192 \
+  --run-name smoke_check
 ```
 
 通过标准：
 
 - 生成：
-  - `$HMO_RESULTS_ROOT/e2_ablation/e2_ablation.jsonl`
+  - `$HMO_RESULTS_ROOT/e2_ablation/smoke_check/e2_ablation.jsonl`
 - 6 个方法都至少能开始写结果
 
 ### 9.4 E3 smoke
 
-```bash
-cd "$HMO_PROJECT_ROOT"
-python experiments/phase2/e3_mechanism/run.py \
-  --gpu_id 0 \
-  --n_samples 2 \
-  --context_length 8192 \
-  --oracle_sample_rate 100 \
-  --run-name e3_mechanism
-
-python experiments/phase2/e3_mechanism/analyze.py
-```
-
-通过标准：
-
-- 生成：
-  - `$HMO_RESULTS_ROOT/e3_mechanism/e3_mechanism.jsonl`
-  - `$HMO_RESULTS_ROOT/e3_mechanism/e3_analysis.json`
-- `analyze.py` 能读到 `jsonl`
+旧 `e3_mechanism` 协议已降级为 legacy，只保留代码审计用途，不再执行 GPU smoke。待 P0-B-D 完成并实现预注册的 E3-v2 后，在独立 `--run-name` 下补充新的 smoke 命令和通过标准。
 
 ### 9.5 E4 smoke
 
@@ -623,13 +611,14 @@ python experiments/phase2/e4_sensitivity/run.py \
   --gpu_id 0 \
   --n_samples 2 \
   --context_length 8192 \
-  --settings budget_1,det_full
+  --settings budget_1,det_full \
+  --run-name smoke_check
 ```
 
 通过标准：
 
 - 生成：
-  - `$HMO_RESULTS_ROOT/e4_sensitivity/e4_sensitivity.jsonl`
+  - `$HMO_RESULTS_ROOT/e4_sensitivity/smoke_check/e4_sensitivity.jsonl`
 - 至少这两个 setting 能正常落盘
 
 ### 9.6 E5 smoke
@@ -644,7 +633,7 @@ bash experiments/phase2/run_single_a100.sh e5_smoke
 通过标准：
 
 - 生成：
-  - `$HMO_RESULTS_ROOT/e5_kimi/e5_kimi.jsonl`
+  - `$HMO_RESULTS_ROOT/e5_kimi/smoke_check/e5_kimi.jsonl`
 - 不出现：
   - CPU/disk offload
   - Kimi remote code 兼容性错误
@@ -656,13 +645,14 @@ cd "$HMO_PROJECT_ROOT"
 python experiments/phase2/e6_overhead/run.py \
   --gpu_id 0 \
   --n_samples 2 \
-  --n_repeats 1
+  --n_repeats 1 \
+  --run-name smoke_check
 ```
 
 通过标准：
 
 - 生成：
-  - `$HMO_RESULTS_ROOT/e6_overhead/e6_overhead.jsonl`
+  - `$HMO_RESULTS_ROOT/e6_overhead/smoke_check/e6_overhead.jsonl`
 - baseline / H2O / HMO 三条 profiling 路径都能至少跑到落盘
 
 ### 9.8 smoke 全部通过后，再切回正式结果目录

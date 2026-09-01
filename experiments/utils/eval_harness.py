@@ -5,6 +5,7 @@ Unified generation + evaluation pipeline for all experiments.
 import json
 import os
 import torch
+from dataclasses import dataclass
 from pathlib import Path
 from loguru import logger
 from datetime import datetime
@@ -12,8 +13,13 @@ from datetime import datetime
 from .dataset_utils import EvalSample
 from .metrics import (
     GenerationMetrics, LatencyTracker,
-    compute_exact_match, compute_f1, compute_rouge_l,
+    compute_exact_match, compute_f1,
     get_peak_vram_mb, reset_vram_stats,
+)
+from experiments.vendor.longbench_metrics import (
+    code_sim_score as longbench_code_sim_score,
+    qa_f1_score as longbench_qa_f1_score,
+    rouge_score as longbench_rouge_score,
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -98,19 +104,60 @@ def get_ground_truths(sample: EvalSample) -> list[str]:
     return [sample.answer] if sample.answer else []
 
 
-def score_prediction(prediction: str, sample: EvalSample) -> tuple[float, float, float]:
-    """
-    Score one prediction against all available ground truths using the
-    official LongBench-style max-over-ground-truths convention.
-    """
+@dataclass(frozen=True)
+class PredictionScores:
+    accuracy: float = 0.0
+    f1: float = 0.0
+    rouge_l: float = 0.0
+    code_sim: float = 0.0
+    primary_metric: str = "accuracy"
+    primary_score: float = 0.0
+
+
+def get_primary_metric_name(dataset: str) -> str:
+    key = get_benchmark_key(dataset)
+    if key in {"hotpotqa", "narrativeqa", "qasper"}:
+        return "f1"
+    if key == "gov_report":
+        return "rouge_l"
+    if key == "lcc":
+        return "code_sim"
+    if dataset in {"needle", "longeval_lines"}:
+        return "accuracy"
+    if dataset.startswith("longbench_"):
+        raise ValueError(f"No pinned official LongBench metric for {dataset}")
+    raise ValueError(f"No registered metric protocol for {dataset}")
+
+
+def score_prediction(prediction: str, sample: EvalSample) -> PredictionScores:
+    """Score a prediction with the dataset's preregistered metric."""
+    primary_metric = get_primary_metric_name(sample.dataset)
     ground_truths = get_ground_truths(sample)
     if not ground_truths:
-        return 0.0, 0.0, 0.0
+        return PredictionScores(primary_metric=primary_metric)
+
+    if primary_metric == "f1":
+        value = max(longbench_qa_f1_score(prediction, gt) for gt in ground_truths)
+        return PredictionScores(
+            f1=float(value), primary_metric=primary_metric, primary_score=float(value),
+        )
+    if primary_metric == "rouge_l":
+        value = max(longbench_rouge_score(prediction, gt) for gt in ground_truths)
+        return PredictionScores(
+            rouge_l=float(value), primary_metric=primary_metric, primary_score=float(value),
+        )
+    if primary_metric == "code_sim":
+        value = max(longbench_code_sim_score(prediction, gt) for gt in ground_truths)
+        return PredictionScores(
+            code_sim=float(value), primary_metric=primary_metric, primary_score=float(value),
+        )
 
     accuracy = max(compute_exact_match(prediction, gt) for gt in ground_truths)
     f1 = max(compute_f1(prediction, gt) for gt in ground_truths)
-    rouge_l = max(compute_rouge_l(prediction, gt) for gt in ground_truths)
-    return float(accuracy), float(f1), float(rouge_l)
+    return PredictionScores(
+        accuracy=float(accuracy), f1=float(f1),
+        primary_metric=primary_metric, primary_score=float(accuracy),
+    )
 
 
 def build_prompt(sample: EvalSample, tokenizer) -> str:
@@ -175,12 +222,16 @@ def generate_and_evaluate(
     generated_ids = outputs[0, input_ids.shape[1]:]
     generated_text = tokenizer.decode(generated_ids, skip_special_tokens=True)
 
-    accuracy, f1, _ = score_prediction(generated_text, sample)
+    scores = score_prediction(generated_text, sample)
     peak_vram = get_peak_vram_mb(device_id)
 
     return GenerationMetrics(
-        accuracy=accuracy,
-        f1=f1,
+        accuracy=scores.accuracy,
+        f1=scores.f1,
+        rouge_l=scores.rouge_l,
+        code_sim=scores.code_sim,
+        primary_metric=scores.primary_metric,
+        primary_score=scores.primary_score,
         ttft_ms=tracker.ttft_ms,
         decode_latency_ms=tracker.decode_ms,
         tokens_per_sec=tracker.tokens_per_sec,
@@ -205,6 +256,8 @@ def run_eval_suite(
     results = []
     total_acc = 0.0
     total_f1 = 0.0
+    total_primary = 0.0
+    primary_metrics = set()
 
     for i, sample in enumerate(samples):
         logger.info(f"[{method_name}] {i+1}/{len(samples)} — {sample.sample_id}")
@@ -216,6 +269,8 @@ def run_eval_suite(
             )
             total_acc += metrics.accuracy
             total_f1 += metrics.f1
+            total_primary += metrics.primary_score
+            primary_metrics.add(metrics.primary_metric)
 
             results.append({
                 "sample_id": sample.sample_id,
@@ -223,6 +278,10 @@ def run_eval_suite(
                 "context_length": sample.context_length,
                 "accuracy": metrics.accuracy,
                 "f1": metrics.f1,
+                "rouge_l": metrics.rouge_l,
+                "code_sim": metrics.code_sim,
+                "primary_metric": metrics.primary_metric,
+                "primary_score": metrics.primary_score,
                 "ttft_ms": metrics.ttft_ms,
                 "decode_ms": metrics.decode_latency_ms,
                 "tok_per_sec": metrics.tokens_per_sec,
@@ -244,6 +303,8 @@ def run_eval_suite(
         "n_samples": n,
         "avg_accuracy": total_acc / max(n, 1),
         "avg_f1": total_f1 / max(n, 1),
+        "primary_metrics": sorted(primary_metrics),
+        "avg_primary": total_primary / max(n, 1),
         "timestamp": datetime.now().isoformat(),
     }
 
@@ -254,5 +315,5 @@ def run_eval_suite(
             json.dump({"summary": summary, "details": results}, f, indent=2, ensure_ascii=False)
         logger.info(f"Results saved to {out_path}")
 
-    logger.info(f"[{method_name}] Accuracy: {summary['avg_accuracy']:.3f}, F1: {summary['avg_f1']:.3f}")
+    logger.info(f"[{method_name}] Primary: {summary['avg_primary']:.3f} ({summary['primary_metrics']})")
     return summary

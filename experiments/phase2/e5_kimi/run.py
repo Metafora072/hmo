@@ -39,8 +39,7 @@ from experiments.utils.dataset_utils import make_needle_samples, load_longbench_
 from experiments.utils.metrics import reset_vram_stats, get_peak_vram_mb
 from experiments.utils.eval_harness import build_prompt, score_prediction, resolve_max_new_tokens
 from experiments.phase2.runner import (
-    get_results_dir, save_cell, ExperimentCell,
-    get_primary_metric_name, get_primary_score,
+    get_named_results_dir, initialize_formal_run, save_cell, ExperimentCell,
 )
 
 
@@ -124,6 +123,7 @@ def parse_args():
     p.add_argument("--max_new_tokens", type=int, default=64)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--resume", action="store_true")
+    p.add_argument("--run-name", type=str, default=None)
     p.add_argument("--methods", type=str, default="full_kv,h2o,hmo_full")
     return p.parse_args()
 
@@ -688,6 +688,19 @@ def main():
     args = parse_args()
     logger.info(f"E5 Cross-Family — {args.model}, n={args.n_samples}, ctx={args.context_length}")
 
+    methods = args.methods.split(",")
+    results_dir = get_named_results_dir("e5_kimi", args.run_name)
+
+    manifest = initialize_formal_run(
+        results_dir, "e5_kimi", args,
+        {
+            "benchmarks": ["longbench_hotpotqa", "needle"],
+            "context_lengths": [args.context_length],
+            "methods": methods,
+        },
+    )
+    logger.info(f"Run manifest: {manifest['manifest_id']}")
+
     model, tokenizer, config = load_model_and_tokenizer(
         args.model, device="cuda", gpu_id=args.gpu_id,
     )
@@ -704,8 +717,6 @@ def main():
     hook_mgr = KDAHookManager(model, kda_indices, segment_length=args.segment_length)
 
     samples = build_samples(tokenizer, args)
-    methods = args.methods.split(",")
-    results_dir = get_results_dir("e5_kimi")
     output_path = results_dir / "e5_kimi.jsonl"
 
     completed = set()
@@ -754,15 +765,14 @@ def main():
                     raise ValueError(f"Unknown method: {method}")
 
                 gen = result.generated_text
-                accuracy, f1, rouge_l = score_prediction(gen, sample)
-                primary_metric = get_primary_metric_name(sample.dataset)
-                primary_score = get_primary_score(sample.dataset, accuracy, f1, rouge_l)
+                scores = score_prediction(gen, sample)
                 cell = ExperimentCell(
                     experiment="e5_kimi", method=method,
                     dataset=sample.dataset, context_length=args.context_length,
                     sample_id=sample.sample_id,
-                    accuracy=accuracy, f1=f1, rouge_l=rouge_l,
-                    primary_metric=primary_metric, primary_score=primary_score,
+                    accuracy=scores.accuracy, f1=scores.f1, rouge_l=scores.rouge_l,
+                    code_sim=scores.code_sim, primary_metric=scores.primary_metric,
+                    primary_score=scores.primary_score,
                     peak_vram_mb=get_total_peak_vram_mb(),
                     tracked_bytes=result.tracked_bytes,
                     budget_limit_bytes=result.budget_limit_bytes,
@@ -814,7 +824,7 @@ def main():
 
     summary_path = results_dir / "e5_summary.json"
     with open(summary_path, "w") as f:
-        json.dump({"summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2)
+        json.dump({"manifest_id": manifest["manifest_id"], "summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2)
     logger.info(f"E5 complete. Summary: {summary_path}")
 
 

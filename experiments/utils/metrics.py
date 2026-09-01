@@ -69,6 +69,10 @@ class GenerationMetrics:
     """Metrics from a single generation."""
     accuracy: float = 0.0
     f1: float = 0.0
+    rouge_l: float = 0.0
+    code_sim: float = 0.0
+    primary_metric: str = "accuracy"
+    primary_score: float = 0.0
     ttft_ms: float = 0.0          # time to first token
     decode_latency_ms: float = 0.0  # total decode time
     tokens_per_sec: float = 0.0

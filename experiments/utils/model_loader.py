@@ -4,6 +4,8 @@ Handles loading Qwen3.5 hybrid models (BF16 / GPTQ-Int4) with proper device mapp
 Model root defaults to the local SSD path, but can be overridden with
 `HMO_MODEL_ROOT` for rented-server data-disk deployments.
 """
+import hashlib
+import json
 import os
 import torch
 from pathlib import Path
@@ -100,6 +102,53 @@ MODEL_REGISTRY = {
         "family": "kimi",
     },
 }
+
+
+def get_model_provenance(model_name: str, config=None) -> dict:
+    """Return stable, path-independent model identity for run manifests."""
+    alias = model_name.lower()
+    if alias not in MODEL_REGISTRY:
+        raise ValueError(f"Unknown model: {alias}. Available: {list(MODEL_REGISTRY)}")
+
+    info = MODEL_REGISTRY[alias]
+    model_path = MODEL_ROOT / info["path"]
+    resolved = model_path.resolve() if model_path.exists() else model_path
+    revision = None
+    parts = resolved.parts
+    if "snapshots" in parts:
+        index = parts.index("snapshots")
+        if index + 1 < len(parts):
+            revision = parts[index + 1]
+
+    config_path = resolved / "config.json"
+    config_sha256 = None
+    raw_config = {}
+    if config_path.is_file():
+        config_bytes = config_path.read_bytes()
+        config_sha256 = hashlib.sha256(config_bytes).hexdigest()
+        try:
+            raw_config = json.loads(config_bytes)
+        except json.JSONDecodeError:
+            raw_config = {}
+
+    if config is not None:
+        revision = revision or getattr(config, "_commit_hash", None)
+        model_type = getattr(config, "model_type", None)
+        architectures = getattr(config, "architectures", None)
+    else:
+        revision = revision or raw_config.get("_commit_hash")
+        model_type = raw_config.get("model_type")
+        architectures = raw_config.get("architectures")
+
+    return {
+        "alias": alias,
+        "registry_path": info["path"],
+        "family": info.get("family", "qwen"),
+        "revision": revision,
+        "config_sha256": config_sha256,
+        "model_type": model_type,
+        "architectures": architectures,
+    }
 
 
 def get_layer_types(config) -> list[str]:

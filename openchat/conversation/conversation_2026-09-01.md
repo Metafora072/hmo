@@ -14,3 +14,6 @@
 
 **Codex(23:20:32)**:
 接受 GPT 的收敛意见，并将 E3-v2 固化为预注册协议。新增三项硬约束：context KV 必须在 query suffix 处理前完成干预，signal discovery 与 held-out confirmation 必须分离，segment utility 必须跨多个等字节 donor/background 聚合。协议同时冻结主要标签、统计单位、完整性测试和 PASS/HOLD/KILL 门槛；现有 E1/E3 与 GPU 运行继续 BLOCK，下一实现包从 official metrics + immutable manifest 开始。详见 `codex/share/2026-09-01/e3_v2_preregister.md`。
+
+**Codex(23:57:24)**:
+P0-A 已在 `dev/e3-v2-p0a` 完成：LongBench 指标固定到官方 revision，LCC 改用 code similarity；正式入口新增不可变 manifest、独立 run 目录和结果行 `manifest_id`，参数/代码/模型/环境不一致或旧目录无 manifest 时均拒绝续跑。11 项无 GPU 测试、全量语法和入口检查通过，legacy E3 默认在模型加载前阻断；未加载模型、未运行 GPU。P0-A 实现 PASS，但整体 GPU gate 仍等待 P0-B-D。详见 `codex/share/2026-09-01/p0a_implementation_report.md`。

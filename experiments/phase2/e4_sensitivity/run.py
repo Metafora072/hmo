@@ -26,7 +26,7 @@ from experiments.utils.dataset_utils import make_needle_samples, load_longbench_
 from experiments.utils.metrics import reset_vram_stats
 from experiments.utils.prototype_runner import build_input_ids
 from experiments.utils.eval_harness import score_prediction
-from experiments.phase2.runner import get_results_dir, save_cell, ExperimentCell, get_primary_metric_name, get_primary_score
+from experiments.phase2.runner import get_named_results_dir, initialize_formal_run, save_cell, ExperimentCell
 
 # 13 ablation settings — each must change a parameter that actually affects controller.run()
 SETTINGS = {
@@ -63,6 +63,7 @@ def parse_args():
     p.add_argument("--max_new_tokens", type=int, default=64)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--resume", action="store_true")
+    p.add_argument("--run-name", type=str, default=None)
     p.add_argument("--settings", type=str, default=None, help="Comma-separated setting subset")
     return p.parse_args()
 
@@ -87,11 +88,21 @@ def main():
     args = parse_args()
     logger.info(f"E4 Sensitivity — {args.model}, n={args.n_samples}, ctx={args.context_length}")
 
+    settings_to_run = args.settings.split(",") if args.settings else list(SETTINGS.keys())
+    results_dir = get_named_results_dir("e4_sensitivity", args.run_name)
+
+    manifest = initialize_formal_run(
+        results_dir, "e4_sensitivity", args,
+        {
+            "benchmarks": ["longbench_hotpotqa", "needle"],
+            "context_lengths": [args.context_length],
+            "settings": settings_to_run,
+        },
+    )
+    logger.info(f"Run manifest: {manifest['manifest_id']}")
+
     model, tokenizer, config = load_model_and_tokenizer(args.model, device="cuda", gpu_id=args.gpu_id)
     samples = build_samples(tokenizer, args)
-
-    settings_to_run = args.settings.split(",") if args.settings else list(SETTINGS.keys())
-    results_dir = get_results_dir("e4_sensitivity")
     output_path = results_dir / "e4_sensitivity.jsonl"
 
     # Load completed for resume
@@ -136,20 +147,19 @@ def main():
                 )
                 hmo_result = controller.run(input_ids, max_new_tokens=args.max_new_tokens)
                 gen = hmo_result.generated_text or ""
-                accuracy, f1, rouge_l = score_prediction(gen, sample)
-                primary_metric = get_primary_metric_name(sample.dataset)
-                primary_score = get_primary_score(sample.dataset, accuracy, f1, rouge_l)
+                scores = score_prediction(gen, sample)
                 cell = ExperimentCell(
                     experiment="e4_sensitivity",
                     method=setting_name,
                     dataset=sample.dataset,
                     context_length=args.context_length,
                     sample_id=sample.sample_id,
-                    accuracy=accuracy,
-                    f1=f1,
-                    rouge_l=rouge_l,
-                    primary_metric=primary_metric,
-                    primary_score=primary_score,
+                    accuracy=scores.accuracy,
+                    f1=scores.f1,
+                    rouge_l=scores.rouge_l,
+                    code_sim=scores.code_sim,
+                    primary_metric=scores.primary_metric,
+                    primary_score=scores.primary_score,
                     peak_vram_mb=hmo_result.peak_vram_mb,
                     tracked_bytes=hmo_result.total_tracked_bytes,
                     budget_limit_bytes=hmo_result.budget_limit_bytes,
@@ -195,7 +205,7 @@ def main():
 
     summary_path = results_dir / "e4_summary.json"
     with open(summary_path, "w") as f:
-        json.dump({"summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2)
+        json.dump({"manifest_id": manifest["manifest_id"], "summary": summary, "timestamp": datetime.now().isoformat()}, f, indent=2)
     logger.info(f"E4 complete. Summary: {summary_path}")
 
 
