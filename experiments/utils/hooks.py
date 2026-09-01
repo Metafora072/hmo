@@ -1,11 +1,14 @@
 """
-HMO Research — DeltaNet Layer Hooks (v2)
+HMO Research — legacy DeltaNet Layer Hooks (v2)
 Memory-efficient: computes per-segment saturation signals inside the hook,
 only stores scalar aggregates, NOT full [B,T,H,D] tensors.
 
-Key fixes from Codex review:
+This module preserves `sigma_current` as a historical baseline. Its rho/c/g
+features are proxies and do not implement the E3-v2 P0-C candidates.
+
+Historical implementation notes:
 - Captures post-conv key (actual write direction) not pre-conv
-- Computes rho from write magnitude vs retention strength
+- Computes rho from write magnitude vs positive decay magnitude
 - Streams per-segment aggregates to avoid OOM at 128K
 """
 import torch
@@ -22,7 +25,7 @@ class SegmentSignals:
     # Each list has length = num_segments, values are floats
     rho_max: list[float] = field(default_factory=list)    # max write-to-state ratio in segment
     c_max: list[float] = field(default_factory=list)      # max novelty collision in segment
-    g_mag_min: list[float] = field(default_factory=list)  # min retention strength (= max decay)
+    g_mag_min: list[float] = field(default_factory=list)  # min positive decay magnitude (-g)
 
 
 class DeltaNetHookManager:
@@ -141,7 +144,7 @@ class _DeltaNetStreamHook:
             write_mag = beta.unsqueeze(-1) * key_norm  # [B, T, H_v, D_k]
             write_norm = write_mag.norm(dim=-1)  # [B, T, H_v]
 
-            # --- Retention strength surrogate tau = -g > 0 ---
+            # --- Historical positive decay-magnitude proxy tau = -g > 0 ---
             retention = (-g).clamp(min=1e-8)  # [B, T, H_v], positive
 
             # --- Per-segment aggregation (no full-seq storage) ---

@@ -1,12 +1,12 @@
 """
-HMO Research — Canonical saturation detector aggregation.
+HMO Research — legacy canonical saturation detector aggregation.
 Aggregates per-segment detector features from DeltaNetHookManager into
-the frozen Phase-1 HMO saturation score.
+the frozen Phase-1 HMO saturation score (`sigma_current` in E3-v2).
 
 Canonical detector:
-- rho: write-to-retention ratio from exposed Qwen3.5 DeltaNet gates
+- rho: historical write-to-positive-decay-magnitude ratio
 - c: novelty collision on normalized write directions
-- g_pressure: inverse retention pressure derived from the scalar decay gate
+- g_pressure: historical inverse transform of scalar decay magnitude
 - warmup suppression and repeat-text filtering at the segment level
 """
 import numpy as np

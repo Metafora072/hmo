@@ -1,7 +1,9 @@
 # E3-v2 execution path
 
 This package is the preregistered replacement for the legacy full-prompt E3
-prototype. P0-B establishes only the context/query execution contract:
+prototype.
+
+P0-B establishes the context/query contract:
 
 1. serialize and tokenize the exact full prompt once;
 2. prefill the memory context;
@@ -10,6 +12,18 @@ prototype. P0-B establishes only the context/query execution contract:
 5. expose answer logits only after the query suffix;
 6. score or generate from a fresh, single-use post-intervention state.
 
-There is intentionally no formal GPU runner yet. P0-C and P0-D must complete
-the recurrent-state gate, fixed-byte interventions, alpha isolation, and run
-manifest before E3-v2 experiments are allowed to execute.
+P0-C adds exact Qwen3.5 recurrent instrumentation:
+
+- recover `beta * (v - state^T k)` with the model's chunk-WY delta rule;
+- compute cumulative log-survival from the actual `exp(g)` multiplier;
+- measure later surviving writes that align with or cancel a segment write;
+- freeze formulas and aggregation in the immutable run manifest.
+
+`Qwen35RecurrentCandidateHookManager` must be attached immediately before the
+fresh context prefill. Its `finalize_context()` method must run at the start of
+the attention-KV intervention callback, which detaches every hook before query
+processing. The legacy hook remains the source of `sigma_current` only.
+
+There is intentionally no formal GPU runner yet. P0-D must complete fixed-byte
+interventions, alpha isolation, manifest recoverability, and integrated real-
+model preflight before E3-v2 experiments are allowed to execute.
