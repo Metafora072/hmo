@@ -158,7 +158,10 @@ def build_run_spec(
     code: Mapping[str, Any],
     environment: Mapping[str, Any],
 ) -> dict[str, Any]:
-    from experiments.phase2.e3_v2.protocol import recurrent_signal_protocol
+    from experiments.phase2.e3_v2.protocol import (
+        oracle_protocol,
+        recurrent_signal_protocol,
+    )
 
     return {
         "experiment": experiment,
@@ -169,6 +172,7 @@ def build_run_spec(
         "environment": dict(environment),
         "metrics": metric_protocol(),
         "recurrent_signals": recurrent_signal_protocol(),
+        "oracle": oracle_protocol(),
     }
 
 
