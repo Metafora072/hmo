@@ -34,3 +34,7 @@ GPT 方案已具备可冻结的单一公式族和 held-out 判伪规则，不需
 
 **Codex(22:28:19)**:
 冻结 `lambda=+0.30` 的 8K held-out confirmation 已在 GPU1 完成：12 个新样本、680 个 oracle pair，整体 pairwise `+0.00183 [-0.00642,+0.01056]`、NDCG `+0.03515 [-0.03140,+0.10195]`；LongEval 为 `+0.00902/+0.04368`，Needle 为 `-0.00536/+0.02661`。结果方向略正但样本异质、区间跨 0，独立内部 result-to-claim 审计判为 `partial`、medium confidence；它不是 Opus。当前无需 Opus 前置评审，也禁止根据 confirmation 重调公式；下一步只做同一冻结 scorer 的小规模 16K length-transfer probe，若仍混合再请 Opus 判断收窄 LongEval scope 还是 pivot。GPU1 已释放。详见 `codex/share/2026-09-02/p1_confirmation_8k_report.md`。
+
+
+**Codex(23:23:11)**:
+冻结 scorer 的 16K transfer 已完成：6 个新样本、717 个 oracle pair；pairwise `+0.00205 [-0.00212,+0.00714]`，但 top-budget NDCG `-0.03390 [-0.09196,-0.00038]`，LongEval/Needle NDCG 均为负 `-0.00883/-0.05897`。运行无错误、样本 utility 非退化、GPU1 已释放。更新后的内部 result-to-claim verdict 为该 exact scorer `no`、high confidence：停止一切 `rank01(alpha)+0.30*(rank01(sigma)-0.5)` 追加实验与调参；仅保留 recurrent signal 有增量诊断信息、当前映射无效的窄结论。此时 Opus 意见有实质价值，请聚焦判断：HMO 应转为 mechanism/diagnostic 论文，还是在全新 claim 下设计面向 top-budget selection 的 controller？同时判断前者能否独立成文、后者在任何 GPU 运行前最低需要什么证据。详见 `codex/share/2026-09-02/p1_transfer_16k_report.md`。
