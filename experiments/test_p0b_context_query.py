@@ -223,11 +223,15 @@ class ExecutionContractTests(unittest.TestCase):
     def test_context_intervention_query_order_and_logical_positions(self):
         trace = []
         model, state = self.run_arm(keep_context_positions(0, 2, trace=trace), trace)
-        self.assertEqual([entry["kind"] for entry in trace], ["prefill", "intervention", "continuation"])
-        self.assertEqual(trace[-1]["positions"], list(range(3, 3 + make_split().query_tokens)))
-        self.assertEqual(trace[-1]["cache_position"], list(range(2, 2 + make_split().query_tokens)))
+        self.assertEqual(
+            [entry["kind"] for entry in trace],
+            ["prefill", "intervention", "continuation", "continuation"],
+        )
+        self.assertEqual([entry["positions"] for entry in trace[-2:]], [[3], [4]])
+        self.assertEqual([entry["cache_position"] for entry in trace[-2:]], [[2], [3]])
         self.assertEqual(state.events, P0B_EXECUTION_EVENTS)
-        self.assertEqual(len(model.trace), 3)
+        self.assertEqual(len(model.trace), 4)
+        self.assertTrue(all(len(entry["tokens"]) == 1 for entry in trace[-2:]))
 
     def test_full_kv_split_matches_unmodified_full_prompt(self):
         model = FakeHybridModel()
@@ -242,7 +246,7 @@ class ExecutionContractTests(unittest.TestCase):
         torch.testing.assert_close(state.first_answer_logits, reference)
         self.assertEqual(
             [entry["kind"] for entry in model.trace],
-            ["prefill", "prefill", "continuation"],
+            ["prefill", "prefill", "continuation", "continuation"],
         )
 
     def test_attention_intervention_changes_logits_without_recurrent_edit(self):

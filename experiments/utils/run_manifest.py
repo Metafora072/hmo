@@ -134,6 +134,7 @@ def metric_protocol() -> dict[str, Any]:
             "execution_order": list(P0B_EXECUTION_EVENTS),
             "primary_quality": "mean_gold_answer_logprob_per_token",
             "answer_prefix": P0B_ANSWER_PREFIX,
+            "query_suffix_execution": "one_token_per_forward_for_hybrid_cache",
             "rotary_positions": "original_logical_positions",
             "causal_mask_positions": "resident_kv_order",
         },

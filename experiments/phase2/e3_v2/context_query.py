@@ -299,27 +299,30 @@ def run_post_intervention_prompt(
         )
     events.append("context_kv_intervention_complete")
 
-    logical_positions = torch.arange(
-        prompt.context_tokens,
-        prompt.context_tokens + prompt.query_tokens,
-        device=query_ids.device,
-        dtype=torch.long,
-    ).unsqueeze(0)
-    resident_positions = torch.arange(
-        active_positions.numel(),
-        active_positions.numel() + prompt.query_tokens,
-        device=query_ids.device,
-        dtype=torch.long,
-    )
-    query_outputs = base_model(
-        query_ids,
-        past_key_values=cache,
-        use_cache=True,
-        position_ids=logical_positions,
-        cache_position=resident_positions,
-        return_dict=True,
-    )
-    cache = query_outputs.past_key_values
+    query_outputs = None
+    for query_offset in range(prompt.query_tokens):
+        query_token = query_ids[:, query_offset : query_offset + 1]
+        logical_position = torch.tensor(
+            [[prompt.context_tokens + query_offset]],
+            device=query_ids.device,
+            dtype=torch.long,
+        )
+        resident_position = torch.tensor(
+            [active_positions.numel() + query_offset],
+            device=query_ids.device,
+            dtype=torch.long,
+        )
+        query_outputs = base_model(
+            query_token,
+            past_key_values=cache,
+            use_cache=True,
+            position_ids=logical_position,
+            cache_position=resident_position,
+            return_dict=True,
+        )
+        cache = query_outputs.past_key_values
+    if query_outputs is None:
+        raise CacheContractError("Query suffix unexpectedly contained no tokens")
     events.append("query_suffix_complete")
     query_lengths = _attention_lengths(cache, attention_layer_indices)
     expected_length = int(active_positions.numel()) + prompt.query_tokens

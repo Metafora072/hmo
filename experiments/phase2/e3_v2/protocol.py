@@ -1,6 +1,6 @@
 """Immutable protocol constants for the preregistered E3-v2 path."""
 
-P0B_PROTOCOL_VERSION = "p0b-context-query-v1"
+P0B_PROTOCOL_VERSION = "p0b-context-query-v2"
 P0B_EXECUTION_EVENTS = (
     "context_prefill_complete",
     "context_kv_intervention_complete",

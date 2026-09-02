@@ -63,6 +63,9 @@ class PreflightThresholds:
     needle_mean_abs_min: float = 1e-7
 
 
+REFERENCE_BACKEND = "transformers_torch_reference"
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -242,6 +245,21 @@ def _load_model(model_path: Path):
     return model, tokenizer
 
 
+def _force_torch_reference_backend(model, recurrent_layers) -> None:
+    from transformers.models.qwen3_5.modeling_qwen3_5 import (
+        torch_causal_conv1d_update,
+        torch_chunk_gated_delta_rule,
+        torch_recurrent_gated_delta_rule,
+    )
+
+    for layer_index in recurrent_layers:
+        linear_attention = model.model.layers[layer_index].linear_attn
+        linear_attention.causal_conv1d_fn = None
+        linear_attention.causal_conv1d_update = torch_causal_conv1d_update
+        linear_attention.chunk_gated_delta_rule = torch_chunk_gated_delta_rule
+        linear_attention.recurrent_gated_delta_rule = torch_recurrent_gated_delta_rule
+
+
 def run_preflight(args: argparse.Namespace) -> dict:
     if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
         raise RuntimeError("preflight requires exactly one visible CUDA device")
@@ -255,6 +273,7 @@ def run_preflight(args: argparse.Namespace) -> dict:
         "segment_length": args.segment_length,
         "seed": args.seed,
         "max_new_tokens": args.max_new_tokens,
+        "recurrent_backend": REFERENCE_BACKEND,
         "thresholds": asdict(thresholds),
         "visible_cuda_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
     }
@@ -279,6 +298,7 @@ def run_preflight(args: argparse.Namespace) -> dict:
     recurrent_layers = tuple(get_linear_attention_indices(model.config))
     if not attention_layers or not recurrent_layers:
         raise OracleContractError("model is not a hybrid attention/recurrent architecture")
+    _force_torch_reference_backend(model, recurrent_layers)
 
     sample = make_needle_samples(
         tokenizer,
@@ -533,6 +553,7 @@ def run_preflight(args: argparse.Namespace) -> dict:
         "architecture": {
             "attention_layers": list(attention_layers),
             "recurrent_layers": list(recurrent_layers),
+            "recurrent_backend": REFERENCE_BACKEND,
         },
         "oracle": {
             "manifest_id": plan.manifest_id,
