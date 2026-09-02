@@ -35,3 +35,16 @@
 - Limitation: Q3 is sparse (39 segments versus 141 in Q4), and 3/12 sample contrasts are negative; this is a design basis, not a held-out method result.
 - Next action pending confirmation: freeze a minimal discrete one-rank SAFE/NEUTRAL/STRESSED adjustment, unit-test it, then run one fresh 8K held-out confirmation on GPU1.
 - Full report: openchat/codex/share/2026-09-03/conditional_regime_offline_report.md
+
+
+## 2026-09-03: Frozen Conditional Controller at 8K
+
+- Result-to-claim verdict for the exact controller: no, high confidence.
+- Evidence: 12 fresh Qwen3.5-0.8B samples at 8K, 683 equal-byte oracle comparisons, fixed top-3 budget, unchanged frozen SHA 183255763fb2bdfa7e29f9bc46e8eed88f8658183077b258dd0cab563e8f4a93.
+- Overall delta versus raw alpha: pairwise -0.00019 [-0.00287,+0.00249]; NDCG +0.00751 [-0.00086,+0.02339].
+- Task delta: LongEval pairwise/NDCG +0.00115/+0.01559; Needle -0.00153/-0.00057.
+- Activity: 2 to 10 adjacent swaps per sample, but NDCG changed in only 2/12 samples; one LongEval gain of +0.09355 dominates the mean, one Needle sample changed by -0.00343, and ten were zero.
+- Interpretation: discovery-level safe/stressed mechanism evidence survives, but the one-rank conditional mapping does not reliably improve held-out fixed-budget allocation.
+- Stop condition: no 16K run, threshold search, larger swap radius, alpha buckets, or held-out retuning for this exact controller. Universal multiplicative/additive scorers remain rejected.
+- Route: stop the current controller aspect and return to OpenChat for mechanism/diagnostic scope versus a genuinely new claim.
+- Full report: openchat/codex/share/2026-09-03/p1_conditional_confirmation_8k_report.md
