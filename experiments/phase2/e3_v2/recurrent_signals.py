@@ -50,6 +50,20 @@ class AggregatedRecurrentCandidates:
     surviving_write_norm: tuple[float, ...]
 
 
+@dataclass(frozen=True)
+class SurvivingSegmentContributions:
+    """Exact additive decomposition of the final recurrent state by segment."""
+
+    segment_starts: tuple[int, ...]
+    segment_ends: tuple[int, ...]
+    partial_segments: tuple[bool, ...]
+    values: torch.Tensor
+
+    @property
+    def n_segments(self) -> int:
+        return len(self.segment_starts)
+
+
 def qwen35_l2_normalize(value: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
     """Match the Qwen3.5/FLA key normalization, including its additive epsilon."""
     inverse_norm = torch.rsqrt((value * value).sum(dim=-1, keepdim=True) + eps)
@@ -336,6 +350,132 @@ def summarize_recurrent_trace(
         decay_risk=tuple(decay_risk),
         suffix_interference=tuple(interference),
         surviving_write_norm=tuple(write_norm),
+    )
+
+
+def surviving_segment_contributions(
+    trace: DeltaRuleTrace,
+    *,
+    segment_length: int,
+) -> SurvivingSegmentContributions:
+    """Decompose the final state into suffix-decayed segment contributions.
+
+    The returned tensor has shape ``[segment, batch, head, key_dim, value_dim]``
+    and sums to ``trace.final_state`` up to floating-point error.
+    """
+    if segment_length <= 0:
+        raise RecurrentSignalError("segment_length must be positive")
+    key = trace.normalized_keys
+    delta = trace.delta_residuals
+    log_decay = trace.log_decay
+    if key.ndim != 4 or delta.ndim != 4 or log_decay.ndim != 3:
+        raise RecurrentSignalError("trace tensors have invalid ranks")
+    if key.shape[:3] != delta.shape[:3] or key.shape[:3] != log_decay.shape:
+        raise RecurrentSignalError("trace batch/token/head dimensions do not agree")
+    if not torch.isfinite(delta).all() or not torch.isfinite(log_decay).all():
+        raise RecurrentSignalError("trace contains non-finite values")
+
+    tokens = key.shape[1]
+    minimum_tail = max(segment_length // 4, 1)
+    starts = tuple(
+        start
+        for start in range(0, tokens, segment_length)
+        if min(start + segment_length, tokens) - start >= minimum_tail
+    )
+    if not starts:
+        raise RecurrentSignalError("context has no segment meeting the minimum tail length")
+    ends = tuple(min(start + segment_length, tokens) for start in starts)
+    partial = tuple(end - start < segment_length for start, end in zip(starts, ends))
+
+    reverse_cumulative = torch.flip(
+        torch.cumsum(torch.flip(log_decay, dims=(1,)), dim=1),
+        dims=(1,),
+    )
+    log_survival_after_token = reverse_cumulative - log_decay
+    survival_weight = log_survival_after_token.clamp(min=-80.0, max=0.0).exp()
+    values = []
+    for start, end in zip(starts, ends):
+        weighted_delta = (
+            delta[:, start:end] * survival_weight[:, start:end].unsqueeze(-1)
+        )
+        values.append(
+            torch.einsum(
+                "bthk,bthv->bhkv",
+                key[:, start:end],
+                weighted_delta,
+            )
+        )
+    stacked = torch.stack(values, dim=0)
+    if not torch.isfinite(stacked).all():
+        raise RecurrentSignalError("segment contributions contain non-finite values")
+    return SurvivingSegmentContributions(
+        segment_starts=starts,
+        segment_ends=ends,
+        partial_segments=partial,
+        values=stacked,
+    )
+
+
+def surviving_segment_contributions_for_bounds(
+    trace: DeltaRuleTrace,
+    *,
+    segment_starts: Sequence[int],
+    segment_ends: Sequence[int],
+    segment_length: int,
+) -> SurvivingSegmentContributions:
+    """Decompose state using an externally frozen segment catalog."""
+    starts = tuple(int(value) for value in segment_starts)
+    ends = tuple(int(value) for value in segment_ends)
+    if segment_length <= 0 or not starts or len(starts) != len(ends):
+        raise RecurrentSignalError("explicit segment boundaries are invalid")
+    if starts[0] != 0 or ends[-1] != trace.normalized_keys.shape[1]:
+        raise RecurrentSignalError("explicit segments must cover the full context")
+    if any(
+        start != (0 if index == 0 else ends[index - 1])
+        or end <= start
+        or end - start > segment_length
+        for index, (start, end) in enumerate(zip(starts, ends))
+    ):
+        raise RecurrentSignalError("explicit segment boundaries must be contiguous")
+
+    key = trace.normalized_keys
+    delta = trace.delta_residuals
+    log_decay = trace.log_decay
+    if key.ndim != 4 or delta.ndim != 4 or log_decay.ndim != 3:
+        raise RecurrentSignalError("trace tensors have invalid ranks")
+    if key.shape[:3] != delta.shape[:3] or key.shape[:3] != log_decay.shape:
+        raise RecurrentSignalError("trace batch/token/head dimensions do not agree")
+    if not torch.isfinite(delta).all() or not torch.isfinite(log_decay).all():
+        raise RecurrentSignalError("trace contains non-finite values")
+
+    reverse_cumulative = torch.flip(
+        torch.cumsum(torch.flip(log_decay, dims=(1,)), dim=1),
+        dims=(1,),
+    )
+    log_survival_after_token = reverse_cumulative - log_decay
+    survival_weight = log_survival_after_token.clamp(min=-80.0, max=0.0).exp()
+    values = []
+    for start, end in zip(starts, ends):
+        weighted_delta = (
+            delta[:, start:end] * survival_weight[:, start:end].unsqueeze(-1)
+        )
+        values.append(
+            torch.einsum(
+                "bthk,bthv->bhkv",
+                key[:, start:end],
+                weighted_delta,
+            )
+        )
+    stacked = torch.stack(values, dim=0)
+    if not torch.isfinite(stacked).all():
+        raise RecurrentSignalError("segment contributions contain non-finite values")
+    return SurvivingSegmentContributions(
+        segment_starts=starts,
+        segment_ends=ends,
+        partial_segments=tuple(
+            end - start < segment_length for start, end in zip(starts, ends)
+        ),
+        values=stacked,
     )
 
 

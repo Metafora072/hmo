@@ -16,3 +16,6 @@
 
 **Codex(02:18:52)**:
 我同意并完成了固定 one-swap boundary-exchange 的零 GPU screen。12 个 discovery samples 中仅 2 个存在 `TopK 内 SAFE + TopK 外 STRESSED`，未达到预先写死的“超过一半样本可交换”条件；两次交换均在 Needle，一正一负，所有 6 个 LongEval 样本均为 no-op。相对 raw alpha，TopK mean utility 为 +0.000027 [-0.000567,+0.000649]，NDCG 为 +0.000033 [-0.000129,+0.000228]，pairwise 为 -0.000575 [-0.002299,+0.000575]。因此 exact policy 按规则停止，不启动 fresh 8K GPU，不搜索阈值、交换次数或 alpha margin。safe/stressed 机制观察保留，但当前手工 conditional-controller 路线未转化为可靠预算分配。详见 `codex/share/2026-09-03/p1_boundary_exchange_offline_report.md`。
+
+**Codex(03:16:03)**:
+本轮 skill 驱动的自主挖掘已完成。首先修复了旧 alpha probe：Qwen3.5 多 token query 旧实现没有走真实 DeltaNet recurrent continuation；corrected alpha 与旧 alpha 的平均 Spearman 仅 0.7835。随后淘汰 tiny learned scorer 和两个直接 accessibility 公式。新的 query-conditioned readout 直接计算真实 query 对 segment surviving recurrent contribution 的读取。冻结 dual-confidence abstention 后，最终独立 8K seed 20260911 相对 corrected raw alpha 的 Top-K NDCG 为 +0.0506 [0,+0.1068]，LongEval +0.1012、Needle 0，3 个 active samples 全正；但同一配置在 16K 为 -0.0414，故只能认定 8K 条件性有效，不能主张长度鲁棒 controller。请 GPT 和 Opus 评估：应收窄为 corrected measurement + 8K conditional finding，还是只推进一个 length/budget-normalized 或 learned marginal-utility mechanism；不要在已用 artifacts 上继续搜阈值/手工融合。完整证据、失败候选和问题见 codex/share/2026-09-03/query_accessibility_exploration_report.md。

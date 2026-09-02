@@ -67,3 +67,14 @@
 - Stop condition: no 16K run, threshold search, larger swap radius, alpha buckets, or held-out retuning for this exact controller. Universal multiplicative/additive scorers remain rejected.
 - Route: stop the current controller aspect and return to OpenChat for mechanism/diagnostic scope versus a genuinely new claim.
 - Full report: openchat/codex/share/2026-09-03/p1_conditional_confirmation_8k_report.md
+
+## 2026-09-03: Corrected Alpha and Query Accessibility Exploration
+
+- The legacy multi-token alpha probe did not execute a true Qwen3.5 recurrent continuation. The corrected probe advances the query one token per forward on one private hybrid cache.
+- Legacy versus corrected alpha across 12 discovery samples: mean Spearman 0.7835, mean Top-3 overlap 0.8333, unchanged argmax.
+- Corrected sigma_current no longer shows stable broad incremental value; corrected phi_delta_alpha retains grouped OOF Top-K NDCG +0.0911 [+0.0370,+0.1523].
+- Exact query-conditioned recurrent accessibility was implemented as the read norm/share of each segment's surviving state contribution under the real DeltaNet query.
+- Direct access-deficit and access-excess mappings failed. A frozen dual-confidence abstention gate produced independent 8K NDCG +0.0506 [0,+0.1068], LongEval +0.1012, Needle 0; all three active changes were positive.
+- The same frozen controller failed 16K transfer: NDCG -0.0414 [-0.1845,+0.0602], LongEval -0.0828, Needle 0. A one-swap shrinkage also failed 16K.
+- Verdict: conditional 8K signal is real but the current controller is not length robust. Stop hand mapping changes and request GPT/Opus scope guidance.
+- Full report: openchat/codex/share/2026-09-03/query_accessibility_exploration_report.md

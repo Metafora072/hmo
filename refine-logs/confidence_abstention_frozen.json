@@ -1,0 +1,25 @@
+{
+  "schema_version": "hmo.confidence_abstention.v1",
+  "status": "frozen",
+  "frozen_at": "2026-09-03T03:03:00+08:00",
+  "development_artifact": "/mnt/nvme0/hmo/runs/r001_query_accessibility_discovery_12samples_20260903.json",
+  "development_artifact_sha256": "c9cc2623cbad65c60af3fda1ef6ed7f35f6b499d928e31398cc9156c4ccd9adc",
+  "model": "Qwen/Qwen3.5-0.8B",
+  "feature": "query_read_share",
+  "alpha": "sequential full-query mean attention mass",
+  "alpha_confidence": "H(alpha/sum(alpha))/log(n_eligible_segments)",
+  "entropy_threshold": 0.45,
+  "accessibility_score": "alpha*(1-rank01(query_read_share))",
+  "controller": "use accessibility_score when normalized_alpha_entropy >= 0.45, otherwise use raw alpha",
+  "threshold_search": false,
+  "task_identity_used_at_inference": false,
+  "oracle_labels_used_at_inference": false,
+  "primary_metric": "Top-K NDCG at exact-KV budget",
+  "independent_success": {
+    "8k_overall_ndcg_improvement": "> 0",
+    "8k_longeval_ndcg_improvement": "> 0",
+    "8k_needle_ndcg_improvement": ">= -0.005",
+    "16k_overall_ndcg_improvement": "> 0",
+    "no_threshold_or_formula_changes": true
+  }
+}

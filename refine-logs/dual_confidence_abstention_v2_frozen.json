@@ -1,0 +1,40 @@
+{
+  "schema_version": "hmo.dual_confidence_abstention.v2",
+  "status": "frozen",
+  "frozen_at": "2026-09-03T03:10:00+08:00",
+  "development_artifacts": [
+    {
+      "path": "/mnt/nvme0/hmo/runs/r001_query_accessibility_discovery_12samples_20260903.json",
+      "sha256": "c9cc2623cbad65c60af3fda1ef6ed7f35f6b499d928e31398cc9156c4ccd9adc"
+    },
+    {
+      "path": "/mnt/nvme0/hmo/runs/r002_query_accessibility_confirmation_8k_s20260908_20260903.json",
+      "sha256": "b164e7ec6ea86dc3124febc242c403c4c3a007835613bdc95c36718e8b1856a0"
+    }
+  ],
+  "model": "Qwen/Qwen3.5-0.8B",
+  "alpha": "sequential full-query mean attention mass",
+  "accessibility": "mean query_read_share from exact segment recurrent-state contributions",
+  "need_score": "alpha*(1-rank01(query_read_share))",
+  "normalized_alpha_entropy_threshold": 0.45,
+  "alpha_access_spearman_threshold": 0.75,
+  "controller": "use need_score iff normalized alpha entropy >= 0.45 and alpha/access Spearman < 0.75; otherwise use raw alpha",
+  "threshold_search_after_freeze": false,
+  "task_identity_used_at_inference": false,
+  "oracle_labels_used_at_inference": false,
+  "primary_metric": "Top-K NDCG at exact-KV budget",
+  "final_confirmation": {
+    "artifact": "/mnt/nvme0/hmo/runs/p1_conditional_confirmation_qwen08b_8k_s20260911_20260903_004044",
+    "seed": 20260911,
+    "was_used_for_v2_development": false,
+    "overall_ndcg_mean": "> 0",
+    "overall_ndcg_bootstrap_lower": "> 0",
+    "longeval_ndcg_mean": "> 0",
+    "needle_ndcg_mean": ">= -0.005"
+  },
+  "length_transfer": {
+    "artifact": "/mnt/nvme0/hmo/runs/p1_transfer_qwen08b_16k_s20260909_20260902_223041",
+    "overall_ndcg_mean": "> 0",
+    "needle_ndcg_mean": ">= -0.005"
+  }
+}
