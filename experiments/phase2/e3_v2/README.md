@@ -24,6 +24,17 @@ fresh context prefill. Its `finalize_context()` method must run at the start of
 the attention-KV intervention callback, which detaches every hook before query
 processing. The legacy hook remains the source of `sigma_current` only.
 
-There is intentionally no formal GPU runner yet. P0-D must complete fixed-byte
-interventions, alpha isolation, manifest recoverability, and integrated real-
-model preflight before E3-v2 experiments are allowed to execute.
+The integrated real-model preflight is implemented in
+`real_model_preflight.py`. It must pass before discovery is launched.
+
+`run_discovery.py` is the bounded P1 GPU path. It collects equal-byte
+gold-log-prob labels, query-aware alpha, `sigma_current`, and the P0-C recurrent
+candidates, then runs sample-grouped incremental-value analysis. Pair results
+are appended to JSONL as they finish so an interrupted run can resume without
+repeating completed comparisons.
+
+The default P1 configuration is deliberately lightweight: Qwen3.5-0.8B, two
+Needle and two LongEval-Lines samples at 8K, 256-token segments, two donors per
+segment, one background per pair, and no per-arm secondary generation. These
+overrides are recorded in the run manifest and produce discovery evidence only;
+they are not confirmation settings.
