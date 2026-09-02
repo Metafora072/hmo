@@ -3,16 +3,20 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from experiments.phase2.e3_v2.oracle import OracleContractError, SegmentSpec
 from experiments.phase2.e3_v2.recurrent_signals import AggregatedRecurrentCandidates
 from experiments.phase2.e3_v2.run_discovery import (
     EVALUATED_CANDIDATES,
+    _build_samples,
     analyze_discovery,
     build_segment_evidence,
+    load_frozen_scorer_config,
     load_pair_observations,
 )
 from experiments.phase2.e3_v2.statistics import SegmentEvidence
+from experiments.utils.dataset_utils import EvalSample
 
 
 class ObservationResumeTests(unittest.TestCase):
@@ -53,6 +57,67 @@ class ObservationResumeTests(unittest.TestCase):
             path.write_text(encoded + encoded, encoding="utf-8")
             with self.assertRaises(OracleContractError):
                 load_pair_observations(path)
+
+
+class FrozenScorerConfigTests(unittest.TestCase):
+    def _payload(self):
+        return {
+            "schema_version": "p1-bounded-additive-v1",
+            "formula": "rank01(alpha)+lambda*(rank01(sigma_current)-0.5)",
+            "feature": "sigma_current",
+            "normalization": "within_sample_average_rank01",
+            "selected_lambda": 0.15,
+            "lambda_candidates": [-0.30, -0.15, 0.15, 0.30],
+            "selection_rule": "max_mean_pairwise_then_ndcg_then_smaller_abs_lambda",
+            "development": {
+                "scope": "combined_discovery_only_not_confirmation",
+                "sample_count": 12,
+                "sources": [{"manifest_id": "development"}],
+            },
+        }
+
+    def test_valid_frozen_scorer_is_hashed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "scorer.json"
+            path.write_text(json.dumps(self._payload()), encoding="utf-8")
+            loaded, digest = load_frozen_scorer_config(path)
+        self.assertEqual(loaded["selected_lambda"], 0.15)
+        self.assertEqual(len(digest), 64)
+
+    def test_non_discovery_scorer_provenance_fails_closed(self):
+        payload = self._payload()
+        payload["development"]["scope"] = "held_out_confirmation"
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "scorer.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaises(OracleContractError):
+                load_frozen_scorer_config(path)
+
+
+class HeldOutSampleTests(unittest.TestCase):
+    def test_confirmation_prefix_makes_sample_id_distinct(self):
+        sample = EvalSample(
+            dataset="needle",
+            sample_id="needle_0000",
+            context="context",
+            question="question",
+            answer="answer",
+            context_length=8192,
+        )
+        args = SimpleNamespace(
+            datasets="needle",
+            seed=99,
+            samples_per_dataset=1,
+            context_length=8192,
+            sample_id_prefix="confirm_seed99_",
+        )
+        with patch(
+            "experiments.phase2.e3_v2.run_discovery.make_needle_samples",
+            return_value=[sample],
+        ):
+            built = _build_samples(object(), args)
+        self.assertEqual(built[0].sample_id, "confirm_seed99_needle_0000")
+        self.assertEqual(sample.sample_id, "needle_0000")
 
 
 class SegmentEvidenceTests(unittest.TestCase):

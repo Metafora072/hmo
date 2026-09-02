@@ -1,6 +1,9 @@
 import unittest
 
-from experiments.phase2.e3_v2.direct_fusion import evaluate_direct_fusions
+from experiments.phase2.e3_v2.direct_fusion import (
+    evaluate_bounded_additive,
+    evaluate_direct_fusions,
+)
 from experiments.phase2.e3_v2.statistics import SegmentEvidence
 
 
@@ -34,6 +37,46 @@ class DirectFusionTests(unittest.TestCase):
         self.assertGreater(inverse_delta["ndcg_improvement"]["mean"], 0.0)
         sigma = result["methods"]["alpha_sigma_product"]
         self.assertEqual(sigma["pairwise_improvement"]["mean"], 0.0)
+
+
+    def test_bounded_additive_selects_smaller_positive_lambda_on_tie(self):
+        rows = []
+        for sample_index in range(4):
+            for segment_id, utility in enumerate((0.0, 1.0, 2.0)):
+                rows.append(
+                    SegmentEvidence(
+                        sample_id=f"sample_{sample_index}",
+                        dataset="synthetic",
+                        segment_id=segment_id,
+                        utility=utility,
+                        alpha=1.0,
+                        normalized_position=0.0,
+                        candidates={
+                            "sigma_current": utility,
+                            "delta_update": 0.0,
+                        },
+                    )
+                )
+        result = evaluate_bounded_additive(
+            rows,
+            {f"sample_{index}": 1 for index in range(4)},
+            bootstrap_samples=100,
+            seed=17,
+        )
+        self.assertEqual(result["selected_lambda"], 0.15)
+        selected = result["methods"][result["selected_method"]]
+        self.assertGreater(selected["pairwise_improvement"]["mean"], 0.0)
+        self.assertGreater(selected["ndcg_improvement"]["mean"], 0.0)
+
+    def test_bounded_additive_rejects_out_of_family_lambda(self):
+        with self.assertRaises(ValueError):
+            evaluate_bounded_additive(
+                [],
+                {},
+                lambdas=(0.31,),
+                bootstrap_samples=10,
+                seed=1,
+            )
 
 
 if __name__ == "__main__":

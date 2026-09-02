@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import argparse
 import gc
+import hashlib
 import json
 import math
 import os
 import time
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
@@ -15,6 +16,11 @@ import numpy as np
 import torch
 
 from experiments.phase2.e3_v2.alpha_probe import collect_isolated_query_alpha
+from experiments.phase2.e3_v2.direct_fusion import (
+    BOUNDED_ADDITIVE_LAMBDAS,
+    BOUNDED_ADDITIVE_SCHEMA,
+    evaluate_bounded_additive,
+)
 from experiments.phase2.e3_v2.context_query import (
     run_post_intervention_prompt,
     score_gold_answer_logprob,
@@ -67,6 +73,7 @@ from experiments.utils.saturation import compute_segment_saturation
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 OBSERVATIONS_FILENAME = "pair_observations.jsonl"
 SUMMARY_FILENAME = "discovery_summary.json"
+CONFIRMATION_SUMMARY_FILENAME = "confirmation_summary.json"
 EVALUATED_CANDIDATES = (
     "sigma_current",
     "delta_update",
@@ -93,6 +100,42 @@ def _append_jsonl(path: Path, payload: Mapping) -> None:
         handle.write(json.dumps(payload, ensure_ascii=True, sort_keys=True) + "\n")
         handle.flush()
         os.fsync(handle.fileno())
+
+
+def load_frozen_scorer_config(path: Path) -> tuple[dict, str]:
+    try:
+        encoded = path.read_bytes()
+        payload = json.loads(encoded)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise OracleContractError(f"cannot read frozen scorer config: {path}") from exc
+    if payload.get("schema_version") != BOUNDED_ADDITIVE_SCHEMA:
+        raise OracleContractError("unsupported frozen scorer schema")
+    if payload.get("formula") != (
+        "rank01(alpha)+lambda*(rank01(sigma_current)-0.5)"
+    ):
+        raise OracleContractError("frozen scorer formula mismatch")
+    if payload.get("feature") != "sigma_current":
+        raise OracleContractError("frozen scorer feature mismatch")
+    try:
+        selected_lambda = float(payload["selected_lambda"])
+        candidates = tuple(float(value) for value in payload["lambda_candidates"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise OracleContractError("invalid frozen scorer lambda fields") from exc
+    if (
+        not math.isfinite(selected_lambda)
+        or abs(selected_lambda) > 0.30
+        or selected_lambda not in candidates
+        or set(candidates) != set(BOUNDED_ADDITIVE_LAMBDAS)
+    ):
+        raise OracleContractError("selected lambda is outside the frozen family")
+    development = payload.get("development", {})
+    if (
+        development.get("scope") != "combined_discovery_only_not_confirmation"
+        or int(development.get("sample_count", 0)) <= 0
+        or not development.get("sources")
+    ):
+        raise OracleContractError("frozen scorer lacks discovery-only provenance")
+    return payload, hashlib.sha256(encoded).hexdigest()
 
 
 def load_pair_observations(path: Path) -> tuple[PairObservation, ...]:
@@ -274,10 +317,15 @@ def _build_samples(tokenizer, args) -> list:
                 seed=dataset_seed,
             )
         else:
-            raise ValueError(f"unsupported discovery dataset {name!r}")
+            raise ValueError(f"unsupported E3-v2 dataset {name!r}")
+        if args.sample_id_prefix:
+            built = [
+                replace(sample, sample_id=f"{args.sample_id_prefix}{sample.sample_id}")
+                for sample in built
+            ]
         samples.extend(built)
     if len({sample.sample_id for sample in samples}) != len(samples):
-        raise OracleContractError("discovery sample IDs must be unique")
+        raise OracleContractError("E3-v2 sample IDs must be unique")
     return samples
 
 
@@ -330,9 +378,15 @@ def _capture_sample_signals(
 
 def run_discovery(args: argparse.Namespace) -> dict:
     if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
-        raise RuntimeError("P1 discovery requires exactly one visible CUDA device")
+        raise RuntimeError("E3-v2 P1 requires exactly one visible CUDA device")
     run_dir = Path(args.run_dir).resolve()
     model_path = Path(args.model_path).resolve()
+    frozen_scorer = None
+    frozen_scorer_sha256 = None
+    if args.scope == "confirmation":
+        frozen_scorer, frozen_scorer_sha256 = load_frozen_scorer_config(
+            Path(args.frozen_scorer_config).resolve()
+        )
     model_identity = model_provenance(
         model_path,
         args.model_id,
@@ -349,23 +403,34 @@ def run_discovery(args: argparse.Namespace) -> dict:
         "backgrounds_per_pair": args.backgrounds_per_pair,
         "bootstrap_samples": args.bootstrap_samples,
         "seed": args.seed,
+        "scope": args.scope,
+        "sample_id_prefix": args.sample_id_prefix,
+        "frozen_scorer_sha256": frozen_scorer_sha256,
         "recurrent_backend": REFERENCE_BACKEND,
         "secondary_generation": False,
         "visible_cuda_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
     }
+    selections = {
+        "scope": (
+            "held_out_confirmation"
+            if args.scope == "confirmation"
+            else "discovery_only"
+        ),
+        "candidate_names": (
+            [] if frozen_scorer is not None else list(EVALUATED_CANDIDATES)
+        ),
+        "frozen_scorer": frozen_scorer,
+        "oracle_primary_only": True,
+        "lightweight_oracle_override": {
+            "donors_per_segment": args.donors_per_segment,
+            "backgrounds_per_pair": args.backgrounds_per_pair,
+        },
+    }
     manifest = ensure_run_manifest(
         run_dir,
-        experiment="e3_v2_p1_discovery",
+        experiment=f"e3_v2_p1_{args.scope}",
         args=scientific_args,
-        selections={
-            "scope": "discovery_only",
-            "candidate_names": list(EVALUATED_CANDIDATES),
-            "oracle_primary_only": True,
-            "lightweight_oracle_override": {
-                "donors_per_segment": args.donors_per_segment,
-                "backgrounds_per_pair": args.backgrounds_per_pair,
-            },
-        },
+        selections=selections,
         model=model_identity,
         project_root=PROJECT_ROOT,
         require_clean=True,
@@ -548,17 +613,31 @@ def run_discovery(args: argparse.Namespace) -> dict:
         )
         _cleanup_cuda()
 
-    analysis = analyze_discovery(
-        all_evidence,
-        k_by_sample,
-        bootstrap_samples=args.bootstrap_samples,
-        seed=args.seed,
-    )
+    if args.scope == "confirmation":
+        analysis = evaluate_bounded_additive(
+            all_evidence,
+            k_by_sample,
+            lambdas=(float(frozen_scorer["selected_lambda"]),),
+            bootstrap_samples=args.bootstrap_samples,
+            seed=args.seed,
+        )
+        result_scope = "held_out_confirmation_frozen_scorer"
+        summary_filename = CONFIRMATION_SUMMARY_FILENAME
+    else:
+        analysis = analyze_discovery(
+            all_evidence,
+            k_by_sample,
+            bootstrap_samples=args.bootstrap_samples,
+            seed=args.seed,
+        )
+        result_scope = "discovery_only_not_confirmation"
+        summary_filename = SUMMARY_FILENAME
     payload = {
         "status": "complete",
-        "scope": "discovery_only_not_confirmation",
+        "scope": result_scope,
         "manifest_id": manifest["manifest_id"],
         "model_id": args.model_id,
+        "frozen_scorer_sha256": frozen_scorer_sha256,
         "architecture": {
             "attention_layers": list(attention_layers),
             "recurrent_layers": list(recurrent_layers),
@@ -573,7 +652,7 @@ def run_discovery(args: argparse.Namespace) -> dict:
             "max_memory_reserved_bytes": torch.cuda.max_memory_reserved(),
         },
     }
-    _atomic_json(run_dir / SUMMARY_FILENAME, payload)
+    _atomic_json(run_dir / summary_filename, payload)
     return payload
 
 
@@ -583,6 +662,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-id", default="Qwen/Qwen3.5-0.8B")
     parser.add_argument("--model-revision")
     parser.add_argument("--run-dir", required=True)
+    parser.add_argument("--scope", choices=("discovery", "confirmation"), default="discovery")
+    parser.add_argument("--frozen-scorer-config")
+    parser.add_argument("--sample-id-prefix", default="")
     parser.add_argument("--datasets", default="needle,longeval_lines")
     parser.add_argument("--samples-per-dataset", type=int, default=2)
     parser.add_argument("--context-length", type=int, default=8192)
@@ -606,6 +688,13 @@ def parse_args() -> argparse.Namespace:
         parser.error("all count/length arguments must be positive")
     if not 0 < args.middle_kv_fraction < 1:
         parser.error("middle-kv-fraction must lie in (0, 1)")
+    if args.scope == "confirmation":
+        if not args.frozen_scorer_config or not args.sample_id_prefix:
+            parser.error(
+                "confirmation requires --frozen-scorer-config and --sample-id-prefix"
+            )
+    elif args.frozen_scorer_config or args.sample_id_prefix:
+        parser.error("frozen scorer and sample prefix are confirmation-only")
     return args
 
 

@@ -6,7 +6,10 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
-from experiments.phase2.e3_v2.direct_fusion import evaluate_direct_fusions
+from experiments.phase2.e3_v2.direct_fusion import (
+    evaluate_bounded_additive,
+    evaluate_direct_fusions,
+)
 
 from experiments.phase2.e3_v2.oracle import OracleContractError
 from experiments.phase2.e3_v2.run_discovery import analyze_discovery
@@ -116,6 +119,34 @@ def combine_discovery_runs(
             bootstrap_samples=bootstrap_samples,
             seed=seed + 100,
         ),
+        "bounded_additive": evaluate_bounded_additive(
+            evidence,
+            k_by_sample,
+            bootstrap_samples=bootstrap_samples,
+            seed=seed + 200,
+        ),
+    }
+
+
+def build_frozen_scorer_config(payload: dict) -> dict:
+    bounded = payload["bounded_additive"]
+    selected = bounded["methods"][bounded["selected_method"]]
+    return {
+        "schema_version": bounded["schema_version"],
+        "formula": bounded["formula"],
+        "feature": "sigma_current",
+        "normalization": "within_sample_average_rank01",
+        "selected_lambda": bounded["selected_lambda"],
+        "lambda_candidates": [
+            row["lambda"] for row in bounded["methods"].values()
+        ],
+        "selection_rule": bounded["selection_rule"],
+        "development": {
+            "scope": payload["scope"],
+            "sample_count": payload["sample_count"],
+            "sources": payload["sources"],
+            "selected_metrics": selected,
+        },
     }
 
 
@@ -125,6 +156,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", required=True)
     parser.add_argument("--bootstrap-samples", type=int, default=5000)
     parser.add_argument("--seed", type=int, default=20260904)
+    parser.add_argument("--frozen-scorer-output")
     args = parser.parse_args()
     if len(args.run_dir) < 2 or args.bootstrap_samples <= 0:
         parser.error("provide at least two run dirs and a positive bootstrap count")
@@ -144,6 +176,18 @@ def main() -> int:
         json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    if args.frozen_scorer_output:
+        scorer_output = Path(args.frozen_scorer_output).resolve()
+        scorer_output.parent.mkdir(parents=True, exist_ok=True)
+        scorer_output.write_text(
+            json.dumps(
+                build_frozen_scorer_config(payload),
+                ensure_ascii=True,
+                indent=2,
+                sort_keys=True,
+            ) + "\n",
+            encoding="utf-8",
+        )
     print(json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True))
     return 0
 

@@ -38,3 +38,10 @@ Needle and two LongEval-Lines samples at 8K, 256-token segments, two donors per
 segment, one background per pair, and no per-arm secondary generation. These
 overrides are recorded in the run manifest and produce discovery evidence only;
 they are not confirmation settings.
+
+The same runner supports a held-out confirmation mode with `--scope confirmation`.
+This mode requires both `--frozen-scorer-config` and a non-empty
+`--sample-id-prefix`, embeds the scorer file SHA-256 and full configuration in
+the immutable manifest, and writes `confirmation_summary.json`. It evaluates
+only the frozen lambda against rank-normalized alpha; it does not reselect a
+candidate or lambda on confirmation labels.

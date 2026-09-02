@@ -1,0 +1,57 @@
+{
+  "development": {
+    "sample_count": 12,
+    "scope": "combined_discovery_only_not_confirmation",
+    "selected_metrics": {
+      "lambda": 0.3,
+      "ndcg_improvement": {
+        "lower": -0.06595608293610385,
+        "mean": 0.005764408433567704,
+        "n_bootstrap": 5000,
+        "n_samples": 12,
+        "upper": 0.06830672461138355
+      },
+      "pairwise_improvement": {
+        "lower": -0.00449970867101009,
+        "mean": 0.004695693627840484,
+        "n_bootstrap": 5000,
+        "n_samples": 12,
+        "upper": 0.012931034482758633
+      },
+      "task_ndcg_improvement": {
+        "longeval_lines": 0.06604153394604337,
+        "needle": -0.05451271707890796
+      },
+      "task_pairwise_improvement": {
+        "longeval_lines": 0.006134682274838044,
+        "needle": 0.0032567049808429247
+      }
+    },
+    "sources": [
+      {
+        "manifest_id": "ed2262672a08be3d7ea2c5b8b43147f3fb4c8431dd0474b82d34d6a54d6390bc",
+        "run_dir": "/mnt/nvme0/hmo/runs/p1_discovery_qwen08b_8k_20260902_192652",
+        "sample_count": 4,
+        "seed": 20260902
+      },
+      {
+        "manifest_id": "6b60a7df4caeadb0d2d03b098bf4de020499f5252b606fce1092ce7a872f296a",
+        "run_dir": "/mnt/nvme0/hmo/runs/p1_discovery_qwen08b_8k_seed20260903_20260902_194216",
+        "sample_count": 8,
+        "seed": 20260903
+      }
+    ]
+  },
+  "feature": "sigma_current",
+  "formula": "rank01(alpha)+lambda*(rank01(sigma_current)-0.5)",
+  "lambda_candidates": [
+    -0.3,
+    -0.15,
+    0.15,
+    0.3
+  ],
+  "normalization": "within_sample_average_rank01",
+  "schema_version": "p1-bounded-additive-v1",
+  "selected_lambda": 0.3,
+  "selection_rule": "max_mean_pairwise_then_ndcg_then_smaller_abs_lambda"
+}
