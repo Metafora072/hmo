@@ -1,0 +1,56 @@
+{
+  "configuration": {
+    "collision_policy": "swap_adjacent_alpha_ranks_when_lower_regime_priority_is_higher_and_neither_segment_has_moved",
+    "normalization": "within_sample_average_rank01",
+    "rank_adjustment": {
+      "NEUTRAL": 0,
+      "SAFE": 1,
+      "STRESSED": -1
+    },
+    "regime_priority": {
+      "NEUTRAL": 1,
+      "SAFE": 0,
+      "STRESSED": 2
+    },
+    "threshold": 0.5,
+    "threshold_search": false
+  },
+  "development": {
+    "pattern_supported": true,
+    "q4_stressed_minus_q3_safe": {
+      "lower": 0.037020658050108034,
+      "mean": 0.2554116581637958,
+      "n_bootstrap": 5000,
+      "n_samples": 12,
+      "upper": 0.4508173730246115
+    },
+    "report": "codex/share/2026-09-03/conditional_regime_offline_report.md",
+    "sample_count": 12,
+    "scope": "combined_discovery_conditional_regime_only_not_confirmation",
+    "segment_count": 360,
+    "sources": [
+      {
+        "manifest_id": "ed2262672a08be3d7ea2c5b8b43147f3fb4c8431dd0474b82d34d6a54d6390bc",
+        "run_dir": "/mnt/nvme0/hmo/runs/p1_discovery_qwen08b_8k_20260902_192652",
+        "sample_count": 4,
+        "seed": 20260902
+      },
+      {
+        "manifest_id": "6b60a7df4caeadb0d2d03b098bf4de020499f5252b606fce1092ce7a872f296a",
+        "run_dir": "/mnt/nvme0/hmo/runs/p1_discovery_qwen08b_8k_seed20260903_20260902_194216",
+        "sample_count": 8,
+        "seed": 20260903
+      }
+    ],
+    "task_means": {
+      "longeval_lines": 0.28193418354823435,
+      "needle": 0.22888913277935716
+    }
+  },
+  "features": [
+    "sigma_current",
+    "delta_update"
+  ],
+  "formula": "single_top_down_adjacent_regime_inversion_pass",
+  "schema_version": "p1-conditional-rank-v1"
+}

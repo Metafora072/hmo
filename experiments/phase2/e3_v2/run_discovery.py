@@ -19,7 +19,11 @@ from experiments.phase2.e3_v2.alpha_probe import collect_isolated_query_alpha
 from experiments.phase2.e3_v2.direct_fusion import (
     BOUNDED_ADDITIVE_LAMBDAS,
     BOUNDED_ADDITIVE_SCHEMA,
+    CONDITIONAL_COLLISION_POLICY,
+    CONDITIONAL_CONTROLLER_FORMULA,
+    CONDITIONAL_CONTROLLER_SCHEMA,
     evaluate_bounded_additive,
+    evaluate_conditional_controller,
 )
 from experiments.phase2.e3_v2.context_query import (
     run_post_intervention_prompt,
@@ -108,7 +112,38 @@ def load_frozen_scorer_config(path: Path) -> tuple[dict, str]:
         payload = json.loads(encoded)
     except (OSError, json.JSONDecodeError) as exc:
         raise OracleContractError(f"cannot read frozen scorer config: {path}") from exc
-    if payload.get("schema_version") != BOUNDED_ADDITIVE_SCHEMA:
+    schema = payload.get("schema_version")
+    if schema == CONDITIONAL_CONTROLLER_SCHEMA:
+        configuration = payload.get("configuration", {})
+        if payload.get("formula") != CONDITIONAL_CONTROLLER_FORMULA:
+            raise OracleContractError("frozen controller formula mismatch")
+        if payload.get("features") != ["sigma_current", "delta_update"]:
+            raise OracleContractError("frozen controller feature mismatch")
+        if (
+            configuration.get("normalization")
+            != "within_sample_average_rank01"
+            or configuration.get("threshold") != 0.5
+            or configuration.get("threshold_search") is not False
+            or configuration.get("regime_priority")
+            != {"SAFE": 0, "NEUTRAL": 1, "STRESSED": 2}
+            or configuration.get("rank_adjustment")
+            != {"SAFE": 1, "NEUTRAL": 0, "STRESSED": -1}
+            or configuration.get("collision_policy")
+            != CONDITIONAL_COLLISION_POLICY
+        ):
+            raise OracleContractError("frozen controller configuration mismatch")
+        development = payload.get("development", {})
+        if (
+            development.get("scope")
+            != "combined_discovery_conditional_regime_only_not_confirmation"
+            or int(development.get("sample_count", 0)) != 12
+            or int(development.get("segment_count", 0)) != 360
+            or not development.get("sources")
+            or not development.get("pattern_supported")
+        ):
+            raise OracleContractError("frozen controller lacks discovery-only evidence")
+        return payload, hashlib.sha256(encoded).hexdigest()
+    if schema != BOUNDED_ADDITIVE_SCHEMA:
         raise OracleContractError("unsupported frozen scorer schema")
     if payload.get("formula") != (
         "rank01(alpha)+lambda*(rank01(sigma_current)-0.5)"
@@ -406,6 +441,9 @@ def run_discovery(args: argparse.Namespace) -> dict:
         "scope": args.scope,
         "sample_id_prefix": args.sample_id_prefix,
         "frozen_scorer_sha256": frozen_scorer_sha256,
+        "frozen_method_schema": (
+            None if frozen_scorer is None else frozen_scorer["schema_version"]
+        ),
         "recurrent_backend": REFERENCE_BACKEND,
         "secondary_generation": False,
         "visible_cuda_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
@@ -614,14 +652,23 @@ def run_discovery(args: argparse.Namespace) -> dict:
         _cleanup_cuda()
 
     if args.scope == "confirmation":
-        analysis = evaluate_bounded_additive(
-            all_evidence,
-            k_by_sample,
-            lambdas=(float(frozen_scorer["selected_lambda"]),),
-            bootstrap_samples=args.bootstrap_samples,
-            seed=args.seed,
-        )
-        result_scope = "held_out_confirmation_frozen_scorer"
+        if frozen_scorer["schema_version"] == CONDITIONAL_CONTROLLER_SCHEMA:
+            analysis = evaluate_conditional_controller(
+                all_evidence,
+                k_by_sample,
+                bootstrap_samples=args.bootstrap_samples,
+                seed=args.seed,
+            )
+            result_scope = "held_out_confirmation_frozen_conditional_controller"
+        else:
+            analysis = evaluate_bounded_additive(
+                all_evidence,
+                k_by_sample,
+                lambdas=(float(frozen_scorer["selected_lambda"]),),
+                bootstrap_samples=args.bootstrap_samples,
+                seed=args.seed,
+            )
+            result_scope = "held_out_confirmation_frozen_scorer"
         summary_filename = CONFIRMATION_SUMMARY_FILENAME
     else:
         analysis = analyze_discovery(

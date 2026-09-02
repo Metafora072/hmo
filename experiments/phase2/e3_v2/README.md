@@ -39,9 +39,11 @@ segment, one background per pair, and no per-arm secondary generation. These
 overrides are recorded in the run manifest and produce discovery evidence only;
 they are not confirmation settings.
 
-The same runner supports a held-out confirmation mode with `--scope confirmation`.
-This mode requires both `--frozen-scorer-config` and a non-empty
-`--sample-id-prefix`, embeds the scorer file SHA-256 and full configuration in
-the immutable manifest, and writes `confirmation_summary.json`. It evaluates
-only the frozen lambda against rank-normalized alpha; it does not reselect a
-candidate or lambda on confirmation labels.
+The same runner supports a held-out confirmation mode with --scope confirmation.
+This mode requires both --frozen-scorer-config and a non-empty
+--sample-id-prefix, embeds the frozen method SHA-256 and full configuration in
+the immutable manifest, and writes confirmation_summary.json. Supported
+schemas are dispatched without tuning on confirmation labels: the historical
+bounded additive scorer remains reproducible, while the conditional controller
+uses fixed median regimes and one top-down adjacent inversion pass in which each
+segment moves at most one alpha rank.

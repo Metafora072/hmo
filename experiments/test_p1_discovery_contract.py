@@ -76,6 +76,50 @@ class FrozenScorerConfigTests(unittest.TestCase):
             },
         }
 
+    def _controller_payload(self):
+        return {
+            "schema_version": "p1-conditional-rank-v1",
+            "formula": "single_top_down_adjacent_regime_inversion_pass",
+            "features": ["sigma_current", "delta_update"],
+            "configuration": {
+                "normalization": "within_sample_average_rank01",
+                "threshold": 0.5,
+                "threshold_search": False,
+                "regime_priority": {"SAFE": 0, "NEUTRAL": 1, "STRESSED": 2},
+                "rank_adjustment": {"SAFE": 1, "NEUTRAL": 0, "STRESSED": -1},
+                "collision_policy": (
+                    "swap_adjacent_alpha_ranks_when_lower_regime_priority_is_higher_"
+                    "and_neither_segment_has_moved"
+                ),
+            },
+            "development": {
+                "scope": (
+                    "combined_discovery_conditional_regime_only_not_confirmation"
+                ),
+                "sample_count": 12,
+                "segment_count": 360,
+                "pattern_supported": True,
+                "sources": [{"manifest_id": "development"}],
+            },
+        }
+
+    def test_valid_frozen_controller_is_hashed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "controller.json"
+            path.write_text(json.dumps(self._controller_payload()), encoding="utf-8")
+            loaded, digest = load_frozen_scorer_config(path)
+        self.assertEqual(loaded["configuration"]["threshold"], 0.5)
+        self.assertEqual(len(digest), 64)
+
+    def test_controller_collision_policy_is_immutable(self):
+        payload = self._controller_payload()
+        payload["configuration"]["collision_policy"] = "global_sort"
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "controller.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaises(OracleContractError):
+                load_frozen_scorer_config(path)
+
     def test_valid_frozen_scorer_is_hashed(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "scorer.json"

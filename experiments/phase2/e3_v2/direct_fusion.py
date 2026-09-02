@@ -29,6 +29,7 @@ def _rank01(values: Sequence[float]) -> np.ndarray:
 
 BOUNDED_ADDITIVE_SCHEMA = "p1-bounded-additive-v1"
 BOUNDED_ADDITIVE_LAMBDAS = (-0.30, -0.15, 0.15, 0.30)
+CONDITIONAL_CONTROLLER_SCHEMA = "p1-conditional-rank-v1"
 
 
 def _task_means(values, sample_rows):
@@ -210,3 +211,152 @@ def evaluate_direct_fusions(
             "task_ndcg_improvement": _task_means(ndcg_diff, sample_rows),
         }
     return {"baseline": "alpha", "methods": results, "samples": sample_rows}
+
+
+REGIME_PRIORITY = {"SAFE": 0, "NEUTRAL": 1, "STRESSED": 2}
+CONDITIONAL_CONTROLLER_FORMULA = (
+    "single_top_down_adjacent_regime_inversion_pass"
+)
+CONDITIONAL_COLLISION_POLICY = (
+    "swap_adjacent_alpha_ranks_when_lower_regime_priority_is_higher_"
+    "and_neither_segment_has_moved"
+)
+
+
+def conditional_controller_scores(
+    alpha: Sequence[float],
+    sigma_current: Sequence[float],
+    delta_update: Sequence[float],
+) -> tuple[np.ndarray, tuple[str, ...], tuple[tuple[int, int], ...]]:
+    """Apply one stable adjacent regime swap per segment at most."""
+    alpha = np.asarray(alpha, dtype=np.float64)
+    sigma_current = np.asarray(sigma_current, dtype=np.float64)
+    delta_update = np.asarray(delta_update, dtype=np.float64)
+    if (
+        alpha.ndim != 1
+        or len(alpha) < 2
+        or alpha.shape != sigma_current.shape
+        or alpha.shape != delta_update.shape
+        or not np.all(np.isfinite(alpha))
+        or not np.all(np.isfinite(sigma_current))
+        or not np.all(np.isfinite(delta_update))
+    ):
+        raise ValueError("conditional controller inputs must be aligned and finite")
+
+    high_sigma = _rank01(sigma_current) >= 0.5
+    high_delta = _rank01(delta_update) >= 0.5
+    regimes = tuple(
+        "SAFE"
+        if sigma_high and not delta_high
+        else "STRESSED"
+        if sigma_high and delta_high
+        else "NEUTRAL"
+        for sigma_high, delta_high in zip(high_sigma, high_delta)
+    )
+    priorities = np.asarray(
+        [REGIME_PRIORITY[regime] for regime in regimes],
+        dtype=np.int64,
+    )
+    base_order = list(np.argsort(-alpha, kind="stable"))
+    scores = alpha.copy()
+    moved = set()
+    swaps = []
+    for position in range(len(base_order) - 1):
+        upper = int(base_order[position])
+        lower = int(base_order[position + 1])
+        if upper in moved or lower in moved:
+            continue
+        if priorities[lower] > priorities[upper]:
+            scores[upper], scores[lower] = scores[lower], scores[upper]
+            moved.update((upper, lower))
+            swaps.append((upper, lower))
+    return scores, regimes, tuple(swaps)
+
+
+def evaluate_conditional_controller(
+    evidence: Sequence[SegmentEvidence],
+    k_by_sample: Mapping[str, int],
+    *,
+    bootstrap_samples: int,
+    seed: int,
+) -> dict:
+    """Compare the frozen local regime controller against raw alpha."""
+    by_sample: dict[str, list[SegmentEvidence]] = {}
+    for row in evidence:
+        by_sample.setdefault(row.sample_id, []).append(row)
+    if not by_sample or set(by_sample) != set(k_by_sample):
+        raise ValueError("conditional controller evidence and k_by_sample disagree")
+
+    sample_rows = {}
+    for sample_id, rows in sorted(by_sample.items()):
+        rows = sorted(rows, key=lambda row: row.segment_id)
+        datasets = {row.dataset for row in rows}
+        if len(datasets) != 1:
+            raise ValueError("one sample cannot span multiple datasets")
+        utility = [row.utility for row in rows]
+        alpha = np.asarray([row.alpha for row in rows], dtype=np.float64)
+        controller, regimes, swaps = conditional_controller_scores(
+            alpha,
+            [row.candidates["sigma_current"] for row in rows],
+            [row.candidates["delta_update"] for row in rows],
+        )
+        metrics = {
+            "alpha": {
+                "pairwise_accuracy": pairwise_ranking_accuracy(alpha, utility),
+                "ndcg": ndcg_at_k(alpha, utility, k_by_sample[sample_id]),
+            },
+            "conditional_controller": {
+                "pairwise_accuracy": pairwise_ranking_accuracy(controller, utility),
+                "ndcg": ndcg_at_k(controller, utility, k_by_sample[sample_id]),
+            },
+        }
+        sample_rows[sample_id] = {
+            "dataset": next(iter(datasets)),
+            "regime_counts": {
+                regime: regimes.count(regime) for regime in REGIME_PRIORITY
+            },
+            "adjacent_swaps": [
+                [rows[upper].segment_id, rows[lower].segment_id]
+                for upper, lower in swaps
+            ],
+            "metrics": metrics,
+        }
+
+    pairwise_diff = {
+        sample_id: row["metrics"]["conditional_controller"]["pairwise_accuracy"]
+        - row["metrics"]["alpha"]["pairwise_accuracy"]
+        for sample_id, row in sample_rows.items()
+    }
+    ndcg_diff = {
+        sample_id: row["metrics"]["conditional_controller"]["ndcg"]
+        - row["metrics"]["alpha"]["ndcg"]
+        for sample_id, row in sample_rows.items()
+    }
+    return {
+        "schema_version": CONDITIONAL_CONTROLLER_SCHEMA,
+        "formula": CONDITIONAL_CONTROLLER_FORMULA,
+        "baseline": "raw alpha ranking",
+        "configuration": {
+            "normalization": "within_sample_average_rank01",
+            "threshold": 0.5,
+            "threshold_search": False,
+            "regime_priority": REGIME_PRIORITY,
+            "rank_adjustment": {"SAFE": 1, "NEUTRAL": 0, "STRESSED": -1},
+            "collision_policy": CONDITIONAL_COLLISION_POLICY,
+        },
+        "controller": {
+            "pairwise_improvement": sample_grouped_bootstrap_interval(
+                pairwise_diff,
+                n_bootstrap=bootstrap_samples,
+                seed=seed,
+            ).__dict__,
+            "ndcg_improvement": sample_grouped_bootstrap_interval(
+                ndcg_diff,
+                n_bootstrap=bootstrap_samples,
+                seed=seed + 1,
+            ).__dict__,
+            "task_pairwise_improvement": _task_means(pairwise_diff, sample_rows),
+            "task_ndcg_improvement": _task_means(ndcg_diff, sample_rows),
+        },
+        "samples": sample_rows,
+    }
