@@ -47,10 +47,13 @@ class ProvenanceTests(unittest.TestCase):
                 '{"weight_map":{}}\n'
             )
             (snapshot / "model.safetensors").write_bytes(b"weights")
-            identity = model_provenance(snapshot, "Qwen/test")
+            identity = model_provenance(
+                snapshot, "Qwen/test", revision="pinned-revision"
+            )
             self.assertEqual(identity["model_id"], "Qwen/test")
-            self.assertEqual(identity["revision"], "revision-123")
+            self.assertEqual(identity["revision"], "pinned-revision")
             self.assertEqual(identity["weight_files"][0]["size_bytes"], 7)
+            self.assertEqual(len(identity["weight_files"][0]["sha256"]), 64)
             self.assertNotIn(str(snapshot), str(identity))
 
 

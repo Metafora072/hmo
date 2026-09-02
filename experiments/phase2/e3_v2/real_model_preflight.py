@@ -76,13 +76,19 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def model_provenance(model_path: Path, model_id: str) -> dict:
+def model_provenance(
+    model_path: Path,
+    model_id: str,
+    revision: str | None = None,
+) -> dict:
     model_path = model_path.resolve()
     config_path = model_path / "config.json"
     index_path = model_path / "model.safetensors.index.json"
     if not config_path.is_file() or not index_path.is_file():
         raise FileNotFoundError("model snapshot lacks config or safetensors index")
-    revision = model_path.name if model_path.parent.name == "snapshots" else None
+    revision = revision or (
+        model_path.name if model_path.parent.name == "snapshots" else None
+    )
     weight_files = sorted(model_path.glob("*.safetensors"))
     if not weight_files:
         raise FileNotFoundError("model snapshot contains no safetensors weights")
@@ -96,6 +102,7 @@ def model_provenance(model_path: Path, model_id: str) -> dict:
                 "name": path.name,
                 "size_bytes": path.stat().st_size,
                 "blob_id": path.resolve().name,
+                "sha256": _sha256(path),
             }
             for path in weight_files
         ],
@@ -286,7 +293,11 @@ def run_preflight(args: argparse.Namespace) -> dict:
     thresholds = PreflightThresholds()
     run_dir = Path(args.run_dir).resolve()
     model_path = Path(args.model_path).resolve()
-    model_identity = model_provenance(model_path, args.model_id)
+    model_identity = model_provenance(
+        model_path,
+        args.model_id,
+        revision=args.model_revision,
+    )
     scientific_args = {
         "model_id": args.model_id,
         "context_length": args.context_length,
@@ -609,6 +620,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model-path", required=True)
     parser.add_argument("--model-id", default="Qwen/Qwen3.5-0.8B")
+    parser.add_argument("--model-revision")
     parser.add_argument("--run-dir", required=True)
     parser.add_argument("--context-length", type=int, default=2048)
     parser.add_argument("--segment-length", type=int, default=64)
