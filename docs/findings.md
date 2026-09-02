@@ -1,5 +1,24 @@
 # Research Findings
 
+## 2026-09-03: One-Swap Boundary Exchange Offline Screen
+
+- Verdict for the exact policy: `no`; stop without a fresh GPU confirmation.
+- Frozen action: replace the lowest-alpha SAFE segment inside TopK with the
+  highest-alpha STRESSED segment outside TopK, at most once per sample.
+- Existing discovery evidence: 12 Qwen3.5-0.8B 8K samples, Top-3 exact-KV
+  budget, no new oracle labels or GPU work.
+- Only 2/12 samples admitted an exchange, both on Needle; one exchange improved
+  oracle utility and one reduced it. All six LongEval samples were no-ops.
+- Overall deltas versus raw alpha: TopK mean utility `+0.000027
+  [-0.000567,+0.000649]`; NDCG `+0.000033 [-0.000129,+0.000228]`; pairwise
+  `-0.000575 [-0.002299,+0.000575]`.
+- Interpretation: acting directly at the budget boundary does not rescue the
+  fixed median safe/stressed controller because the required boundary
+  configuration is itself rare.
+- Stop condition: do not run fresh 8K/16K or tune thresholds, exchange count,
+  alpha margins, or candidate rules for this exact controller.
+- Full report: openchat/codex/share/2026-09-03/p1_boundary_exchange_offline_report.md
+
 ## 2026-09-02: Bounded Recurrent Correction at 8K
 
 - Verdict: `partial` with medium confidence.
