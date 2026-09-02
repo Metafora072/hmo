@@ -23,3 +23,15 @@
 - Stop condition: no more GPU runs or retuning for `rank01(alpha) + 0.30 * (rank01(sigma_current) - 0.5)`.
 - Surviving claim: recurrent measurements may contain diagnostic information beyond attention, but this bounded additive rule does not convert it into reliable fixed-budget utility.
 - Next decision: external Opus review should choose between a mechanism/diagnostic-only scope and a fresh method formulation under a new claim.
+
+
+## 2026-09-03: Conditional Safe/Stressed Regime Evidence
+
+- Verdict: the segment-level safe/stressed hypothesis is supported on existing discovery evidence; controller performance remains untested.
+- Protocol: 12 discovery samples and 360 segments; sample-grouped OOF ridge residuals controlling alpha + position; within-sample sigma/delta rank median split; no threshold search.
+- Main contrast: Q4 high-sigma/high-delta minus Q3 high-sigma/low-delta residual utility is +0.25541 [+0.03702,+0.45082], with 9/12 samples positive.
+- Task contrast: LongEval +0.28193 (5/6 positive); Needle +0.22889 (4/6 positive); no aggregate task direction reversal.
+- Interaction evidence: low-sigma Q1/Q2 means are nearly identical (-0.12495/-0.12786), while Q3/Q4 differ (-0.06870/+0.17931).
+- Limitation: Q3 is sparse (39 segments versus 141 in Q4), and 3/12 sample contrasts are negative; this is a design basis, not a held-out method result.
+- Next action pending confirmation: freeze a minimal discrete one-rank SAFE/NEUTRAL/STRESSED adjustment, unit-test it, then run one fresh 8K held-out confirmation on GPU1.
+- Full report: openchat/codex/share/2026-09-03/conditional_regime_offline_report.md

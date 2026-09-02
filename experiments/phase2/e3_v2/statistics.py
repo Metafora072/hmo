@@ -254,6 +254,54 @@ def _fit_ridge_predict(
     return test @ coefficients
 
 
+def grouped_baseline_residuals(
+    evidence: Sequence[SegmentEvidence],
+    *,
+    folds: int = 4,
+    ridge_lambda: float = 0.001,
+    seed: int = 20260903,
+) -> tuple[float, ...]:
+    """Return OOF utility residuals from the alpha-plus-position baseline."""
+    evidence = tuple(evidence)
+    if not evidence:
+        raise OracleContractError("baseline residuals require segment evidence")
+    if folds < 2 or ridge_lambda < 0:
+        raise OracleContractError(
+            "baseline residuals require folds >= 2 and nonnegative ridge"
+        )
+
+    seen = set()
+    for row in evidence:
+        key = (row.sample_id, row.segment_id)
+        if key in seen:
+            raise OracleContractError("segment evidence IDs must be unique within sample")
+        seen.add(key)
+        values = (row.utility, row.alpha, row.normalized_position)
+        if not all(math.isfinite(float(value)) for value in values):
+            raise OracleContractError("segment evidence contains non-finite baseline values")
+
+    sample_ids = np.asarray([row.sample_id for row in evidence], dtype=object)
+    fold_by_sample = _group_folds(sample_ids, folds, seed)
+    features = np.asarray(
+        [[row.alpha, row.normalized_position] for row in evidence],
+        dtype=np.float64,
+    )
+    targets = np.asarray([row.utility for row in evidence], dtype=np.float64)
+    predictions = np.empty(len(evidence), dtype=np.float64)
+    for fold in sorted(set(fold_by_sample.values())):
+        test_mask = np.asarray(
+            [fold_by_sample[sample_id] == fold for sample_id in sample_ids],
+            dtype=bool,
+        )
+        predictions[test_mask] = _fit_ridge_predict(
+            features[~test_mask],
+            targets[~test_mask],
+            features[test_mask],
+            ridge_lambda,
+        )
+    return tuple(float(value) for value in targets - predictions)
+
+
 def _validate_evidence(evidence: Sequence[SegmentEvidence], candidate: str) -> None:
     if not evidence:
         raise OracleContractError("candidate evaluation requires segment evidence")
