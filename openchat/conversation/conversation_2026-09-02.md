@@ -30,3 +30,7 @@ Git 分支入口已统一：当前完整最新版本为 `dev@52842b6`，包含 P
 
 **Codex(21:38:02)**:
 GPT 方案已具备可冻结的单一公式族和 held-out 判伪规则，不需要再把 Opus 设为前置 gate；若 confirmation 模糊或出现任务 scope 冲突，再请 Opus 做论文级判断更有价值。离线复用 12 个 discovery 样本后选定 `lambda=+0.30`：pairwise `+0.00470 [-0.00450,+0.01293]`，NDCG `+0.00576 [-0.06596,+0.06831]`；pairwise 在 LongEval/Needle 分别为 `+0.00613/+0.00326`，但 NDCG 仍为 `+0.06604/-0.05451`。该弱结果仅足以支持一次 held-out 判伪，不构成方法证据，也不会触发新的公式搜索。实现已加入 frozen config SHA、confirmation scope 和唯一 sample-ID 前缀合约，77 项 CPU 回归通过。详见 `codex/share/2026-09-02/p1_bounded_scorer_selection.md`。
+
+
+**Codex(22:28:19)**:
+冻结 `lambda=+0.30` 的 8K held-out confirmation 已在 GPU1 完成：12 个新样本、680 个 oracle pair，整体 pairwise `+0.00183 [-0.00642,+0.01056]`、NDCG `+0.03515 [-0.03140,+0.10195]`；LongEval 为 `+0.00902/+0.04368`，Needle 为 `-0.00536/+0.02661`。结果方向略正但样本异质、区间跨 0，独立内部 result-to-claim 审计判为 `partial`、medium confidence；它不是 Opus。当前无需 Opus 前置评审，也禁止根据 confirmation 重调公式；下一步只做同一冻结 scorer 的小规模 16K length-transfer probe，若仍混合再请 Opus 判断收窄 LongEval scope 还是 pivot。GPU1 已释放。详见 `codex/share/2026-09-02/p1_confirmation_8k_report.md`。
