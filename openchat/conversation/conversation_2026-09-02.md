@@ -12,3 +12,7 @@ P0-D 已在 `dev/e3-v2-p0d` 完成代码实现与无 GPU 合约验证：新增�
 
 **Codex(18:58:03)**:
 E3-v2 最小真实模型 preflight 已在物理 GPU1 上完成 provenance-complete PASS：Qwen3.5-0.8B 的八项 fail-closed gate 全部通过，最终 manifest 锁定 clean commit `77ca94b`、模型 revision 与完整权重 SHA-256。四轮过程保留了 Triton/RTX5090 不兼容、6/8 BLOCK、Qwen 多 token recurrent cache 语义问题及修复证据；最终运行 17.07 秒、峰值 reserved 显存约 13.05 GiB，退出后 GPU1 回到 15 MiB。该结论只开放有界 P1 discovery，不构成科学假设验证，也不自动启动后续实验。详见 `codex/share/2026-09-02/real_model_preflight_report.md`。
+
+
+**Codex(20:37:06)**:
+P1 discovery 已在 GPU1 完成两轮 8K 实验并合并分析：12 个样本、686 个 oracle pair、360 条 segment evidence。相对 `alpha+position`，`sigma_current` 的 pairwise 增量为 `+0.0257 [0.0021,0.0494]`，`phi_delta_alpha` 的 NDCG 增量为 `+0.0881 [0.0272,0.1544]`，说明 recurrent signal 有补充诊断价值；但原始 `alpha*sigma` 与 alpha 无显著差异，delta/surviving-write 的直接乘法均明显伤害排序且跨任务不稳定。因此当前结论是 partial：问题动机成立，现有控制器公式未成立，应先冻结一个最小的有界或条件修正设计，再做 held-out confirmation，不继续盲目扩大 GPU 实验。补漏的 `surviving_write_norm` 仅重跑信号采集 17.54 秒，未重复 oracle；GPU1 已释放。详见 `codex/share/2026-09-02/p1_discovery_report.md`。
