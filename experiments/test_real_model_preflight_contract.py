@@ -90,6 +90,9 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(metrics["max_abs"], 2.0)
         self.assertFalse(metrics["argmax_equal"])
         self.assertFalse(metrics["exact_equal"])
+        self.assertGreater(metrics["js_divergence"], 0.0)
+        self.assertGreater(metrics["max_probability_abs"], 0.0)
+        self.assertEqual(metrics["top10_overlap"], 1.0)
 
     def test_capture_records_failure_as_nonempty_evidence(self):
         checks = {}

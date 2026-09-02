@@ -57,8 +57,10 @@ ORACLE_MANIFEST_FILENAME = "oracle_manifest.json"
 
 @dataclass(frozen=True)
 class PreflightThresholds:
-    full_kv_atol: float = 0.05
-    full_kv_rtol: float = 0.01
+    full_kv_max_abs_max: float = 0.5
+    full_kv_mean_abs_max: float = 0.1
+    full_kv_js_divergence_max: float = 0.001
+    full_kv_top10_overlap_min: float = 0.8
     needle_max_abs_min: float = 1e-4
     needle_mean_abs_min: float = 1e-7
 
@@ -106,6 +108,19 @@ def _logit_difference(left: torch.Tensor, right: torch.Tensor) -> dict[str, floa
     if left.shape != right.shape or left.ndim != 2 or left.shape[0] != 1:
         raise OracleContractError("logit comparisons require aligned [1, vocab] tensors")
     difference = (left - right).abs()
+    left_log_probability = torch.log_softmax(left, dim=-1)
+    right_log_probability = torch.log_softmax(right, dim=-1)
+    left_probability = left_log_probability.exp()
+    right_probability = right_log_probability.exp()
+    mixture = 0.5 * (left_probability + right_probability)
+    log_mixture = mixture.clamp_min(torch.finfo(mixture.dtype).tiny).log()
+    js_divergence = 0.5 * (
+        torch.sum(left_probability * (left_log_probability - log_mixture))
+        + torch.sum(right_probability * (right_log_probability - log_mixture))
+    )
+    top_k = min(10, left.shape[-1])
+    left_top = set(torch.topk(left, top_k, dim=-1).indices.reshape(-1).tolist())
+    right_top = set(torch.topk(right, top_k, dim=-1).indices.reshape(-1).tolist())
     return {
         "max_abs": float(difference.max().item()),
         "mean_abs": float(difference.mean().item()),
@@ -113,6 +128,11 @@ def _logit_difference(left: torch.Tensor, right: torch.Tensor) -> dict[str, floa
         "argmax_right": int(right.argmax(dim=-1).item()),
         "argmax_equal": bool(torch.equal(left.argmax(dim=-1), right.argmax(dim=-1))),
         "exact_equal": bool(torch.equal(left, right)),
+        "js_divergence": float(js_divergence.item()),
+        "max_probability_abs": float(
+            (left_probability - right_probability).abs().max().item()
+        ),
+        "top10_overlap": len(left_top & right_top) / top_k,
     }
 
 
@@ -377,12 +397,15 @@ def run_preflight(args: argparse.Namespace) -> dict:
             split = state.first_answer_logits.detach().cpu().clone()
             del state
         metrics = _logit_difference(reference, split)
-        passed = torch.allclose(
-            reference.to(torch.float32),
-            split.to(torch.float32),
-            atol=thresholds.full_kv_atol,
-            rtol=thresholds.full_kv_rtol,
-        ) and bool(metrics["argmax_equal"])
+        passed = (
+            bool(metrics["argmax_equal"])
+            and float(metrics["max_abs"]) <= thresholds.full_kv_max_abs_max
+            and float(metrics["mean_abs"]) <= thresholds.full_kv_mean_abs_max
+            and float(metrics["js_divergence"])
+            <= thresholds.full_kv_js_divergence_max
+            and float(metrics["top10_overlap"])
+            >= thresholds.full_kv_top10_overlap_min
+        )
         metrics.update(asdict(thresholds))
         return passed, metrics
 

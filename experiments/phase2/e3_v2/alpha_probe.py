@@ -103,11 +103,18 @@ def collect_isolated_query_alpha(
     attentions = getattr(query_outputs, "attentions", None)
     if attentions is None:
         raise OracleContractError("alpha probe produced no attention tensors")
+    if len(attentions) == len(layer_indices):
+        indexed_attentions = tuple(zip(layer_indices, attentions))
+    elif max(layer_indices) < len(attentions):
+        indexed_attentions = tuple(
+            (layer_index, attentions[layer_index]) for layer_index in layer_indices
+        )
+    else:
+        raise OracleContractError("alpha attention tuple cannot be mapped to model layers")
     token_mass_per_layer = []
-    for layer_index in layer_indices:
-        if layer_index >= len(attentions) or attentions[layer_index] is None:
+    for layer_index, weights in indexed_attentions:
+        if weights is None:
             raise OracleContractError(f"alpha attention layer {layer_index} is missing")
-        weights = attentions[layer_index]
         if weights.ndim != 4 or weights.shape[-2] != prompt.query_tokens:
             raise OracleContractError("alpha attention tensor has an unexpected shape")
         if weights.shape[-1] < prompt.context_tokens:

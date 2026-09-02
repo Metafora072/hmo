@@ -341,6 +341,19 @@ class FakeAlphaBase:
         )
 
 
+class FakeCompactAlphaBase(FakeAlphaBase):
+    def __init__(self, trace):
+        super().__init__(trace, attention_layers=(3, 7))
+
+    def __call__(self, *args, **kwargs):
+        result = super().__call__(*args, **kwargs)
+        if getattr(result, "attentions", None) is not None:
+            result.attentions = tuple(
+                result.attentions[index] for index in self.attention_layers
+            )
+        return result
+
+
 class FakeAlphaModel:
     def __init__(self, emit_attentions=True):
         self.device = torch.device("cpu")
@@ -399,6 +412,20 @@ class AlphaIsolationTests(unittest.TestCase):
             )
         self.assertEqual(model.config._attn_implementation, "sdpa")
         self.assertEqual(model.model.config._attn_implementation, "sdpa")
+
+
+    def test_alpha_maps_compact_tuple_to_noncontiguous_layers(self):
+        prompt, segments = self.make_prompt_and_segments()
+        model = FakeAlphaModel()
+        model.model = FakeCompactAlphaBase(model.trace)
+        result = collect_isolated_query_alpha(
+            model,
+            prompt,
+            attention_layer_indices=[3, 7],
+            segments=segments,
+        )
+        self.assertEqual(result.attention_layer_indices, (3, 7))
+        self.assertAlmostEqual(result.attention_mass[0], 3.0)
 
 
 class StatisticalAnalysisTests(unittest.TestCase):
