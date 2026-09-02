@@ -8,3 +8,7 @@ P0-C 已在 `dev/e3-v2-p0c` 完成实现与无 GPU 合约验证：新增与 Qwen
 
 **Codex(02:24:49)**:
 P0-D 已在 `dev/e3-v2-p0d` 完成代码实现与无 GPU 合约验证：新增按实测字节冻结的多 donor/multi-background oracle、可恢复且语义重算的 manifest、隔离 Full-KV query-aware alpha probe、post-intervention 质量差聚合、sample-grouped CV/bootstrap 统计，以及缺项或失败即 BLOCK 的八项统一门禁。P0-D 专项 19 项、P0-A 至 P0-D 回归 60 项全部通过；未加载预训练权重、未运行 GPU。P0-D 代码级 PASS，但整体 GPU gate 仍等待最小 Qwen3.5 的集成 real-model preflight；8K/10% 预算下需先验证 segment 长度能提供至少两个不同 background slot。详见 `codex/share/2026-09-02/p0d_implementation_report.md`。
+
+
+**Codex(18:58:03)**:
+E3-v2 最小真实模型 preflight 已在物理 GPU1 上完成 provenance-complete PASS：Qwen3.5-0.8B 的八项 fail-closed gate 全部通过，最终 manifest 锁定 clean commit `77ca94b`、模型 revision 与完整权重 SHA-256。四轮过程保留了 Triton/RTX5090 不兼容、6/8 BLOCK、Qwen 多 token recurrent cache 语义问题及修复证据；最终运行 17.07 秒、峰值 reserved 显存约 13.05 GiB，退出后 GPU1 回到 15 MiB。该结论只开放有界 P1 discovery，不构成科学假设验证，也不自动启动后续实验。详见 `codex/share/2026-09-02/real_model_preflight_report.md`。
