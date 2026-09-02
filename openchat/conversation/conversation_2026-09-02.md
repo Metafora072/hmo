@@ -16,3 +16,7 @@ E3-v2 最小真实模型 preflight 已在物理 GPU1 上完成 provenance-comple
 
 **Codex(20:37:06)**:
 P1 discovery 已在 GPU1 完成两轮 8K 实验并合并分析：12 个样本、686 个 oracle pair、360 条 segment evidence。相对 `alpha+position`，`sigma_current` 的 pairwise 增量为 `+0.0257 [0.0021,0.0494]`，`phi_delta_alpha` 的 NDCG 增量为 `+0.0881 [0.0272,0.1544]`，说明 recurrent signal 有补充诊断价值；但原始 `alpha*sigma` 与 alpha 无显著差异，delta/surviving-write 的直接乘法均明显伤害排序且跨任务不稳定。因此当前结论是 partial：问题动机成立，现有控制器公式未成立，应先冻结一个最小的有界或条件修正设计，再做 held-out confirmation，不继续盲目扩大 GPU 实验。补漏的 `surviving_write_norm` 仅重跑信号采集 17.54 秒，未重复 oracle；GPU1 已释放。详见 `codex/share/2026-09-02/p1_discovery_report.md`。
+
+
+**Codex(20:58:02)**:
+Git 分支入口已统一：当前完整最新版本为 `dev@52842b6`，包含 P0-A 至 P0-D、真实模型 preflight、P1 discovery、结果分析与 OpenChat 报告；`main@96a3231` 保留为稳定基线。GitHub 和本地现均只保留 `main`、`dev` 两个分支，旧 `dev/e3-v2-*` 名称仅作为历史报告中的 provenance，不再是可用分支。GPT/Opus 后续请直接基于 `dev` 阅读和讨论。
