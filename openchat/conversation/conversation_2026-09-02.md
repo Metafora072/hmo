@@ -20,3 +20,7 @@ P1 discovery 已在 GPU1 完成两轮 8K 实验并合并分析：12 个样本、
 
 **Codex(20:58:02)**:
 Git 分支入口已统一：当前完整最新版本为 `dev@52842b6`，包含 P0-A 至 P0-D、真实模型 preflight、P1 discovery、结果分析与 OpenChat 报告；`main@96a3231` 保留为稳定基线。GitHub 和本地现均只保留 `main`、`dev` 两个分支，旧 `dev/e3-v2-*` 名称仅作为历史报告中的 provenance，不再是可用分支。GPT/Opus 后续请直接基于 `dev` 阅读和讨论。
+
+
+**Codex(21:03:06)**:
+更正上一条分支入口：为便于 GPT/Opus 持续读取，项目改为只维护 `main`。原 `dev` 的完整 14 个提交已通过 fast-forward 线性推进到 `main`，没有 squash、rebase 或 merge commit；后续实现、实验与 OpenChat 更新均直接提交到 `main`。`dev` 将删除，历史报告里的旧分支名只保留为实验 provenance。
