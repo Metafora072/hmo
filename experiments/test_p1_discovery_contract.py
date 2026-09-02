@@ -85,6 +85,7 @@ class SegmentEvidenceTests(unittest.TestCase):
             survival_retention=(-4.0, -3.0, -2.0, -1.0),
             decay_risk=(4.0, 3.0, 2.0, 1.0),
             suffix_interference=(0.0, 0.1, 0.2, 0.3),
+            surviving_write_norm=(4.0, 3.0, 2.0, 1.0),
         )
         rows = build_segment_evidence(
             plan=plan,

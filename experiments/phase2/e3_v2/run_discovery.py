@@ -146,6 +146,7 @@ def build_segment_evidence(
         "survival_retention": recurrent.survival_retention,
         "decay_risk": recurrent.decay_risk,
         "suffix_interference": recurrent.suffix_interference,
+        "surviving_write_norm": recurrent.surviving_write_norm,
     }
     rows = []
     for segment_id in plan.eligible_segment_ids:

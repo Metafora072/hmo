@@ -47,6 +47,7 @@ class AggregatedRecurrentCandidates:
     survival_retention: tuple[float, ...]
     decay_risk: tuple[float, ...]
     suffix_interference: tuple[float, ...]
+    surviving_write_norm: tuple[float, ...]
 
 
 def qwen35_l2_normalize(value: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
@@ -375,6 +376,7 @@ def aggregate_recurrent_candidates(
         survival_retention=mean_field("log_survival"),
         decay_risk=mean_field("decay_risk"),
         suffix_interference=mean_field("suffix_interference"),
+        surviving_write_norm=mean_field("surviving_write_norm"),
     )
 
 

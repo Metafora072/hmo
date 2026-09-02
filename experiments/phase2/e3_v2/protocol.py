@@ -9,7 +9,7 @@ P0B_EXECUTION_EVENTS = (
 )
 P0B_ANSWER_PREFIX = " "
 
-P0C_PROTOCOL_VERSION = "p0c-recurrent-candidates-v1"
+P0C_PROTOCOL_VERSION = "p0c-recurrent-candidates-v2"
 
 
 def recurrent_signal_protocol() -> dict:
@@ -43,6 +43,12 @@ def recurrent_signal_protocol() -> dict:
                     "C_i=sum_t_in_i(exp(sum_g_after_t)*outer(k_t,delta_t))"
                 ),
                 "later_contribution": "L_i=sum_j_after_i(C_j)",
+                "layer_aggregation": "mean",
+            },
+            "surviving_write_norm": {
+                "field": "surviving_write_norm",
+                "formula": "mean_batch_head(norm(C_i))",
+                "interpretation": "final_context_recurrent_contribution_strength",
                 "layer_aggregation": "mean",
             },
         },
