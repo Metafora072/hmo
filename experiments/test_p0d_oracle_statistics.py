@@ -389,7 +389,13 @@ class AlphaIsolationTests(unittest.TestCase):
             segments=segments,
         )
         self.assertEqual(model.trace[0][0], "context")
-        self.assertEqual(model.trace[1], ("query", model.trace[0][1]))
+        self.assertEqual(len(model.trace), 1 + prompt.query_tokens)
+        self.assertTrue(
+            all(
+                event == ("query", model.trace[0][1])
+                for event in model.trace[1:]
+            )
+        )
         self.assertEqual(model.config._attn_implementation, "sdpa")
         self.assertEqual(model.config.text_config._attn_implementation, "sdpa")
         self.assertEqual(model.model.config._attn_implementation, "sdpa")

@@ -77,51 +77,58 @@ def collect_isolated_query_alpha(
         if not layer.has_kv() or layer.keys.shape[-2] != prompt.context_tokens:
             raise OracleContractError("isolated alpha cache does not contain Full-KV context")
 
-    logical_positions = torch.arange(
-        prompt.context_tokens,
-        prompt.context_tokens + prompt.query_tokens,
-        device=device,
-        dtype=torch.long,
-    ).unsqueeze(0)
-    resident_positions = torch.arange(
-        prompt.context_tokens,
-        prompt.context_tokens + prompt.query_tokens,
-        device=device,
-        dtype=torch.long,
-    )
+    token_mass_per_layer_and_query = []
     with _eager_attention(model, base_model):
-        query_outputs = base_model(
-            query_ids,
-            past_key_values=private_cache,
-            use_cache=True,
-            output_attentions=True,
-            position_ids=logical_positions,
-            cache_position=resident_positions,
-            return_dict=True,
-        )
-
-    attentions = getattr(query_outputs, "attentions", None)
-    if attentions is None:
-        raise OracleContractError("alpha probe produced no attention tensors")
-    if len(attentions) == len(layer_indices):
-        indexed_attentions = tuple(zip(layer_indices, attentions))
-    elif max(layer_indices) < len(attentions):
-        indexed_attentions = tuple(
-            (layer_index, attentions[layer_index]) for layer_index in layer_indices
-        )
-    else:
-        raise OracleContractError("alpha attention tuple cannot be mapped to model layers")
-    token_mass_per_layer = []
-    for layer_index, weights in indexed_attentions:
-        if weights is None:
-            raise OracleContractError(f"alpha attention layer {layer_index} is missing")
-        if weights.ndim != 4 or weights.shape[-2] != prompt.query_tokens:
-            raise OracleContractError("alpha attention tensor has an unexpected shape")
-        if weights.shape[-1] < prompt.context_tokens:
-            raise OracleContractError("alpha attention tensor omits context keys")
-        context_weights = weights[..., : prompt.context_tokens].to(torch.float32)
-        token_mass_per_layer.append(context_weights.mean(dim=(0, 1, 2)))
-    token_mass = torch.stack(token_mass_per_layer, dim=0).mean(dim=0)
+        for query_offset in range(prompt.query_tokens):
+            logical_position = torch.tensor(
+                [[prompt.context_tokens + query_offset]],
+                device=device,
+                dtype=torch.long,
+            )
+            resident_position = torch.tensor(
+                [prompt.context_tokens + query_offset],
+                device=device,
+                dtype=torch.long,
+            )
+            query_outputs = base_model(
+                query_ids[:, query_offset : query_offset + 1],
+                past_key_values=private_cache,
+                use_cache=True,
+                output_attentions=True,
+                position_ids=logical_position,
+                cache_position=resident_position,
+                return_dict=True,
+            )
+            private_cache = query_outputs.past_key_values
+            attentions = getattr(query_outputs, "attentions", None)
+            if attentions is None:
+                raise OracleContractError("alpha probe produced no attention tensors")
+            if len(attentions) == len(layer_indices):
+                indexed_attentions = tuple(zip(layer_indices, attentions))
+            elif max(layer_indices) < len(attentions):
+                indexed_attentions = tuple(
+                    (layer_index, attentions[layer_index]) for layer_index in layer_indices
+                )
+            else:
+                raise OracleContractError(
+                    "alpha attention tuple cannot be mapped to model layers"
+                )
+            for layer_index, weights in indexed_attentions:
+                if weights is None:
+                    raise OracleContractError(
+                        f"alpha attention layer {layer_index} is missing"
+                    )
+                if weights.ndim != 4 or weights.shape[-2] != 1:
+                    raise OracleContractError(
+                        "alpha attention tensor has an unexpected shape"
+                    )
+                if weights.shape[-1] < prompt.context_tokens:
+                    raise OracleContractError("alpha attention tensor omits context keys")
+                context_weights = weights[..., : prompt.context_tokens].to(torch.float32)
+                token_mass_per_layer_and_query.append(
+                    context_weights.mean(dim=(0, 1, 2))
+                )
+    token_mass = torch.stack(token_mass_per_layer_and_query, dim=0).mean(dim=0)
     if not torch.isfinite(token_mass).all() or torch.any(token_mass < 0):
         raise OracleContractError("alpha attention mass is invalid")
 
