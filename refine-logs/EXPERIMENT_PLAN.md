@@ -29,3 +29,9 @@
 - If fresh 8K fails its continuation gate, stop V2 and do not run fresh 16K.
 - If 8K passes and 16K fails, preserve the result as a length-regime shift candidate and diagnose without fitting these outcomes.
 - Bootstrap intervals report uncertainty; sparse abstention makes a strictly positive lower bound unsuitable as the sole pilot gate.
+
+## Outcome
+
+Both prospective stages passed their scoped oracle Top-K NDCG criteria. The
+result-to-claim verdict is `partial`: proceed only under a new approved plan for
+end-task quality and baseline evidence; do not tune V2 on P2 outcomes.

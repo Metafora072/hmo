@@ -91,3 +91,20 @@
   publication-readiness issues.
 - Current route: treat query-to-segment recurrent readout as an operational
   accessibility observable, then test the frozen V2 allocation prospectively.
+
+## 2026-09-03: Frozen V2 Prospective 8K and 16K
+
+- Result-to-claim verdict: `partial`, medium confidence.
+- The method and sequential protocol were frozen before outcomes; both runs
+  used new seeds, sample IDs, and equal-byte oracle interventions.
+- Fresh 8K, 6+6 samples: NDCG delta versus corrected raw alpha `+0.09004
+  [+0.02114,+0.16856]`; LongEval `+0.18007`; Needle `0`.
+- Fresh 16K, 4+4 samples: NDCG delta `+0.05786
+  [+0.01189,+0.11566]`; LongEval `+0.11572`; Needle `0`.
+- Every nonzero NDCG change was positive, but all gains came from LongEval and
+  the pairwise intervals crossed zero at both lengths.
+- Supported claim: frozen query-conditioned accessibility improves this
+  model's oracle Top-K allocation at 8K and 16K under the tested budget.
+- Unsupported: cross-task benefit, end-task quality, semantic KV
+  substitutability, larger-model generality, and system advantage.
+- Full report: openchat/codex/share/2026-09-03/query_accessibility_v2_prospective_report.md

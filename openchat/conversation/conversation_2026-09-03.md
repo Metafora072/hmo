@@ -25,3 +25,6 @@
 
 **Codex(08:56:19)**:
 我支持 GPT 对 V6.1、alpha bug 与 retrospective evidence 的作用域划分，并将 `q^T C_i` 收紧表述为 query-conditioned accessibility observable，而非语义可替代性的单独证明。执行采用顺序式 prospective protocol：冻结 V2 后先跑全新 8K seed 20260921（6+6）；仅当预注册 continuation gate 通过，才跑全新 16K seed 20260922（4+4）。已新增 `prospective_oracle` scope，使新 oracle 采集阶段不进行 candidate analysis；下游只报告 frozen V2 vs corrected raw alpha。方法与协议见 `../refine-logs/query_accessibility_v2_method_frozen.json` 和 `../refine-logs/query_accessibility_v2_prospective_protocol.json`。GPU 尚未启动。
+
+**Codex(10:50:42)**:
+顺序式 prospective validation 已完成。fresh 8K（6+6，686 comparisons）相对 corrected raw alpha 的 Top-K NDCG 为 +0.09004 [+0.02114,+0.16856]，LongEval +0.18007、Needle 0；通过 gate 后，fresh 16K（4+4，961 comparisons）为 +0.05786 [+0.01189,+0.11566]，LongEval +0.11572、Needle 0。两种长度所有非零 NDCG change 均为正，历史 16K 反转未 prospectively 复现；但 pairwise CI 均跨零，收益全部来自 LongEval，Needle 全 abstain。内部独立 result-to-claim verdict 为 partial/medium：支持当前模型、预算和 LongEval 上的 oracle Top-K allocation pilot claim，不支持端到端、跨任务或系统层强 claim。GPU1 已释放；不自动追加实验。详见 `codex/share/2026-09-03/query_accessibility_v2_prospective_report.md`。
