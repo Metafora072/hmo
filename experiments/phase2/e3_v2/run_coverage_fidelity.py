@@ -205,6 +205,15 @@ def summarize_results(rows: Sequence[Mapping]) -> dict:
             "cf_hmo_vs_raw_alpha_exact_topk": _pair_summary(
                 rows, "cf_hmo", "raw_alpha_exact_topk"
             ),
+            "no_access_vs_raw_alpha_exact_topk": _pair_summary(
+                rows, "cf_hmo_no_access", "raw_alpha_exact_topk"
+            ),
+            "no_access_vs_full_kv_reference": _pair_summary(
+                rows, "cf_hmo_no_access", "full_kv_reference"
+            ),
+            "sparse_only_vs_raw_alpha_exact_topk": _pair_summary(
+                rows, "sparse_only", "raw_alpha_exact_topk"
+            ),
         },
         "mean_post_query_resident_kv_bytes": mean_resident,
         "mean_resident_fraction_of_full": {

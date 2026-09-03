@@ -84,6 +84,10 @@ class CoverageFidelityRunnerTests(unittest.TestCase):
         self.assertEqual(causal["normalized_answer_contains"]["wins"], 1)
         self.assertEqual(summary["p3_baseline_reproduced_cases"], 2)
         self.assertEqual(summary["mean_resident_fraction_of_full"]["cf_hmo"], 0.1)
+        attention_led = summary["comparisons"][
+            "no_access_vs_raw_alpha_exact_topk"
+        ]["normalized_answer_contains"]
+        self.assertEqual(attention_led["mean_delta"], 0.0)
 
 
 if __name__ == "__main__":
