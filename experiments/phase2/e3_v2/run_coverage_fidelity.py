@@ -25,6 +25,7 @@ from experiments.phase2.e3_v2.coverage_fidelity import (
     allocate_coverage_fidelity,
 )
 from experiments.phase2.e3_v2.coverage_fidelity_cache import (
+    SPARSE_SELECTORS,
     build_retained_position_plan,
     make_coverage_fidelity_intervention,
 )
@@ -263,6 +264,7 @@ def run(args: argparse.Namespace) -> dict:
         "model_revision": args.model_revision,
         "middle_kv_fraction": args.middle_kv_fraction,
         "sparse_width": args.sparse_width,
+        "sparse_selector": args.sparse_selector,
         "expected_changed_cases": args.expected_changed_cases,
         "max_new_tokens": protocol["max_new_tokens"],
         "recurrent_backend": REFERENCE_BACKEND,
@@ -283,7 +285,7 @@ def run(args: argparse.Namespace) -> dict:
                 "rank01(query_attention)*(1-rank01(query_read_share))"
                 "/incremental_exact_bytes"
             ),
-            "sparse_selector": "stable_token_query_attention",
+            "sparse_selector": args.sparse_selector,
             "candidate_search": False,
         },
         model=model_identity,
@@ -413,6 +415,7 @@ def run(args: argparse.Namespace) -> dict:
                 segments,
                 probe.token_attention_mass,
                 context_tokens=prompt.context_tokens,
+                sparse_selector=args.sparse_selector,
             )
             for name, plan in plans.items()
         }
@@ -621,6 +624,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-result", action="append", required=True)
     parser.add_argument("--middle-kv-fraction", type=float, default=0.10)
     parser.add_argument("--sparse-width", type=int, default=16)
+    parser.add_argument(
+        "--sparse-selector", choices=SPARSE_SELECTORS, default="top_tokens"
+    )
     parser.add_argument("--expected-changed-cases", type=int, default=10)
     parser.add_argument("--run-dir", required=True)
     parser.add_argument("--resume", action="store_true")

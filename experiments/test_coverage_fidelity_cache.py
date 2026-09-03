@@ -10,6 +10,7 @@ from experiments.phase2.e3_v2.coverage_fidelity import allocate_coverage_fidelit
 from experiments.phase2.e3_v2.coverage_fidelity_cache import (
     build_retained_position_plan,
     make_coverage_fidelity_intervention,
+    select_max_attention_window_positions,
     select_query_attention_positions,
 )
 from experiments.phase2.e3_v2.oracle import SegmentSpec
@@ -42,6 +43,14 @@ def _segments():
 
 
 class CoverageFidelityCacheTests(unittest.TestCase):
+    def test_max_mass_window_is_contiguous_and_uses_earliest_tie(self):
+        segment = _segments()[1]
+        mass = [0.0] * 16
+        mass[4:8] = [1.0, 2.0, 1.0, 2.0]
+        self.assertEqual(
+            select_max_attention_window_positions(mass, segment, 2), [4, 5]
+        )
+
     def test_stable_query_attention_tie_break(self):
         segment = _segments()[1]
         mass = [0.0] * 16
@@ -74,6 +83,26 @@ class CoverageFidelityCacheTests(unittest.TestCase):
         )
         self.assertEqual(result.metadata["context_resident_bytes"], 96)
         self.assertEqual(positions.context_charged_bytes, plan.total_charged_bytes)
+
+    def test_window_intervention_preserves_byte_contract(self):
+        segments = _segments()
+        plan = allocate_coverage_fidelity(
+            {1: 0.9, 2: 0.8},
+            {1: 0.9, 2: 0.1},
+            segments,
+            middle_kv_fraction=0.5,
+            sparse_width=1,
+            enable_exact_upgrades=False,
+        )
+        positions = build_retained_position_plan(
+            plan,
+            segments,
+            [float(index % 4) for index in range(16)],
+            context_tokens=16,
+            sparse_selector="max_mass_window",
+        )
+        self.assertEqual(positions.sparse_selector, "max_mass_window")
+        self.assertEqual(positions.context_charged_bytes, 96)
 
 
 if __name__ == "__main__":

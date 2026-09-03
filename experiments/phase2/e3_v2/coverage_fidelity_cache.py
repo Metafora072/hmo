@@ -14,6 +14,9 @@ from experiments.utils.cache_access import get_cache_layer
 from experiments.utils.memory_accounting import get_active_kv_bytes
 
 
+SPARSE_SELECTORS = ("top_tokens", "max_mass_window")
+
+
 @dataclass(frozen=True)
 class SegmentRetention:
     segment_id: int
@@ -25,6 +28,7 @@ class SegmentRetention:
 class RetainedPositionPlan:
     context_tokens: int
     context_charged_bytes: int
+    sparse_selector: str
     active_positions: tuple[int, ...]
     segments: tuple[SegmentRetention, ...]
 
@@ -59,12 +63,58 @@ def select_query_attention_positions(
     return sorted(segment.start + index for index in order[:keep])
 
 
+def select_max_attention_window_positions(
+    token_attention_mass: Sequence[float],
+    segment: SegmentSpec,
+    width: int,
+) -> list[int]:
+    """Select the contiguous window with maximum query-attention mass."""
+    if width <= 0 or len(token_attention_mass) < segment.end:
+        raise OracleContractError("invalid attention-window Sparse selection inputs")
+    values = [float(value) for value in token_attention_mass[segment.start : segment.end]]
+    if len(values) != segment.token_count or any(
+        not math.isfinite(value) or value < 0 for value in values
+    ):
+        raise OracleContractError(
+            "attention-window Sparse scores must be finite and nonnegative"
+        )
+    keep = min(width, segment.token_count)
+    window_sum = sum(values[:keep])
+    best_sum = window_sum
+    best_start = 0
+    for start in range(1, len(values) - keep + 1):
+        window_sum += values[start + keep - 1] - values[start - 1]
+        if window_sum > best_sum:
+            best_sum = window_sum
+            best_start = start
+    return list(
+        range(segment.start + best_start, segment.start + best_start + keep)
+    )
+
+
+def select_sparse_positions(
+    token_attention_mass: Sequence[float],
+    segment: SegmentSpec,
+    width: int,
+    *,
+    selector: str,
+) -> list[int]:
+    if selector == "top_tokens":
+        return select_query_attention_positions(token_attention_mass, segment, width)
+    if selector == "max_mass_window":
+        return select_max_attention_window_positions(
+            token_attention_mass, segment, width
+        )
+    raise OracleContractError(f"unknown Sparse selector {selector!r}")
+
+
 def build_retained_position_plan(
     plan: CoverageFidelityPlan,
     segments: Sequence[SegmentSpec],
     token_attention_mass: Sequence[float],
     *,
     context_tokens: int,
+    sparse_selector: str = "top_tokens",
 ) -> RetainedPositionPlan:
     """Materialize exact token positions for every allocator action."""
     ordered = tuple(sorted(segments, key=lambda item: item.segment_id))
@@ -92,10 +142,11 @@ def build_retained_position_plan(
         elif allocation.action == "exact":
             positions = list(range(segment.start, segment.end))
         elif allocation.action == "sparse":
-            positions = select_query_attention_positions(
+            positions = select_sparse_positions(
                 token_attention_mass,
                 segment,
                 allocation.retained_tokens,
+                selector=sparse_selector,
             )
         else:
             raise OracleContractError(
@@ -120,6 +171,7 @@ def build_retained_position_plan(
     return RetainedPositionPlan(
         context_tokens=context_tokens,
         context_charged_bytes=charged,
+        sparse_selector=sparse_selector,
         active_positions=tuple(active),
         segments=tuple(retention),
     )
