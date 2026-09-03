@@ -1,0 +1,61 @@
+{
+  "schema_version": "hmo.query_accessibility.end_task_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "frozen_at": "2026-09-03T16:08:10+08:00",
+  "frozen_v2_config": "refine-logs/query_accessibility_v2_method_frozen.json",
+  "frozen_v2_sha256": "01bcd3a9ea864ef2b9ab64c23c058badec70d7c88976168ff77100668b49a5f5",
+  "model_id": "Qwen/Qwen3.5-0.8B",
+  "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "systems": ["raw_alpha", "frozen_v2", "full_kv_reference"],
+  "equal_byte_comparison": ["raw_alpha", "frozen_v2"],
+  "primary_metric": "normalized_answer_contains",
+  "secondary_metrics": ["normalized_exact_match", "token_f1"],
+  "max_new_tokens": 32,
+  "bootstrap_samples": 5000,
+  "stages": {
+    "smoke": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 1,
+      "context_length": 2048,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "seed": 20261000,
+      "sample_id_prefix": "endtask_v2_smoke_s20261000_"
+    },
+    "8k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 12,
+      "context_length": 8192,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "seed": 20261001,
+      "sample_id_prefix": "endtask_v2_8k_s20261001_"
+    },
+    "16k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 12,
+      "context_length": 16384,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "seed": 20261002,
+      "sample_id_prefix": "endtask_v2_16k_s20261002_"
+    }
+  },
+  "run_order": ["smoke", "8k", "16k after the 8k continuation gate"],
+  "eight_k_continuation_gate": {
+    "overall_primary_delta": ">= 0",
+    "needle_primary_delta": ">= 0",
+    "longeval_membership_changed_samples": ">= 2",
+    "protocol_errors": "== 0"
+  },
+  "claim_gate": {
+    "combined_longeval_primary_wins": "> losses",
+    "needle_primary_delta_each_length": ">= 0",
+    "equal_byte_contract_errors": "== 0"
+  },
+  "immutability": {
+    "controller_or_threshold_changes": false,
+    "task_identity_or_labels_at_selection": false,
+    "sample_or_metric_changes_after_smoke": false
+  }
+}

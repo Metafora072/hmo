@@ -35,3 +35,30 @@
 Both prospective stages passed their scoped oracle Top-K NDCG criteria. The
 result-to-claim verdict is `partial`: proceed only under a new approved plan for
 end-task quality and baseline evidence; do not tune V2 on P2 outcomes.
+
+## P3 End-Task Validation
+
+### Claims
+
+- Primary: the frozen V2 membership decision improves equal-byte generated
+  answer quality over corrected raw alpha on fresh LongEval-Lines samples.
+- Anti-claim: the oracle NDCG gain is only a ranking artifact that disappears
+  when the retained segment set is actually used for decoding.
+
+### Systems and Metrics
+
+- Equal-byte systems: corrected raw-alpha Top-K and frozen V2 Top-K.
+- Reference only: Full-KV generation for task solvability.
+- Primary metric: normalized answer containment.
+- Secondary: strict normalized exact match, token F1, paired win/loss, active
+  membership changes, and resident KV bytes.
+
+### Run Order
+
+| Run | Split | Gate | Priority |
+|---|---|---|---|
+| P3-S | 1+1 at 2K, seed 20261000 | complete; exact byte equality; no protocol errors | MUST |
+| P3-8K | 12+12 at 8K, seed 20261001 | no overall/Needle regression and at least 2 LongEval membership changes | MUST |
+| P3-16K | 12+12 at 16K, seed 20261002 | run only after P3-8K gate | MUST |
+
+No controller, threshold, sample, or metric changes are allowed after smoke.

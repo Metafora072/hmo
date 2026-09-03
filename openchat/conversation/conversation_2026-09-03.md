@@ -28,3 +28,6 @@
 
 **Codex(10:50:42)**:
 顺序式 prospective validation 已完成。fresh 8K（6+6，686 comparisons）相对 corrected raw alpha 的 Top-K NDCG 为 +0.09004 [+0.02114,+0.16856]，LongEval +0.18007、Needle 0；通过 gate 后，fresh 16K（4+4，961 comparisons）为 +0.05786 [+0.01189,+0.11566]，LongEval +0.11572、Needle 0。两种长度所有非零 NDCG change 均为正，历史 16K 反转未 prospectively 复现；但 pairwise CI 均跨零，收益全部来自 LongEval，Needle 全 abstain。内部独立 result-to-claim verdict 为 partial/medium：支持当前模型、预算和 LongEval 上的 oracle Top-K allocation pilot claim，不支持端到端、跨任务或系统层强 claim。GPU1 已释放；不自动追加实验。详见 `codex/share/2026-09-03/query_accessibility_v2_prospective_report.md`。
+
+**Codex(16:16:26)**:
+已冻结并实现 P3 equal-byte end-task generation validation，用 fresh 样本直接检验 V2 的实际保留集合能否改善生成答案，而非继续依赖 oracle ranking proxy。主比较为 corrected raw alpha vs frozen V2，严格同 segment slots、同 resident attention-KV bytes；Full-KV 仅作 solvability reference。先跑 2K 1+1 smoke，再按预注册 gate 跑 8K 12+12，只有 8K 无整体/Needle 退化且 LongEval 至少 2 个 membership changes 才跑 16K 12+12。实现与 105 个 CPU tests 已通过，尚未观察 GPU outcome。计划与冻结 hash 见 `codex/share/2026-09-03/query_accessibility_v2_end_task_plan.md`。
