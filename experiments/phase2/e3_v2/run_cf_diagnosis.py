@@ -22,6 +22,9 @@ from experiments.phase2.e3_v2.context_query import (
     tokenize_answer_continuation,
     tokenize_sample_prompt,
 )
+from experiments.phase2.e3_v2.coverage_fidelity_cache import (
+    select_query_attention_positions,
+)
 from experiments.phase2.e3_v2.oracle import (
     OracleConfig,
     OracleContractError,
@@ -225,23 +228,6 @@ def locate_answer_token_positions(tokenizer, prompt, answer: str) -> dict:
         "answer_char_span": [char_start, char_end],
         "answer_token_positions": positions,
     }
-
-
-def select_query_attention_positions(
-    token_attention_mass: Sequence[float],
-    segment: SegmentSpec,
-    width: int,
-) -> list[int]:
-    if width <= 0 or len(token_attention_mass) < segment.end:
-        raise OracleContractError("invalid query-attention Sparse selection inputs")
-    keep = min(width, segment.token_count)
-    local = torch.tensor(
-        token_attention_mass[segment.start : segment.end], dtype=torch.float64
-    )
-    if not torch.isfinite(local).all() or torch.any(local < 0):
-        raise OracleContractError("query-attention Sparse scores must be finite and nonnegative")
-    indices = local.topk(keep).indices.sort().values.tolist()
-    return [segment.start + int(index) for index in indices]
 
 
 def build_survival_record(

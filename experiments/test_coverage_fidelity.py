@@ -112,6 +112,24 @@ class CoverageFidelityAllocatorTests(unittest.TestCase):
         self.assertLess(plan.residual_middle_bytes, 12)
         self.assertEqual(plan.middle_charged_bytes, 204)
 
+    def test_sparse_only_residual_does_not_create_greedy_exact_upgrade(self):
+        attention, accessibility = _signals()
+        plan = allocate_coverage_fidelity(
+            attention,
+            accessibility,
+            _segments(),
+            middle_kv_fraction=0.8,
+            sparse_width=2,
+            enable_exact_upgrades=False,
+        )
+        middle = [item for item in plan.allocations if item.segment_id in range(1, 5)]
+        self.assertTrue(all(item.action == "sparse" for item in middle))
+        self.assertLessEqual(
+            max(item.retained_tokens for item in middle)
+            - min(item.retained_tokens for item in middle),
+            1,
+        )
+
     def test_invalid_costs_and_signals_fail_closed(self):
         attention, accessibility = _signals()
         with self.assertRaisesRegex(CoverageFidelityError, "exactly match"):

@@ -8,6 +8,9 @@ from typing import Mapping, Sequence
 from experiments.phase2.e3_v2.oracle import SegmentSpec
 
 
+ALLOCATION_SCHEMA = "hmo.coverage_fidelity.allocator.v1"
+
+
 class CoverageFidelityError(ValueError):
     """Raised when allocation inputs cannot satisfy the byte contract."""
 
@@ -194,14 +197,19 @@ def allocate_coverage_fidelity(
         (item for item in eligible if 0 < retained[item.segment_id] < item.token_count),
         key=lambda item: (-attention_ranks[item.segment_id], item.segment_id),
     )
-    for item in residual_order:
-        segment_id = item.segment_id
-        unit = units[segment_id]
-        affordable = (middle_limit - charged) // unit
-        extra = min(affordable, item.token_count - retained[segment_id])
-        retained[segment_id] += extra
-        charged += extra * unit
-        if middle_limit - charged < unit:
+    while residual_order and middle_limit - charged >= next(iter(eligible_units)):
+        assigned = False
+        for item in residual_order:
+            segment_id = item.segment_id
+            unit = units[segment_id]
+            if retained[segment_id] >= item.token_count:
+                continue
+            if charged + unit > middle_limit:
+                break
+            retained[segment_id] += 1
+            charged += unit
+            assigned = True
+        if not assigned:
             break
 
     allocations = []
