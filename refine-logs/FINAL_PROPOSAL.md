@@ -17,3 +17,17 @@
 
 ## Novelty Position
 The method observes the actual query-to-recurrent-state interface of an already trained hybrid LLM. It differs from context-only saturation heuristics and from learned future-utility KV predictors: the score asks whether the implicit memory channel can currently answer the same query whose explicit KV is being budgeted.
+
+## P3 End-Task Outcome
+
+The frozen pilot passed prospective oracle Top-K validation but failed its
+subsequent equal-byte generation claim gate. At 8K, generated containment moved
+from 70.83% to 75.00%; at 16K it moved from 83.33% to 75.00%. Across 48 formal
+samples, the paired delta was -2.08 pp [-10.42,+6.25], with combined LongEval
+wins/losses of 2/3 and no Needle change.
+
+Therefore, the query-conditioned readout remains a validated observable for
+oracle ranking in this setup, but the frozen V2 mapping is not a validated
+deployable KV selector. Do not retune it on the accumulated labels. The next
+proposal must first explain the mismatch between marginal oracle rankings and
+actual jointly retained-set generation.

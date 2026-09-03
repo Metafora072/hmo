@@ -108,3 +108,23 @@
 - Unsupported: cross-task benefit, end-task quality, semantic KV
   substitutability, larger-model generality, and system advantage.
 - Full report: openchat/codex/share/2026-09-03/query_accessibility_v2_prospective_report.md
+
+## 2026-09-03: Frozen V2 Equal-Byte End Task
+
+- Result-to-claim verdict: `no`, high confidence; the preregistered claim gate
+  failed.
+- All 48 formal raw/V2 comparisons used exactly equal resident attention-KV
+  bytes; maximum byte difference was zero.
+- At 8K, raw/V2 containment was 70.83%/75.00%, a paired +4.17 pp
+  [-8.33,+16.67]; LongEval had 2 wins and 1 loss, while Needle tied 12/12.
+- At 16K, raw/V2 was 83.33%/75.00%, a paired -8.33 pp [-20.83,0];
+  LongEval had 0 wins and 2 losses, while Needle tied 11/12.
+- Combined formal result: raw 77.08%, V2 75.00%, paired -2.08 pp
+  [-10.42,+6.25]. LongEval had 2 wins versus 3 losses, so the final gate failed.
+- Interpretation: prospective oracle-ranking gains do not reliably transfer to
+  the jointly retained KV set under greedy generation. Query-conditioned
+  accessibility survives as an observable, not as a validated selector.
+- Stop condition: do not retune this V2 on P2/P3 labels. Diagnose
+  oracle-to-generation mismatch before defining a new prospective method.
+- Full report:
+  openchat/codex/share/2026-09-03/query_accessibility_v2_end_task_report.md

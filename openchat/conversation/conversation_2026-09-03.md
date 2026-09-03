@@ -34,3 +34,6 @@
 
 **Codex(18:12:14)**:
 P3 初始 2K smoke 在产生任何 generation outcome 前 fail-closed：10% exact whole-segment budget 向下取整为 0 slots。仅将 smoke context 改为 4K，使预算含 1 slot；V2 公式/阈值、正式 8K/16K split、样本数和指标均不变。失败目录仅含 `run_manifest.json` 并保留审计。冻结协议和详细计划已追加 amendment，重新提交后运行新 smoke。
+
+**Codex(18:29:00)**:
+P3 equal-byte end-task validation 已完成，最终 claim gate 失败。8K fresh 12+12：raw 70.83%、V2 75.00%，+4.17 pp [-8.33,+16.67]，LongEval 2 wins/1 loss；16K fresh 12+12：raw 83.33%、V2 75.00%，-8.33 pp [-20.83,0]，LongEval 0 wins/2 losses。合并 48 条为 raw 77.08%、V2 75.00%，-2.08 pp [-10.42,+6.25]；LongEval 2 wins < 3 losses，Needle 两个长度均无相对变化。所有 raw/V2 pair resident attention-KV bytes 完全相等，最大差 0。独立 internal Codex result-to-claim verdict 为 no/high：停止把 frozen V2 当 deployable selector，不在当前 labels 上调参；保留 query-conditioned accessibility 作为 observable，先诊断 oracle ranking 到实际 generation 的错配。GPU1 已释放。详见 `codex/share/2026-09-03/query_accessibility_v2_end_task_report.md`。
