@@ -308,6 +308,40 @@ class TokenSkeletonResult:
     skeleton_kv_bytes: int = 0
 
 
+def select_token_skeleton_positions(
+    cache,
+    attn_layer_indices: list[int],
+    start: int,
+    end: int,
+    n_keep: int = 16,
+) -> tuple[list[int], int]:
+    """Select the exact global positions used by the K/V-norm skeleton."""
+    seg_len = end - start
+    if seg_len <= 0 or n_keep <= 0 or not attn_layer_indices:
+        raise ValueError("token skeleton bounds and n_keep must be positive")
+    if seg_len <= n_keep:
+        return list(range(start, end)), 0
+
+    token_scores = torch.zeros(seg_len, device="cpu", dtype=torch.float32)
+    original_kv_bytes = 0
+    for layer_idx in attn_layer_indices:
+        layer = get_cache_layer(cache, layer_idx)
+        if not layer.has_kv() or layer.keys.shape[-2] < end:
+            raise ValueError("token skeleton requires complete attention-layer KV")
+        seg_k = layer.keys[:, :, start:end, :]
+        seg_v = layer.values[:, :, start:end, :]
+        original_kv_bytes += int(
+            seg_k.numel() * seg_k.element_size()
+            + seg_v.numel() * seg_v.element_size()
+        )
+        k_norm = seg_k.float().norm(dim=-1).sum(dim=(0, 1))
+        v_norm = seg_v.float().norm(dim=-1).sum(dim=(0, 1))
+        token_scores += (k_norm + v_norm).cpu()
+
+    top_indices = token_scores.topk(n_keep).indices.sort().values.tolist()
+    return [start + int(index) for index in top_indices], original_kv_bytes
+
+
 def extract_token_skeleton(
     cache,
     attn_layer_indices: list[int],
@@ -342,27 +376,13 @@ def extract_token_skeleton(
             kept_positions=list(range(start, end)),
         )
 
-    # Compute per-token importance across all attention layers
-    token_scores = torch.zeros(seg_len, device='cpu', dtype=torch.float32)
-    original_kv_bytes = 0
-
-    for layer_idx in attn_layer_indices:
-        layer = get_cache_layer(cache, layer_idx)
-        if not layer.has_kv():
-            continue
-        seg_k = layer.keys[:, :, start:end, :]  # [B, H, seg_len, D]
-        seg_v = layer.values[:, :, start:end, :]
-        original_kv_bytes += int(seg_k.numel() * seg_k.element_size() + seg_v.numel() * seg_v.element_size())
-        # Sum of norms across batch and heads
-        k_norm = seg_k.float().norm(dim=-1).sum(dim=(0, 1))  # [seg_len]
-        v_norm = seg_v.float().norm(dim=-1).sum(dim=(0, 1))  # [seg_len]
-        token_scores += (k_norm + v_norm).cpu()
-
-    # Select top-n_keep positions within the segment
-    _, top_indices = token_scores.topk(n_keep)
-    top_indices_sorted = top_indices.sort().values  # keep original order
-    keep_local = top_indices_sorted.tolist()
-    keep_global = [start + i for i in keep_local]
+    keep_global, original_kv_bytes = select_token_skeleton_positions(
+        cache,
+        attn_layer_indices,
+        start,
+        end,
+        n_keep,
+    )
 
     # Build a mask for the full cache sequence
     first_layer = get_cache_layer(cache, attn_layer_indices[0])

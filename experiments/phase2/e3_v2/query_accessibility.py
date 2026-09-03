@@ -42,6 +42,13 @@ class HybridQueryProbeResult:
     accessibility: QueryAccessibilityResult
 
 
+@dataclass(frozen=True)
+class HybridQueryTokenProbeResult:
+    alpha: AlphaProbeResult
+    accessibility: QueryAccessibilityResult
+    token_attention_mass: tuple[float, ...]
+
+
 def segment_query_readout(
     normalized_query: torch.Tensor,
     contributions: torch.Tensor,
@@ -294,7 +301,7 @@ class _Qwen35QueryAccessibilityHook:
 
 
 @torch.no_grad()
-def collect_hybrid_query_probe(
+def collect_hybrid_query_token_probe(
     model,
     prompt: TokenizedPromptSplit,
     *,
@@ -302,8 +309,8 @@ def collect_hybrid_query_probe(
     recurrent_layer_indices: Sequence[int],
     segments: Sequence[SegmentSpec],
     segment_length: int,
-) -> HybridQueryProbeResult:
-    """Collect corrected alpha and recurrent accessibility in one private run."""
+) -> HybridQueryTokenProbeResult:
+    """Collect corrected segment and token attention plus recurrent accessibility."""
     attention_indices = tuple(int(index) for index in attention_layer_indices)
     recurrent_indices = tuple(int(index) for index in recurrent_layer_indices)
     segment_tuple = tuple(segments)
@@ -383,6 +390,12 @@ def collect_hybrid_query_probe(
         manager.detach()
 
     token_mass = torch.stack(token_attention).mean(dim=0)
+    if (
+        token_mass.shape != (prompt.context_tokens,)
+        or not torch.isfinite(token_mass).all()
+        or torch.any(token_mass < 0)
+    ):
+        raise OracleContractError("hybrid query token attention mass is invalid")
     segment_mass = tuple(
         float(token_mass[segment.start : segment.end].sum().item())
         for segment in segment_tuple
@@ -394,4 +407,33 @@ def collect_hybrid_query_probe(
         segment_ids=tuple(segment.segment_id for segment in segment_tuple),
         attention_mass=segment_mass,
     )
-    return HybridQueryProbeResult(alpha=alpha, accessibility=accessibility)
+    return HybridQueryTokenProbeResult(
+        alpha=alpha,
+        accessibility=accessibility,
+        token_attention_mass=tuple(float(value) for value in token_mass.tolist()),
+    )
+
+
+@torch.no_grad()
+def collect_hybrid_query_probe(
+    model,
+    prompt: TokenizedPromptSplit,
+    *,
+    attention_layer_indices: Sequence[int],
+    recurrent_layer_indices: Sequence[int],
+    segments: Sequence[SegmentSpec],
+    segment_length: int,
+) -> HybridQueryProbeResult:
+    """Preserve the frozen segment-level probe API and behavior."""
+    result = collect_hybrid_query_token_probe(
+        model,
+        prompt,
+        attention_layer_indices=attention_layer_indices,
+        recurrent_layer_indices=recurrent_layer_indices,
+        segments=segments,
+        segment_length=segment_length,
+    )
+    return HybridQueryProbeResult(
+        alpha=result.alpha,
+        accessibility=result.accessibility,
+    )
