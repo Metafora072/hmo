@@ -12,8 +12,9 @@ improving oracle Top-K ranking?
   `2fc06364715b967f1860aea9cf38778875588b17`.
 - Method: `refine-logs/query_accessibility_v2_method_frozen.json`, SHA-256
   `01bcd3a9ea864ef2b9ab64c23c058badec70d7c88976168ff77100668b49a5f5`.
-- Protocol: `refine-logs/query_accessibility_v2_end_task_protocol.json`, SHA-256
-  `8933b550b9176f9784d6482b1fe2766b710375c72557b32ebea1717936e0ae02`.
+- Protocol: `refine-logs/query_accessibility_v2_end_task_protocol.json`, amended
+  SHA-256
+  `a085d5d27f55d1edadd467bd6d4ae5a0df3b53c58908b2b8d6c426bf417febe6`.
 - Primary comparison: corrected raw-alpha Top-K versus frozen V2 Top-K.
 - Budget: identical middle-segment slots and exact resident attention-KV bytes.
 - Reference only: Full-KV generation, used to expose task solvability.
@@ -25,7 +26,7 @@ The selector never receives the dataset name, answer, or task label.
 
 ## Run Order
 
-1. Smoke: fresh seed `20261000`, 1 Needle + 1 LongEval sample at 2K.
+1. Smoke: fresh seed `20261000`, 1 Needle + 1 LongEval sample at 4K.
 2. Main: fresh seed `20261001`, 12 + 12 samples at 8K.
 3. Transfer: fresh seed `20261002`, 12 + 12 samples at 16K, only if the
    pre-registered 8K continuation gate passes.
@@ -45,3 +46,12 @@ outputs when raw and V2 selected sets are identical.
 
 The focused contract tests and the complete CPU suite pass: 105 tests total.
 No GPU result was observed before this protocol was frozen.
+
+## Pre-Outcome Amendment
+
+The initial 2K smoke failed before generation because a 10% exact
+whole-segment budget rounded down to zero slots. The smoke context was changed
+to 4K, which yields one slot; no method, threshold, formal split, sample count,
+or metric changed. The failed directory contains only `run_manifest.json` and is
+retained at
+`/mnt/nvme0/hmo/runs/p3_endtask_v2_smoke_s20261000_20260903_181059`.

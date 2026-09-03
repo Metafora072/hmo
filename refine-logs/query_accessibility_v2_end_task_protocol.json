@@ -16,7 +16,7 @@
     "smoke": {
       "datasets": "needle,longeval_lines",
       "samples_per_dataset": 1,
-      "context_length": 2048,
+      "context_length": 4096,
       "segment_length": 256,
       "middle_kv_fraction": 0.1,
       "seed": 20261000,
@@ -42,6 +42,14 @@
     }
   },
   "run_order": ["smoke", "8k", "16k after the 8k continuation gate"],
+  "pre_outcome_amendment": {
+    "time": "2026-09-03T18:12:14+08:00",
+    "scope": "smoke context_length only: 2048 -> 4096",
+    "reason": "At 2K, floor(eligible_middle_bytes * 0.1) yielded zero whole 256-token segments; 4K yields one slot.",
+    "outcomes_observed": false,
+    "failed_run_dir": "/mnt/nvme0/hmo/runs/p3_endtask_v2_smoke_s20261000_20260903_181059",
+    "failed_run_artifacts": ["run_manifest.json"]
+  },
   "eight_k_continuation_gate": {
     "overall_primary_delta": ">= 0",
     "needle_primary_delta": ">= 0",

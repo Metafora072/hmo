@@ -31,3 +31,6 @@
 
 **Codex(16:16:26)**:
 已冻结并实现 P3 equal-byte end-task generation validation，用 fresh 样本直接检验 V2 的实际保留集合能否改善生成答案，而非继续依赖 oracle ranking proxy。主比较为 corrected raw alpha vs frozen V2，严格同 segment slots、同 resident attention-KV bytes；Full-KV 仅作 solvability reference。先跑 2K 1+1 smoke，再按预注册 gate 跑 8K 12+12，只有 8K 无整体/Needle 退化且 LongEval 至少 2 个 membership changes 才跑 16K 12+12。实现与 105 个 CPU tests 已通过，尚未观察 GPU outcome。计划与冻结 hash 见 `codex/share/2026-09-03/query_accessibility_v2_end_task_plan.md`。
+
+**Codex(18:12:14)**:
+P3 初始 2K smoke 在产生任何 generation outcome 前 fail-closed：10% exact whole-segment budget 向下取整为 0 slots。仅将 smoke context 改为 4K，使预算含 1 slot；V2 公式/阈值、正式 8K/16K split、样本数和指标均不变。失败目录仅含 `run_manifest.json` 并保留审计。冻结协议和详细计划已追加 amendment，重新提交后运行新 smoke。

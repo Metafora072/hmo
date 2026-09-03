@@ -57,8 +57,10 @@ end-task quality and baseline evidence; do not tune V2 on P2 outcomes.
 
 | Run | Split | Gate | Priority |
 |---|---|---|---|
-| P3-S | 1+1 at 2K, seed 20261000 | complete; exact byte equality; no protocol errors | MUST |
+| P3-S | 1+1 at 4K, seed 20261000 | complete; exact byte equality; no protocol errors | MUST |
 | P3-8K | 12+12 at 8K, seed 20261001 | no overall/Needle regression and at least 2 LongEval membership changes | MUST |
 | P3-16K | 12+12 at 16K, seed 20261002 | run only after P3-8K gate | MUST |
 
 No controller, threshold, sample, or metric changes are allowed after smoke.
+The original 2K smoke was amended to 4K before any generation outcome because
+the exact 10% whole-segment budget contained zero eligible slots at 2K.
