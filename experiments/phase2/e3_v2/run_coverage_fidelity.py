@@ -129,6 +129,24 @@ def _eligible_action_counts(plan: CoverageFidelityPlan, protected_ids: set[int])
     }
 
 
+def restrict_eligible_signals(
+    attention: Mapping[int, float],
+    accessibility: Mapping[int, float],
+    segments: Sequence,
+) -> tuple[dict[int, float], dict[int, float]]:
+    """Remove protected/partial probe entries at the pure allocator boundary."""
+    eligible_ids = tuple(segment.segment_id for segment in segments if segment.eligible)
+    if any(
+        segment_id not in attention or segment_id not in accessibility
+        for segment_id in eligible_ids
+    ):
+        raise OracleContractError("probe signals do not cover every eligible segment")
+    return (
+        {segment_id: float(attention[segment_id]) for segment_id in eligible_ids},
+        {segment_id: float(accessibility[segment_id]) for segment_id in eligible_ids},
+    )
+
+
 def _pair_summary(rows: Sequence[Mapping], left: str, right: str) -> dict:
     output = {}
     for metric in METRICS:
@@ -341,6 +359,9 @@ def run(args: argparse.Namespace) -> dict:
         )
         attention = probe.alpha.as_dict()
         accessibility = probe.accessibility.field_dict("read_share")
+        allocator_attention, allocator_accessibility = restrict_eligible_signals(
+            attention, accessibility, segments
+        )
         historical_selection = select_equal_byte_segments(
             attention,
             accessibility,
@@ -363,8 +384,8 @@ def run(args: argparse.Namespace) -> dict:
         }
         plans = {
             name: allocate_coverage_fidelity(
-                attention,
-                accessibility,
+                allocator_attention,
+                allocator_accessibility,
                 segments,
                 middle_kv_fraction=args.middle_kv_fraction,
                 sparse_width=args.sparse_width,

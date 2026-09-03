@@ -3,10 +3,38 @@ from __future__ import annotations
 
 import unittest
 
-from experiments.phase2.e3_v2.run_coverage_fidelity import SYSTEMS, summarize_results
+from experiments.phase2.e3_v2.oracle import SegmentSpec
+from experiments.phase2.e3_v2.run_coverage_fidelity import (
+    SYSTEMS,
+    restrict_eligible_signals,
+    summarize_results,
+)
 
 
 class CoverageFidelityRunnerTests(unittest.TestCase):
+    def test_probe_signals_are_restricted_to_eligible_middle(self):
+        segments = tuple(
+            SegmentSpec(
+                index,
+                index * 2,
+                (index + 1) * 2,
+                2,
+                16,
+                index in {0, 3},
+                False,
+                (index + 0.5) / 4,
+                index,
+            )
+            for index in range(4)
+        )
+        attention, accessibility = restrict_eligible_signals(
+            {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3},
+            {0: 1.0, 1: 0.9, 2: 0.8, 3: 0.7},
+            segments,
+        )
+        self.assertEqual(attention, {1: 0.1, 2: 0.2})
+        self.assertEqual(accessibility, {1: 0.9, 2: 0.8})
+
     def test_summary_reports_causal_and_baseline_comparisons(self):
         rows = []
         for index, stage in enumerate(("8k", "16k")):
