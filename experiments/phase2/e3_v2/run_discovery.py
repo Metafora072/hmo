@@ -78,6 +78,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 OBSERVATIONS_FILENAME = "pair_observations.jsonl"
 SUMMARY_FILENAME = "discovery_summary.json"
 CONFIRMATION_SUMMARY_FILENAME = "confirmation_summary.json"
+PROSPECTIVE_ORACLE_SUMMARY_FILENAME = "prospective_oracle_summary.json"
 EVALUATED_CANDIDATES = (
     "sigma_current",
     "delta_update",
@@ -448,14 +449,15 @@ def run_discovery(args: argparse.Namespace) -> dict:
         "secondary_generation": False,
         "visible_cuda_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
     }
+    scope_names = {
+        "discovery": "discovery_only",
+        "confirmation": "held_out_confirmation",
+        "prospective_oracle": "prospective_oracle_acquisition_only",
+    }
     selections = {
-        "scope": (
-            "held_out_confirmation"
-            if args.scope == "confirmation"
-            else "discovery_only"
-        ),
+        "scope": scope_names[args.scope],
         "candidate_names": (
-            [] if frozen_scorer is not None else list(EVALUATED_CANDIDATES)
+            list(EVALUATED_CANDIDATES) if args.scope == "discovery" else []
         ),
         "frozen_scorer": frozen_scorer,
         "oracle_primary_only": True,
@@ -670,6 +672,16 @@ def run_discovery(args: argparse.Namespace) -> dict:
             )
             result_scope = "held_out_confirmation_frozen_scorer"
         summary_filename = CONFIRMATION_SUMMARY_FILENAME
+    elif args.scope == "prospective_oracle":
+        analysis = {
+            "analysis_performed": False,
+            "reason": (
+                "oracle labels are reserved for one preregistered downstream "
+                "query-accessibility evaluation"
+            ),
+        }
+        result_scope = "prospective_oracle_acquisition_only"
+        summary_filename = PROSPECTIVE_ORACLE_SUMMARY_FILENAME
     else:
         analysis = analyze_discovery(
             all_evidence,
@@ -709,7 +721,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-id", default="Qwen/Qwen3.5-0.8B")
     parser.add_argument("--model-revision")
     parser.add_argument("--run-dir", required=True)
-    parser.add_argument("--scope", choices=("discovery", "confirmation"), default="discovery")
+    parser.add_argument(
+        "--scope",
+        choices=("discovery", "confirmation", "prospective_oracle"),
+        default="discovery",
+    )
     parser.add_argument("--frozen-scorer-config")
     parser.add_argument("--sample-id-prefix", default="")
     parser.add_argument("--datasets", default="needle,longeval_lines")
@@ -740,8 +756,14 @@ def parse_args() -> argparse.Namespace:
             parser.error(
                 "confirmation requires --frozen-scorer-config and --sample-id-prefix"
             )
+    elif args.scope == "prospective_oracle":
+        if args.frozen_scorer_config or not args.sample_id_prefix:
+            parser.error(
+                "prospective oracle acquisition requires a sample prefix and "
+                "does not accept a scorer"
+            )
     elif args.frozen_scorer_config or args.sample_id_prefix:
-        parser.error("frozen scorer and sample prefix are confirmation-only")
+        parser.error("frozen scorer and sample prefix are not valid for discovery")
     return args
 
 

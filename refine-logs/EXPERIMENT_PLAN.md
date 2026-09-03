@@ -1,25 +1,31 @@
 # Experiment Plan
 
-**Problem**: query-conditioned recurrent-state-aware exact-KV allocation
-**Method Thesis**: explicit KV demand depends on what the current query can already retrieve from the recurrent channel.
-**Date**: 2026-09-03
+**Problem**: prospective validation of query-conditioned recurrent-state-aware exact-KV allocation
+
+**Method**: frozen dual-confidence abstention V2
+
+**Protocol**: `query_accessibility_v2_prospective_protocol.json`
 
 ## Claim Map
-| Claim | Minimum Convincing Evidence |
+
+| Claim | Required evidence |
 |---|---|
-| Accessibility contains incremental utility information | Grouped-CV NDCG gain above corrected alpha plus position, with positive lower bootstrap bound and no task-sign conflict |
-| Frozen allocation improves top-budget choice | Positive NDCG versus corrected raw alpha on independent 8K and directionally positive 16K; Needle nonnegative |
+| The retrospective 8K pattern reproduces | Fresh 6+6 oracle samples pass the preregistered continuation gate versus corrected raw alpha |
+| The frozen controller transfers to 16K | Only after 8K passes: fresh 4+4 samples are positive overall and on LongEval, with Needle at least -0.005 |
+| The method is generally length robust | Not claimable from these pilots alone; later larger-scale end-task and baseline evaluation is required |
 
 ## Run Order
-| Run | Purpose | Gate | Cost |
-|---|---|---|---|
-| R000 | Real-model probe integrity | Alpha unchanged exactly; finite accessibility | completed, 0.003 GPU-h |
-| R001 | 12-sample discovery enrichment | direct NDCG above +0.02 on both tasks, or incremental NDCG above +0.03 with CI lower above zero | about 3 minutes |
-| R002 | Independent 8K recapture and frozen evaluation | overall and LongEval positive; Needle at least -0.005 | about 2 minutes |
-| R003 | Independent 16K transfer | overall positive; no strong task reversal | about 2 minutes |
+
+| Run | Purpose | Gate | Approximate cost |
+|---|---|---|---:|
+| P2-8K-O | Fresh 8K equal-byte oracle acquisition | No candidate analysis | 33 min |
+| P2-8K-Q | Frozen V2 query-accessibility evaluation | Apply fixed 8K continuation gate | 2-3 min |
+| P2-16K-O | Fresh 16K oracle acquisition | Run only if P2-8K-Q passes | 35-45 min |
+| P2-16K-Q | Frozen V2 query-accessibility evaluation | Diagnose transfer, do not tune | 2-3 min |
 
 ## Stop Rules
-- No threshold, weight, feature, or task-specific search after R001.
-- If R001 fails both gates, stop query accessibility.
-- If R002 fails, do not run new oracle labels or scale the method.
-- Feedback GPT and Opus only after R002 and R003 support the frozen claim.
+
+- No threshold, formula, task-conditioned rule, or length normalization changes.
+- If fresh 8K fails its continuation gate, stop V2 and do not run fresh 16K.
+- If 8K passes and 16K fails, preserve the result as a length-regime shift candidate and diagnose without fitting these outcomes.
+- Bootstrap intervals report uncertainty; sparse abstention makes a strictly positive lower bound unsuitable as the sole pilot gate.

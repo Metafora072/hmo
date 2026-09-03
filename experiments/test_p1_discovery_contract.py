@@ -14,6 +14,7 @@ from experiments.phase2.e3_v2.run_discovery import (
     build_segment_evidence,
     load_frozen_scorer_config,
     load_pair_observations,
+    parse_args,
 )
 from experiments.phase2.e3_v2.statistics import SegmentEvidence
 from experiments.utils.dataset_utils import EvalSample
@@ -162,6 +163,25 @@ class HeldOutSampleTests(unittest.TestCase):
             built = _build_samples(object(), args)
         self.assertEqual(built[0].sample_id, "confirm_seed99_needle_0000")
         self.assertEqual(sample.sample_id, "needle_0000")
+
+    def test_prospective_oracle_requires_distinct_sample_prefix(self):
+        argv = [
+            "run_discovery",
+            "--model-path",
+            "/tmp/model",
+            "--run-dir",
+            "/tmp/run",
+            "--scope",
+            "prospective_oracle",
+        ]
+        with patch("sys.argv", argv), self.assertRaises(SystemExit):
+            parse_args()
+
+        argv.extend(["--sample-id-prefix", "fresh_v2_"])
+        with patch("sys.argv", argv):
+            args = parse_args()
+        self.assertEqual(args.scope, "prospective_oracle")
+        self.assertEqual(args.sample_id_prefix, "fresh_v2_")
 
 
 class SegmentEvidenceTests(unittest.TestCase):

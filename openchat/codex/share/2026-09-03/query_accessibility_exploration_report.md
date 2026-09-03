@@ -9,7 +9,8 @@ The exploration found a real but scoped 8K result, not a length-robust controlle
 
 - Correcting the hybrid alpha probe materially changes segment ranking below Top-1.
 - A direct query-to-DeltaNet-state readout is measurable and isolated without perturbing alpha.
-- A dual-confidence abstention controller improves Top-K NDCG on two independent 8K seeds while leaving Needle unchanged.
+- A dual-confidence abstention controller improves Top-K NDCG on multiple
+  retrospective 8K reuse-label evaluations while leaving Needle unchanged.
 - The identical frozen controller reverses at 16K, so a general 8K-to-16K claim is unsupported.
 - Hand mappings, learned three-feature scoring, and bounded one-swap variants are stopped.
 
@@ -53,7 +54,7 @@ The strong task asymmetry motivated abstention rather than another global scorer
 
 ### Candidate C: Dual-confidence abstention
 
-Version 1 applied access deficit only when normalized alpha entropy was at least 0.45. Discovery NDCG was +0.1287 [+0.0510,+0.2251], but the first independent 8K seed exposed one high-entropy Needle false activation; overall remained +0.0819 [+0.0121,+0.1544], while Needle was -0.0195.
+Version 1 applied access deficit only when normalized alpha entropy was at least 0.45. Discovery NDCG was +0.1287 [+0.0510,+0.2251], but the first retrospective 8K holdout exposed one high-entropy Needle false activation; overall remained +0.0819 [+0.0121,+0.1544], while Needle was -0.0195.
 
 Version 2 was then frozen using both prior 8K artifacts as development evidence:
 
@@ -69,14 +70,14 @@ When disabled, the method is exactly raw alpha. It uses no task identity or orac
 |---|---:|---:|---:|---:|---:|
 | Development seed 20260902/03 | 12 | +0.1143 [+0.0338,+0.2137] | +0.2286 | 0 | 3 |
 | Development seed 20260908 | 12 | +0.0699 [+0.0154,+0.1306] | +0.1398 | 0 | 4 |
-| Final independent 8K seed 20260911 | 12 | +0.0506 [0,+0.1068] | +0.1012 | 0 | 3 |
+| Retrospective holdout 8K seed 20260911 | 12 | +0.0506 [0,+0.1068] | +0.1012 | 0 | 3 |
 | Frozen 16K transfer seed 20260909 | 6 | -0.0414 [-0.1845,+0.0602] | -0.0828 | 0 | 2 |
 
-All three active changes on final independent 8K were positive: +0.1672, +0.2064, and +0.2337 NDCG. The bootstrap lower bound is exactly zero because 9/12 samples abstain; it does not reflect a negative active sample.
+All three active changes on the retrospective 8K holdout were positive: +0.1672, +0.2064, and +0.2337 NDCG. The bootstrap lower bound is exactly zero because 9/12 samples abstain; it does not reflect a negative active sample.
 
 At 16K, the two active LongEval samples were +0.1205 and -0.3690. A bounded one-swap variant was checked offline and also failed 16K LongEval (-0.0644), so further mapping tweaks were stopped.
 
-Pairwise ranking is not improved by the full reranking controller. Final independent 8K pairwise delta is -0.0090 [-0.0226,+0.0008]. The defensible claim is therefore limited to fixed-budget Top-K selection.
+Pairwise ranking is not improved by the full reranking controller. Retrospective 8K holdout pairwise delta is -0.0090 [-0.0226,+0.0008]. The defensible development observation is therefore limited to fixed-budget Top-K selection.
 
 ## 4. Interpretation
 
@@ -95,8 +96,8 @@ This is not evidence for returning to V6.1 alpha-times-sigma, Refresh, RTS, or a
 
 - Corrected discovery: /mnt/nvme0/hmo/runs/p1_corrected_alpha_discovery_12samples_20260903.json
 - Query discovery: /mnt/nvme0/hmo/runs/r001_query_accessibility_discovery_12samples_20260903.json
-- V1 independent 8K: /mnt/nvme0/hmo/runs/r002_query_accessibility_confirmation_8k_s20260908_20260903.json
-- V2 final independent 8K: /mnt/nvme0/hmo/runs/r003_dual_confidence_confirmation_8k_s20260911_20260903.json
+- V1 retrospective 8K holdout: /mnt/nvme0/hmo/runs/r002_query_accessibility_confirmation_8k_s20260908_20260903.json
+- V2 retrospective 8K holdout: /mnt/nvme0/hmo/runs/r003_dual_confidence_confirmation_8k_s20260911_20260903.json
 - V2 16K transfer: /mnt/nvme0/hmo/runs/r004_dual_confidence_transfer_16k_s20260909_20260903.json
 - Frozen v2 config: refine-logs/dual_confidence_abstention_v2_frozen.json
 - GPU1 after runs: 15 MiB, 0% utilization.

@@ -74,7 +74,20 @@
 - Legacy versus corrected alpha across 12 discovery samples: mean Spearman 0.7835, mean Top-3 overlap 0.8333, unchanged argmax.
 - Corrected sigma_current no longer shows stable broad incremental value; corrected phi_delta_alpha retains grouped OOF Top-K NDCG +0.0911 [+0.0370,+0.1523].
 - Exact query-conditioned recurrent accessibility was implemented as the read norm/share of each segment's surviving state contribution under the real DeltaNet query.
-- Direct access-deficit and access-excess mappings failed. A frozen dual-confidence abstention gate produced independent 8K NDCG +0.0506 [0,+0.1068], LongEval +0.1012, Needle 0; all three active changes were positive.
+- Direct access-deficit and access-excess mappings failed. A frozen dual-confidence abstention gate produced retrospective reuse-label 8K NDCG +0.0506 [0,+0.1068], LongEval +0.1012, Needle 0; all three active changes were positive.
 - The same frozen controller failed 16K transfer: NDCG -0.0414 [-0.1845,+0.0602], LongEval -0.0828, Needle 0. A one-swap shrinkage also failed 16K.
-- Verdict: conditional 8K signal is real but the current controller is not length robust. Stop hand mapping changes and request GPT/Opus scope guidance.
+- Verdict: the retrospective 8K pattern is promising but not prospectively confirmed, and the current controller is not length robust. Stop hand mapping changes and run one preregistered fresh 8K before any fresh 16K.
 - Full report: openchat/codex/share/2026-09-03/query_accessibility_exploration_report.md
+
+## 2026-09-03: V6.1 and Corrected-Alpha Scope Clarification
+
+- The multi-token continuation bug belongs to the later E3-v2 query-aware
+  alpha probe. V6.1 E1 uses full-prompt prefill followed by a single generated
+  token continuation and is not invalidated by that specific bug.
+- Preserve V6.1 outputs, actions, and tracked KV bytes as evidence for the old
+  heuristic implementation. They do not validate sigma as recurrent-memory
+  reliability or alpha-times-sigma as the HMO mechanism.
+- Historical evaluator and lite/proxy baseline limitations remain separate
+  publication-readiness issues.
+- Current route: treat query-to-segment recurrent readout as an operational
+  accessibility observable, then test the frozen V2 allocation prospectively.

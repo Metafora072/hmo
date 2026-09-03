@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import time
 from argparse import Namespace
@@ -48,6 +49,75 @@ ACCESSIBILITY_CANDIDATES = (
 )
 ALPHA_ENTROPY_THRESHOLD = 0.45
 ALPHA_ACCESS_AGREEMENT_THRESHOLD = 0.75
+FROZEN_V2_SCHEMA = "hmo.dual_confidence_abstention.v2"
+PROSPECTIVE_PROTOCOL_SCHEMA = "hmo.query_accessibility.prospective_protocol.v1"
+
+
+def load_frozen_v2_config(path: Path) -> tuple[dict, str]:
+    try:
+        encoded = path.read_bytes()
+        payload = json.loads(encoded)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise OracleContractError(f"cannot read frozen V2 config: {path}") from exc
+    if (
+        payload.get("schema_version") != FROZEN_V2_SCHEMA
+        or payload.get("status") != "frozen"
+        or payload.get("need_score")
+        != "alpha*(1-rank01(query_read_share))"
+        or payload.get("normalized_alpha_entropy_threshold")
+        != ALPHA_ENTROPY_THRESHOLD
+        or payload.get("alpha_access_spearman_threshold")
+        != ALPHA_ACCESS_AGREEMENT_THRESHOLD
+        or payload.get("threshold_search_after_freeze") is not False
+        or payload.get("task_identity_used_at_inference") is not False
+        or payload.get("oracle_labels_used_at_inference") is not False
+    ):
+        raise OracleContractError("frozen V2 configuration mismatch")
+    return payload, hashlib.sha256(encoded).hexdigest()
+
+
+def load_prospective_protocol(path: Path) -> tuple[dict, str]:
+    try:
+        encoded = path.read_bytes()
+        payload = json.loads(encoded)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise OracleContractError(f"cannot read prospective protocol: {path}") from exc
+    if (
+        payload.get("schema_version") != PROSPECTIVE_PROTOCOL_SCHEMA
+        or payload.get("status") != "frozen_before_outcomes"
+        or set(payload.get("stages", {})) != {"8k", "16k"}
+    ):
+        raise OracleContractError("prospective protocol mismatch")
+    return payload, hashlib.sha256(encoded).hexdigest()
+
+
+def validate_prospective_stage(
+    source_args: Mapping,
+    protocol: Mapping,
+    stage_name: str,
+    *,
+    frozen_v2_sha256: str,
+) -> None:
+    if protocol.get("frozen_v2_sha256") != frozen_v2_sha256:
+        raise OracleContractError("prospective protocol method hash mismatch")
+    try:
+        stage = protocol["stages"][stage_name]
+    except KeyError as exc:
+        raise OracleContractError("unknown prospective protocol stage") from exc
+    expected = {
+        "scope": "prospective_oracle",
+        "datasets": stage["datasets"],
+        "samples_per_dataset": stage["samples_per_dataset"],
+        "context_length": stage["context_length"],
+        "segment_length": stage["segment_length"],
+        "middle_kv_fraction": stage["middle_kv_fraction"],
+        "donors_per_segment": stage["donors_per_segment"],
+        "backgrounds_per_pair": stage["backgrounds_per_pair"],
+        "seed": stage["seed"],
+        "sample_id_prefix": stage["sample_id_prefix"],
+    }
+    if any(source_args.get(key) != value for key, value in expected.items()):
+        raise OracleContractError("source run disagrees with prospective protocol stage")
 
 
 def replace_query_probe_rows(
@@ -256,7 +326,11 @@ def evaluate_accessibility_scores(
 
 
 def _load_completed_summary(run_dir: Path) -> tuple[dict, str]:
-    for filename in ("discovery_summary.json", "confirmation_summary.json"):
+    for filename in (
+        "prospective_oracle_summary.json",
+        "discovery_summary.json",
+        "confirmation_summary.json",
+    ):
         path = run_dir / filename
         if path.is_file():
             summary = _read_json(path)
@@ -269,6 +343,25 @@ def _load_completed_summary(run_dir: Path) -> tuple[dict, str]:
 def enrich(args: argparse.Namespace) -> dict:
     if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
         raise RuntimeError("query accessibility enrichment requires exactly one visible GPU")
+    frozen_v2 = None
+    frozen_v2_sha256 = None
+    prospective_protocol = None
+    prospective_protocol_sha256 = None
+    if getattr(args, "frozen_v2_config", None):
+        if len(args.run_dir) != 1:
+            raise OracleContractError("prospective V2 evaluation requires one source run")
+        frozen_v2, frozen_v2_sha256 = load_frozen_v2_config(
+            Path(args.frozen_v2_config).resolve()
+        )
+        if not getattr(args, "prospective_protocol", None) or not getattr(
+            args, "protocol_stage", None
+        ):
+            raise OracleContractError(
+                "prospective V2 evaluation requires a protocol and stage"
+            )
+        prospective_protocol, prospective_protocol_sha256 = (
+            load_prospective_protocol(Path(args.prospective_protocol).resolve())
+        )
     model_path = Path(args.model_path).resolve()
     identity = model_provenance(
         model_path,
@@ -290,9 +383,22 @@ def enrich(args: argparse.Namespace) -> dict:
         run_dir = Path(value).resolve()
         manifest = _read_json(run_dir / "run_manifest.json")
         summary, summary_file = _load_completed_summary(run_dir)
+        if frozen_v2 is not None and summary.get("scope") != (
+            "prospective_oracle_acquisition_only"
+        ):
+            raise OracleContractError(
+                "prospective V2 evaluation requires a prospective oracle source"
+            )
         if manifest["run_spec"]["model"] != identity:
             raise OracleContractError("source run model provenance mismatch")
         source_args = manifest["run_spec"]["arguments"]
+        if frozen_v2 is not None:
+            validate_prospective_stage(
+                source_args,
+                prospective_protocol,
+                args.protocol_stage,
+                frozen_v2_sha256=frozen_v2_sha256,
+            )
         samples = _build_samples(
             tokenizer,
             Namespace(
@@ -358,22 +464,61 @@ def enrich(args: argparse.Namespace) -> dict:
         )
 
     cv = {}
-    for index, candidate in enumerate(ACCESSIBILITY_CANDIDATES):
-        cv[candidate] = asdict(
-            evaluate_candidate_grouped_cv(
-                evidence,
-                candidate,
-                k_by_sample=k_by_sample,
-                folds=min(4, len(k_by_sample)),
-                bootstrap_samples=args.bootstrap_samples,
-                seed=args.seed + index * 100,
+    if frozen_v2 is None:
+        for index, candidate in enumerate(ACCESSIBILITY_CANDIDATES):
+            cv[candidate] = asdict(
+                evaluate_candidate_grouped_cv(
+                    evidence,
+                    candidate,
+                    k_by_sample=k_by_sample,
+                    folds=min(4, len(k_by_sample)),
+                    bootstrap_samples=args.bootstrap_samples,
+                    seed=args.seed + index * 100,
+                )
             )
-        )
     shifts = list(alpha_shifts.values())
+    direct_scores = evaluate_accessibility_scores(
+        evidence,
+        k_by_sample,
+        bootstrap_samples=args.bootstrap_samples,
+        seed=args.seed + 1000,
+    )
+    if frozen_v2 is not None:
+        method_name = "dual_confidence_abstention"
+        direct_scores = {
+            "baseline": direct_scores["baseline"],
+            "formula": direct_scores["formulae"][method_name],
+            "method": direct_scores["methods"][method_name],
+            "samples": {
+                sample_id: {
+                    "dataset": row["dataset"],
+                    "normalized_alpha_entropy": row["normalized_alpha_entropy"],
+                    "alpha_access_agreement": row["alpha_access_agreement"],
+                    "dual_gate_enabled": row["dual_gate_enabled"],
+                    "topk_changed": row["topk_changed"][method_name],
+                    "metrics": {
+                        "alpha": row["metrics"]["alpha"],
+                        method_name: row["metrics"][method_name],
+                    },
+                }
+                for sample_id, row in direct_scores["samples"].items()
+            },
+        }
     return {
-        "schema_version": "hmo.query_accessibility_enrichment.v1",
+        "schema_version": (
+            "hmo.query_accessibility_prospective_v2.v1"
+            if frozen_v2 is not None
+            else "hmo.query_accessibility_enrichment.v1"
+        ),
         "status": "complete",
-        "scope": "query_conditioned_recurrent_accessibility_reusing_oracle_labels",
+        "scope": (
+            "prospective_frozen_v2_evaluation"
+            if frozen_v2 is not None
+            else "query_conditioned_recurrent_accessibility_reusing_oracle_labels"
+        ),
+        "frozen_v2_sha256": frozen_v2_sha256,
+        "prospective_protocol_sha256": prospective_protocol_sha256,
+        "protocol_stage": getattr(args, "protocol_stage", None),
         "sources": sources,
         "sample_count": len(k_by_sample),
         "model": identity,
@@ -386,12 +531,7 @@ def enrich(args: argparse.Namespace) -> dict:
             "samples": alpha_shifts,
         },
         "candidate_cv": cv,
-        "direct_scores": evaluate_accessibility_scores(
-            evidence,
-            k_by_sample,
-            bootstrap_samples=args.bootstrap_samples,
-            seed=args.seed + 1000,
-        ),
+        "direct_scores": direct_scores,
         "k_by_sample": k_by_sample,
         "evidence": [asdict(row) for row in evidence],
         "runtime": {
@@ -410,11 +550,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-revision")
     parser.add_argument("--run-dir", action="append", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--frozen-v2-config")
+    parser.add_argument("--prospective-protocol")
+    parser.add_argument("--protocol-stage", choices=("8k", "16k"))
     parser.add_argument("--bootstrap-samples", type=int, default=5000)
     parser.add_argument("--seed", type=int, default=20260914)
     args = parser.parse_args()
     if args.bootstrap_samples <= 0:
         parser.error("bootstrap-samples must be positive")
+    prospective_args = (
+        args.frozen_v2_config,
+        args.prospective_protocol,
+        args.protocol_stage,
+    )
+    if any(prospective_args) and not all(prospective_args):
+        parser.error(
+            "frozen V2 config, prospective protocol, and protocol stage are required together"
+        )
     return args
 
 

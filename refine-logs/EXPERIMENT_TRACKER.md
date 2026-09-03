@@ -1,8 +1,9 @@
 # Experiment Tracker
 
-| Run ID | Purpose | Split | Priority | Status |
-|---|---|---|---|---|
-| R000 | probe integrity | one existing 8K sample | MUST | DONE |
-| R001 | accessibility discovery | existing 12-sample discovery | MUST | TODO |
-| R002 | frozen independent confirmation | existing seed-20260908 8K | MUST | BLOCKED on R001 |
-| R003 | frozen length transfer | existing seed-20260909 16K | MUST | BLOCKED on R002 |
+| Run ID | Purpose | Split | Status |
+|---|---|---|---|
+| R000-R004 | Probe repair and retrospective accessibility exploration | Historical oracle labels | DONE; development evidence only |
+| P2-8K-O | Fresh prospective oracle acquisition | seed 20260921, 6+6 at 8K | READY |
+| P2-8K-Q | Frozen V2 evaluation | P2-8K-O | BLOCKED on P2-8K-O |
+| P2-16K-O | Fresh prospective oracle acquisition | seed 20260922, 4+4 at 16K | BLOCKED on 8K gate |
+| P2-16K-Q | Frozen V2 evaluation | P2-16K-O | BLOCKED on P2-16K-O |

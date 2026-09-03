@@ -1,0 +1,57 @@
+{
+  "schema_version": "hmo.query_accessibility.prospective_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "frozen_at": "2026-09-03T08:53:11+08:00",
+  "frozen_v2_config": "refine-logs/query_accessibility_v2_method_frozen.json",
+  "frozen_v2_sha256": "01bcd3a9ea864ef2b9ab64c23c058badec70d7c88976168ff77100668b49a5f5",
+  "baseline": "corrected sequential raw alpha",
+  "primary_metric": "Top-K NDCG at the exact-KV byte budget",
+  "stages": {
+    "8k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 6,
+      "context_length": 8192,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "donors_per_segment": 2,
+      "backgrounds_per_pair": 1,
+      "seed": 20260921,
+      "sample_id_prefix": "prospective_v2_8k_s20260921_"
+    },
+    "16k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 4,
+      "context_length": 16384,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "donors_per_segment": 2,
+      "backgrounds_per_pair": 1,
+      "seed": 20260922,
+      "sample_id_prefix": "prospective_v2_16k_s20260922_"
+    }
+  },
+  "run_order": [
+    "8k oracle acquisition",
+    "8k frozen V2 evaluation",
+    "16k only if the 8k continuation gate passes",
+    "16k frozen V2 evaluation"
+  ],
+  "eight_k_continuation_gate": {
+    "overall_ndcg_mean": "> 0",
+    "longeval_ndcg_mean": "> 0",
+    "needle_ndcg_mean": ">= -0.005",
+    "topk_changed_samples": ">= 2",
+    "positive_active_samples": "> negative_active_samples",
+    "bootstrap_interval": "report as uncertainty; not a hard gate for sparse abstention"
+  },
+  "sixteen_k_interpretation": {
+    "positive": "overall and LongEval NDCG means > 0; Needle >= -0.005",
+    "negative": "otherwise treat the frozen V2 controller as length-dependent or unsupported",
+    "after_negative": "diagnose length-regime shift without tuning on these outcomes"
+  },
+  "immutability": {
+    "threshold_or_formula_changes_between_stages": false,
+    "task_identity_or_oracle_labels_at_inference": false,
+    "candidate_search_on_prospective_labels": false
+  }
+}

@@ -47,3 +47,10 @@ schemas are dispatched without tuning on confirmation labels: the historical
 bounded additive scorer remains reproducible, while the conditional controller
 uses fixed median regimes and one top-down adjacent inversion pass in which each
 segment moves at most one alpha rank.
+
+For a controller evaluated by a downstream query probe, use
+`--scope prospective_oracle` with a unique `--sample-id-prefix`. This scope
+collects fresh equal-byte oracle labels but deliberately performs no candidate
+analysis. `enrich_query_accessibility.py` then requires the frozen V2 config,
+the prospective protocol, and its stage name; it verifies their hashes and
+reports only frozen V2 versus corrected raw alpha.

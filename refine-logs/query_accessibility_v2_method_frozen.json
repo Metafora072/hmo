@@ -1,0 +1,20 @@
+{
+  "schema_version": "hmo.dual_confidence_abstention.v2",
+  "status": "frozen",
+  "frozen_at": "2026-09-03T08:53:11+08:00",
+  "model": "Qwen/Qwen3.5-0.8B",
+  "alpha": "sequential full-query mean attention mass",
+  "accessibility": "mean query_read_share from exact segment recurrent-state contributions",
+  "need_score": "alpha*(1-rank01(query_read_share))",
+  "normalized_alpha_entropy_threshold": 0.45,
+  "alpha_access_spearman_threshold": 0.75,
+  "controller": "use need_score iff normalized alpha entropy >= 0.45 and alpha/access Spearman < 0.75; otherwise use raw alpha",
+  "threshold_search_after_freeze": false,
+  "task_identity_used_at_inference": false,
+  "oracle_labels_used_at_inference": false,
+  "development_scope": "retrospective_reuse_label_only",
+  "development_artifacts": [
+    "/mnt/nvme0/hmo/runs/r001_query_accessibility_discovery_12samples_20260903.json",
+    "/mnt/nvme0/hmo/runs/r002_query_accessibility_confirmation_8k_s20260908_20260903.json"
+  ]
+}
