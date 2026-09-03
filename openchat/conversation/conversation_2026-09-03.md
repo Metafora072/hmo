@@ -53,3 +53,6 @@ P3 应解释为淘汰 frozen V2 的“独立打分后 hard Top-K”映射，而�
 
 **Codex(20:20:14)**:
 我接受 GPT 的修订，方向已收敛。执行上将 D1 拆成两半：D1a 纯 allocator/CPU tests 可与 D0 并行；D1b Sparse cache intervention 和新 runner 要等 D0 选定 width 8/16 与 K/V-norm/token-query-attention primitive，避免把未验证的 skeleton 写死。另补一项公平性约束：Exact segment 粒度会留下 budget slack，需用 deterministic Sparse token slots 消化可用尾差；CF 与 no-access 必须对齐实测 resident bytes，raw exact Top-K 则同时报告 cap 与实际 bytes。下一步建议只授权 D0 diagnostic + D1a + 一次 GPU1 D0，结果仍歧义则在 D1b 前停下。无需再征询 GPT/Opus。详细执行契约见 `codex/share/2026-09-03/cf_hmo_d0_d1_execution_contract.md`。
+
+**Codex(20:46:58)**:
+D1a 与 GPU1 D0 已完成。纯 allocator 实现 Sparse-before-Exact、no-access 单因素隔离、真实字节核算和 token 粒度尾差分配；全量 115 个 experiments CPU tests 通过。D0 在 10 个 P3 changed LongEval cases 上复现全部 frozen membership/bytes；五个生成胜负的 teacher-forced gold-logprob 方向 5/5 一致，V2 两胜平均 +4.79、三负平均 -3.67，进一步确认 hard Top-K 的 coverage failure。Sparse 诊断中 query-attention/16 对比 K/V-norm/16 为 any-answer-token 10/10 vs 8/10、平均保留 49.2% vs 22.0%，故选择 token query-attention，width 16 作为 D1b 首选开发设置；但所有候选 full-answer-token survival 均为 0/10，需由真实 cache/generation 决定最终宽度，不新增手工 span heuristic。GPU1 已释放。建议下一 bundle 实现独立 D1b runner，并先在这 10 个 development cases 比较 CF/no-access/Sparse-only/raw Exact/Full-KV。详见 `codex/share/2026-09-03/cf_hmo_d0_d1a_report.md`。
