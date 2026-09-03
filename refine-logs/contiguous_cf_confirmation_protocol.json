@@ -1,0 +1,80 @@
+{
+  "schema_version": "hmo.contiguous_cf.confirmation_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "frozen_at": "2026-09-03T22:13:16+08:00",
+  "development_basis": "openchat/codex/share/2026-09-03/contiguous_coverage_fidelity_d2_report.md",
+  "model_id": "Qwen/Qwen3.5-0.8B",
+  "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "systems": [
+    "contiguous_cf",
+    "scattered_cf",
+    "contiguous_sparse_only",
+    "raw_alpha_exact_topk",
+    "full_kv_reference"
+  ],
+  "primary_comparison": [
+    "contiguous_cf",
+    "raw_alpha_exact_topk"
+  ],
+  "primary_metric": "normalized_answer_contains",
+  "secondary_metrics": [
+    "normalized_exact_match",
+    "token_f1"
+  ],
+  "max_new_tokens": 32,
+  "inference_seed": 20261007,
+  "method": {
+    "allocator": "attention_led",
+    "middle_kv_fraction": 0.1,
+    "sparse_selector": "max_mass_window",
+    "sparse_width": 16,
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1
+  },
+  "stages": {
+    "8k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 12,
+      "context_length": 8192,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "seed": 20261005,
+      "sample_id_prefix": "contiguous_cf_confirm_8k_s20261005_"
+    },
+    "16k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 12,
+      "context_length": 16384,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "seed": 20261006,
+      "sample_id_prefix": "contiguous_cf_confirm_16k_s20261006_"
+    }
+  },
+  "execution": {
+    "case_count": 48,
+    "run_order": [
+      "8k/needle",
+      "8k/longeval_lines",
+      "16k/needle",
+      "16k/longeval_lines"
+    ],
+    "continuation_gate": false,
+    "resume_only_after_interruption": true
+  },
+  "claims": [
+    "end_task_quality_at_measured_resident_kv_bytes",
+    "contiguous_local_coverage_mechanism"
+  ],
+  "excluded_claims": [
+    "recurrent_aware_allocation",
+    "cross_model_generalization",
+    "larger_model_generalization"
+  ],
+  "immutability": {
+    "sample_or_metric_changes_after_launch": false,
+    "method_parameter_changes_after_launch": false,
+    "case_filtering_after_outcomes": false,
+    "length_gate": false
+  }
+}
