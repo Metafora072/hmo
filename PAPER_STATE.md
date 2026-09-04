@@ -287,6 +287,11 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - P5 冻结协议：`refine-logs/stratified_fixed_chunk_control_protocol.json`
 - P5 原始结果：
   `/mnt/nvme0/hmo/runs/stratified_fixed_control_formal_20260904_1633/`
+- P6 HotpotQA-32K-Aug Full-KV 可解性报告：
+  `experiments/results/HOTPOTQA_32K_SOLVABILITY_20260904.md`
+- P6 冻结协议：`refine-logs/hotpotqa_32k_solvability_protocol.json`
+- P6 原始结果：
+  `/mnt/nvme0/hmo/runs/hotpotqa_32k_solvability_formal_20260904_171905/`
 
 
 ## 下一阶段
@@ -302,11 +307,13 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
   严格等字节 Pareto；独立 result-to-claim 结论为 `partial/supplement`。
 - 完成 16K/10% Stratified Fixed-Chunk 控制；HMO 为 18/24、aligned 为
   17/24，支持 free-start 对 structured LongEval 的方向性贡献。
+- 完成 Qwen3.5-0.8B 的 HotpotQA-32K-Aug Full-KV 路由检查；四条 exact-32K
+  样本 mean F1 为 0.2315、2/4 非零，说明可继续设计 paired compressed pilot。
 
 ### 待确认 GPU 工作
 
-1. 32K HotpotQA 真实任务 transfer，先验证当前 0.8B 路径的 Full-KV
-   solvability。
+1. 冻结 32K HotpotQA paired compressed pilot，比较 HMO、Full KV 与最强
+   structured baselines；执行前需单独确认。
 2. 若论文机制分解仍需加强，再定义 `global allocation + free-start` 的无重叠
    第四控制，补齐 2x2；当前不优先于真实任务。
 3. 9B 在 16K 已达到 27.85 GiB PyTorch reserved 峰值；32K 优先使用

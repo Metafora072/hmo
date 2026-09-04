@@ -197,3 +197,24 @@
 - Supported: free-start placement contributes a small directional part of the
   positive 16K HMO result. Unsupported: universal superiority across regimes.
 - Full report: experiments/results/STRATIFIED_FIXED_CONTROL_20260904.md
+
+## 2026-09-04: P6 HotpotQA-32K-Aug Full-KV Solvability
+
+- This is model/task routing evidence, not an HMO comparison or contribution
+  claim.
+- The pinned 200-record LongBench HotpotQA split has no native 32K examples;
+  source contexts range from about 1.8K to 17.7K Qwen3.5 tokens.
+- The frozen augmentation preserves each of the four longest base contexts,
+  questions, and gold answers, appends another real HotpotQA context, and
+  truncates only the distractor tail. Every serialized memory context is exactly
+  32,768 tokens.
+- Full-KV official QA F1 is `0.3333/0/0.5926/0`, mean `0.2315`; `2/4` outputs
+  contain the normalized gold answer and no output is an exact match.
+- The two successes are verbose answers containing the correct phrase. The two
+  failures return a related entity rather than the requested attribute,
+  indicating imperfect relation/answer-type precision rather than total context
+  failure.
+- Scoped decision: 0.8B shows enough 32K solvability to justify proposing a
+  separately frozen paired compressed pilot. No compressed run started
+  automatically.
+- Full report: experiments/results/HOTPOTQA_32K_SOLVABILITY_20260904.md

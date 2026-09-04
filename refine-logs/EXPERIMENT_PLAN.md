@@ -178,3 +178,11 @@ cases is initial evidence that the path is viable; two or more is stronger
 support for proposing a matched compressed pilot. These are descriptive routing
 signals, not hard scientific gates. No compressed experiment starts
 automatically after P6.
+
+### Outcome
+
+P6-S and P6-F completed successfully. On four exact-32K Full-KV cases, official
+QA F1 is `0.3333/0/0.5926/0`, with mean `0.2315`, nonzero F1 on `2/4`, and
+normalized gold containment on `2/4`. This supports the scoped routing judgment
+that Qwen3.5-0.8B retains some usable 32K HotpotQA ability and that a paired
+compressed pilot is reasonable. It does not yet provide HMO evidence.
