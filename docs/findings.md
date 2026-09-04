@@ -13,8 +13,9 @@
   resident bytes because whole-segment selection leaves rounding slack.
 - Contiguous CF versus contiguous Sparse-only: 34/48 versus 32/48, +4.17 pp
   [-8.33,+16.67], p=0.7539. Exact upgrades are not separately validated.
-- Memory: contiguous CF uses 13.383% of Full-KV resident bytes and scores
-  70.83%, versus Full KV at 72.92%.
+- Memory: contiguous CF uses a mean per-case 13.383% of Full-KV resident bytes
+  and scores 70.83%, versus Full KV at 72.92%. The ratio of mean bytes is
+  13.030%; these aggregation conventions must remain explicitly separated.
 - Supported claim: contiguous max-attention-mass windows preserve useful local
   evidence better than scattered top-attention tokens at equal bytes in this
   model and synthetic suite.

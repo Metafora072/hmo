@@ -89,7 +89,7 @@ fixed-width locality class. This does not claim globally maximal singleton
 mass; scattered Top-token selection has that property but lacks complete-span
 coverage.
 
-### Proposition 3: Attention-KV Memory Scaling
+### Proposition 3: Attention-KV Retention Ratio
 
 For middle-context length `T`, segment length `L`, Sparse width `w`, and `m`
 Exact upgrades, the retained middle tokens are bounded by
@@ -98,15 +98,23 @@ Exact upgrades, the retained middle tokens are bounded by
 ceil(T / L) * w + m * (L - w).
 ```
 
-The Full-Attention KV storage is therefore
+The retained Full-Attention KV storage is therefore bounded by
 
 ```text
 O(T * w / L + m * L),
 ```
 
-instead of `O(T)`, plus fixed protected anchors and the unchanged recurrent
-state. With `w=16` and `L=256`, the coverage floor retains 6.25% of each full
-middle segment before Exact upgrades.
+plus fixed protected anchors and the unchanged recurrent state. This remains
+`O(T)` when `L`, `w`, and the Exact-upgrade rate are fixed; the contribution is
+a smaller retention coefficient rather than a new asymptotic complexity class.
+Ignoring boundary rounding, the middle-context retention ratio is
+
+```text
+rho_middle <= w / L + m * (L - w) / T.
+```
+
+With `w=16` and `L=256`, the coverage floor retains 6.25% of each full middle
+segment before Exact upgrades.
 
 These propositions explain the inductive bias and memory behavior. They are not
 presented as a theorem guaranteeing downstream generation accuracy.
@@ -128,11 +136,12 @@ The exact equal-byte locality comparison is +14.58 pp, with 7 wins, 41 ties,
 0 losses, a sample bootstrap interval of [+6.25,+25.00] pp, and exact sign-test
 `p=0.0156`. The improvement is positive at both 8K and 16K.
 
-At 13.38% of Full-KV resident memory, contiguous CF reaches 70.83% versus Full
-KV at 72.92%. Against raw Exact it has a directional +4.17 pp result, but this
-comparison is tie heavy and raw uses 1.22% fewer bytes because of segment
-rounding slack. Exact upgrades over contiguous Sparse-only add +4.17 pp but are
-not independently significant.
+At a mean per-sample Full-KV fraction of 13.38%, contiguous CF reaches 70.83%
+versus Full KV at 72.92%. The ratio of mean resident bytes is 13.03%; these two
+aggregation conventions must not be mixed. Against raw Exact it has a
+directional +4.17 pp result, but this comparison is tie heavy and raw uses 1.22%
+fewer bytes because of segment rounding slack. Exact upgrades over contiguous
+Sparse-only add +4.17 pp but are not independently significant.
 
 ## Claim Ladder For A Non-Gate-Driven Paper
 

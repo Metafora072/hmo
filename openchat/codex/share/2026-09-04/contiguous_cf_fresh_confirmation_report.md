@@ -75,7 +75,7 @@ Against scattered retention, it is +12.50 pp at 8K and +16.67 pp at 16K.
 
 ## Memory And Integrity
 
-| system group | mean post-query resident KV | fraction of Full |
+| system group | mean post-query resident KV | mean per-case fraction of Full |
 |---|---:|---:|
 | three coverage arms | 19,406,592 bytes | 13.383% |
 | raw-alpha Exact Top-K | 19,173,120 bytes | 13.266% |
@@ -85,6 +85,8 @@ Against scattered retention, it is +12.50 pp at 8K and +16.67 pp at 16K.
 - Contiguous CF uses 233,472 more bytes than raw on average, a 1.22% increase
   over raw caused by whole-segment rounding slack.
 - Contiguous CF reduces measured resident KV by 86.97% versus Full KV.
+- The ratio of mean contiguous/Full bytes is 13.03%; 13.38% is the mean of the
+  per-case ratios. The paper should use the latter and label it explicitly.
 - There were no protocol or byte-accounting failures.
 - Runtime was 608.02 seconds on one RTX 5090.
 - Peak allocated/reserved GPU memory was 4.35/5.05 GiB.
