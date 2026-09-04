@@ -180,3 +180,20 @@
 - Next evidence: one low-cost 16K/10% Stratified Fixed-Chunk control under the
   identical HMO allocation and bytes, followed by realistic-task transfer.
 - Full report: experiments/results/PARETO_PACKAGE_B_20260904.md
+
+## 2026-09-04: P5 Stratified Fixed-Chunk Control
+
+- Result-to-claim verdict: `partial`, route `supplement`, medium confidence.
+- Evidence: frozen 24-case Qwen3.5-0.8B 16K/10% suite. The new aligned control
+  reuses HMO's macro allocation, Exact upgrades, retained-token counts, slack,
+  anchors, probe, and bytes; only Sparse-window start freedom is removed.
+- HMO is 18/24 versus 17/24 for Stratified Fixed-Chunk, with 2 wins, 21 ties,
+  and 1 loss. Needle ties 10/12; LongEval is 8/12 versus 7/12.
+- The control is nontrivial: mean retained-position Jaccard is 0.646 and an
+  average 54.54/59.5 Sparse segments change placement per sample.
+- Combined with Package B, Global Fixed / Stratified Fixed / HMO totals are
+  16/17/18 overall and 6/7/8 on LongEval. These are complementary sample-level
+  gains, not a nested additive sequence.
+- Supported: free-start placement contributes a small directional part of the
+  positive 16K HMO result. Unsupported: universal superiority across regimes.
+- Full report: experiments/results/STRATIFIED_FIXED_CONTROL_20260904.md

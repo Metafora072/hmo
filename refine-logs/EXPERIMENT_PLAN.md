@@ -137,3 +137,12 @@ The runner must recompute the parent HMO allocation and retained positions and
 match them exactly against the frozen Package B row before generating the
 control. The experiment is descriptive: either direction informs whether the
 16K advantage comes from stratification or free-start placement.
+
+### Outcome
+
+P5 completed 24/24 exact equal-byte cases. HMO obtains 18/24 versus 17/24 for
+Stratified Fixed-Chunk, with 2 wins, 21 ties, and 1 loss; all disagreements are
+LongEval. Together with the parent Global Fixed result of 16/24, this provides
+directional support for both macro organization and free-start placement, but
+the sample-level gains are complementary rather than a nested additive ladder.
+The result-to-claim verdict is `partial/supplement` with medium confidence.

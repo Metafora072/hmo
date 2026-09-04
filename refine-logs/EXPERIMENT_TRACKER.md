@@ -13,4 +13,4 @@
 | PB-S | Structured Pareto smoke | 1 Needle at 8K, 5/10/20% | DONE; 3/3 budget cases, exact-byte contract passed |
 | PB-P | Structured-baseline Pareto | matched 48-case 8K/16K suite, 5/10/20% | DONE; 144/144 budget cases, verdict partial/supplement |
 | P5-S | Stratified Fixed-Chunk smoke | first frozen Needle at 16K/10% | DONE; parent plan exact, equal bytes, 56/60 Sparse windows changed |
-| P5-P | Free-start mechanism isolation | frozen 12+12 suite at 16K/10% | READY; no result gate |
+| P5-P | Free-start mechanism isolation | frozen 12+12 suite at 16K/10% | DONE; HMO 18/24 vs aligned 17/24, verdict partial/supplement |

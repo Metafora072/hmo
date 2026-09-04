@@ -14,7 +14,7 @@
 | Contiguous retention preserves complete span evidence better than scattered equal-cardinality retention | 0.8B Pareto: +18.75/+14.58 pp at 5%/10%, zero losses; 20% saturates. 9B 10%: +16.67 pp | Strong cross-scale, tight/mid-budget synthetic evidence | Theory, Main Results |
 | HMO approaches Full-KV quality at a small KV footprint | 0.8B: 34/48 vs 35/48 at 13.38%, and both 35/48 at 23.01%; 9B: both 23/24 at 13.38% | Supported on two model sizes | Abstract, Main Results |
 | HMO remains competitive with strong Raw Exact baselines | 0.8B HMO/Raw+Slack: 30/30, 34/32, 35/35 across 5%/10%/20%; 9B generated tokens identical in 24/24 | Fairness baseline established; no stable superiority claim | Main Results, Pareto |
-| HMO improves over generic fixed chunks in the long-context coverage regime | Overall Fixed leads at 5%/10% and ties at 20%; at 10%/16K HMO is 18/24 vs 16/24, including LongEval 8/12 vs 6/12 | Partial, length-conditioned; needs mechanism isolation | Main Results, Ablation |
+| HMO improves over generic fixed chunks in the long-context coverage regime | At 10%/16K Global Fixed / Stratified Fixed / HMO are 16/17/18 overall and 6/7/8 on LongEval; HMO vs aligned is 2W/21T/1L at exact equal bytes | Partial, length-conditioned mechanism evidence | Main Results, Ablation |
 | Exact upgrades improve contiguous coverage | 0.8B: 34/48 vs 32/48; 9B: both 23/24 with opposite one-case differences | Optional component, not primary claim | Ablation |
 | The result transfers to realistic tasks and larger Hybrid models | Current method transfers from Qwen3.5-0.8B to 9B; realistic 32K task remains pending | Model scale supported; task breadth pending | Transfer section |
 
@@ -152,7 +152,12 @@ All formal metadata and BibTeX must be verified before use.
 - Package B completed the frozen structured-baseline Pareto. Independent
   result-to-claim review returned `partial/supplement` with high confidence:
   contiguous versus scattered is supported at 5-10%, while fixed-chunk
-  superiority is length-conditioned and requires one mechanism control.
+  superiority is length-conditioned; the review requested one mechanism
+  control, subsequently completed as P5.
+- P5 completed that mechanism control. Independent result-to-claim review
+  returned `partial/supplement` with medium confidence: under fixed stratified
+  allocation, free-start is directionally +4.17 pp and all three disagreements
+  occur on LongEval, but broader generalization remains unestablished.
 
 ## Next Steps
 
@@ -161,7 +166,7 @@ All formal metadata and BibTeX must be verified before use.
 - [x] Specify Figure 1 and add the post-hoc format-robust secondary analysis.
 - [x] Implement Raw Exact+Slack and complete the frozen 10% Qwen3.5-9B transfer.
 - [x] Add Global Fixed-Chunk Top-K and complete the 5%/10%/20% Pareto package.
-- [ ] Add the 16K/10% Stratified Fixed-Chunk mechanism control after PZ approval.
+- [x] Add the 16K/10% Stratified Fixed-Chunk mechanism control.
 - [ ] Add 32K HotpotQA transfer after PZ approval.
 - [ ] Generate Figure 1 and the current-results plots.
 - [ ] Verify citations and construct the bibliography.

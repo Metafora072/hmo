@@ -2,10 +2,10 @@
 
 ## 当前状态
 
-论文处于故事冻结与机制隔离阶段。核心方法不再继续搜索新的 recurrent
-打分公式；5%/10%/20% Pareto 与结构化强基线已经完成。当前任务是围绕
-已经验证的 locality-preserving mechanism 补足分层分配与 free-start 的
-因果拆分，再扩展真实任务证据。
+论文处于故事冻结与外部效度扩展阶段。核心方法不再继续搜索新的 recurrent
+打分公式；5%/10%/20% Pareto、结构化强基线与 free-start 机制控制均已
+完成。当前首要任务是把已经成形的 locality-preserving mechanism 扩展到
+真实长上下文任务。
 
 目标会议暂按 ICLR 规划，正文页数按 9 页控制。工作标题为：
 
@@ -47,10 +47,12 @@ query-guided free-start window，最后才执行可选 Exact fidelity。完整�
 
 新增的 Global Fixed-Chunk Top-K 表明，通用固定块本身是强基线：它在 5%
 与整体 10% 上优于 HMO，在 20% 与 HMO 持平；但 HMO 在 10%/16K 上反超
-8.33 pp，且优势集中于 LongEval。因而当前新颖性不能包装为“free-start
-普遍优于 fixed chunk”，而应落在达到 coverage floor 后的长上下文
-stratified organization。下一轮只需一个 Stratified Fixed-Chunk 控制即可
-拆分 macro-segment coverage 与 free-start placement。
+8.33 pp，且优势集中于 LongEval。进一步的 Stratified Fixed-Chunk 控制固定
+HMO 的 macro allocation、Exact upgrades 与 bytes，只移除 free-start：HMO
+为 18/24，对齐控制为 17/24，Global Fixed 为 16/24；LongEval 分别为
+8/12、7/12、6/12。因而最合适的新颖性表达是长上下文覆盖门槛后的
+two-level organization：宏观分层覆盖与微观自适应窗口共同塑造 residual
+memory，而不是“free-start 普遍优于 fixed chunk”。
 
 ### V6.1 与当前版本的关系
 
@@ -153,6 +155,24 @@ HMO 相对 Scattered 在 5% 与 10% 分别提升 18.75 与 14.58 pp，均为零
 LongEval 为 8/12 对 6/12。这支持预算与长度相关的 memory organization
 故事，而不支持 HMO 对 fixed chunk 的无条件优势。
 
+### Free-Start 机制控制
+
+在正向的 16K/10% slice 上，Stratified Fixed-Chunk 完全复用 HMO 的分层
+allocation、Exact upgrades、Sparse retained-token counts、slack 与真实
+resident bytes，仅把窗口起点限制在 segment-local 16-token boundary。
+
+| 系统 | All | Needle | LongEval-Lines |
+|---|---:|---:|---:|
+| Global Fixed-Chunk | 16/24 | 10/12 | 6/12 |
+| Stratified Fixed-Chunk | 17/24 | 10/12 | 7/12 |
+| HMO free-start | **18/24** | 10/12 | **8/12** |
+
+HMO 相对 aligned control 为 2 wins、21 ties、1 loss，净提升 4.17 pp；三处
+分离全部位于 LongEval。平均 54.54/59.5 个 Sparse segments 改变窗口位置，
+排除了控制近似相同的解释。总数虽形成 16/17/18，但逐样本收益并不嵌套，
+因此正文将其表述为宏观分配与微观 placement 的互补证据，而非严格可加
+分解。
+
 ### 跨规模确认
 
 正式 fresh confirmation 使用 Qwen3.5-0.8B、8K/16K、Needle 与
@@ -209,7 +229,8 @@ Hybrid LLM 的 residual KV 应承担局部高保真 overlay，而不应继续采
 singleton importance 进行离散保留。Query-guided contiguous retention 在
 相同 KV bytes 下，在 0.8B 和 9B 两个规模的紧到中等预算均优于 scattered
 singleton retention；其相对 fixed chunk 的收益是预算与长度相关的，而非
-无条件成立。
+无条件成立。在 16K/10% 的固定 stratified allocation 下，free-start 相对
+aligned placement 取得小幅正向收益，并集中于 structured retrieval。
 
 ### 系统主张
 
@@ -261,6 +282,11 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - Package B 冻结协议：`refine-logs/contiguous_cf_pareto_protocol.json`
 - Package B 原始结果：
   `/mnt/nvme0/hmo/runs/contiguous_cf_pareto_formal_20260904_1518/`
+- P5 free-start 控制报告：
+  `experiments/results/STRATIFIED_FIXED_CONTROL_20260904.md`
+- P5 冻结协议：`refine-logs/stratified_fixed_chunk_control_protocol.json`
+- P5 原始结果：
+  `/mnt/nvme0/hmo/runs/stratified_fixed_control_formal_20260904_1633/`
 
 
 ## 下一阶段
@@ -274,14 +300,15 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
   format-robust secondary analysis。
 - 实现 Global Fixed-Chunk Top-K，并完成 0.8B 48 样本、5%/10%/20%
   严格等字节 Pareto；独立 result-to-claim 结论为 `partial/supplement`。
+- 完成 16K/10% Stratified Fixed-Chunk 控制；HMO 为 18/24、aligned 为
+  17/24，支持 free-start 对 structured LongEval 的方向性贡献。
 
 ### 待确认 GPU 工作
 
-1. 在 0.8B 的 16K/10% 配置加入 `Stratified Fixed-Chunk`：复用 HMO 的
-   macro-segment allocation 与 Exact upgrades，仅将 segment 内窗口限制为
-   aligned 16-token chunk，以隔离 free-start placement 的贡献。
-2. 32K HotpotQA 真实任务 transfer，先验证当前 0.8B 路径的 Full-KV
+1. 32K HotpotQA 真实任务 transfer，先验证当前 0.8B 路径的 Full-KV
    solvability。
+2. 若论文机制分解仍需加强，再定义 `global allocation + free-start` 的无重叠
+   第四控制，补齐 2x2；当前不优先于真实任务。
 3. 9B 在 16K 已达到 27.85 GiB PyTorch reserved 峰值；32K 优先使用
    0.8B/4B，不在当前单卡上直接尝试 9B BF16 或 27B/32B。
 
