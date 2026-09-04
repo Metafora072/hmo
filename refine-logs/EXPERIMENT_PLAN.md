@@ -219,3 +219,15 @@ estimate.
 The smoke checks successful generation, exact compressed resident-byte equality,
 parent Full-KV identity, and parseable outputs. Formal execution is descriptive;
 no case filtering, tuning, or automatic follow-up is allowed.
+
+### Outcome
+
+P7 completed all four exact-byte cases. Mean official QA F1 for HMO / Fixed /
+Raw+Slack / Scattered / Full is `0.3357 / 0.2315 / 0.3981 / 0.4038 / 0.2315`.
+All systems contain gold on the same `2/4` cases. HMO beats Fixed in the formal
+run by `+0.1042` F1 but trails Raw and Scattered by `0.0625/0.0682`; these
+differences reflect phrasing on already-solved cases. Mean compressed footprint
+is `11.556%` of Full and all four compressed arms are equal-byte in `4/4` cases.
+An independent review returns `partial/supplement`, medium confidence. A
+smoke/formal near-tie ranking difference weakens the Fixed comparison and should
+be addressed before making a stronger real-task superiority claim.

@@ -218,3 +218,25 @@
   separately frozen paired compressed pilot. No compressed run started
   automatically.
 - Full report: experiments/results/HOTPOTQA_32K_SOLVABILITY_20260904.md
+
+## 2026-09-04: P7 HotpotQA-32K-Aug Equal-Byte Paired Pilot
+
+- Independent result-to-claim verdict: `partial`, route `supplement`, medium
+  confidence.
+- Four compressed arms use exactly equal measured post-query resident bytes in
+  `4/4` cases. Their mean is `46,611,456` bytes, `11.556%` of Full KV.
+- Mean official QA F1 for HMO / Fixed / Raw+Slack / Scattered / Full is
+  `0.3357 / 0.2315 / 0.3981 / 0.4038 / 0.2315`.
+- HMO versus Fixed is `+0.1042` F1 (`2W/2T/0L`); versus Raw and Scattered it is
+  `-0.0625` and `-0.0682`.
+- Every system contains the answer on the same `2/4` cases. F1 differences come
+  from verbosity and phrasing on already-solved cases, not additional solvability.
+- Smoke/formal reproducibility audit: HMO positions/output are identical, but
+  Fixed swaps 7 retained positions in each direction and changes from F1 1.0 to
+  0.3333; Raw and Scattered also show small position changes without F1 changes.
+  This is consistent with near-tied query-probe ranking sensitivity and weakens
+  the formal HMO-versus-Fixed claim.
+- Supported: at about 11.6% Full-KV footprint, HMO preserves the same real-task
+  solvable set and remains a plausible equal-byte contender. Unsupported: HMO
+  is the strongest real-task method or contiguous locality beats Scattered here.
+- Full report: experiments/results/HOTPOTQA_32K_PAIRED_PILOT_20260904.md

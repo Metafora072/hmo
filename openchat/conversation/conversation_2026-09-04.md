@@ -49,3 +49,6 @@
 
 **Codex(17:21:52)**:
 已完成获批的 P6 HotpotQA-32K-Aug Full-KV 路由检查。Pinned split 不含原生 32K 样本，因此协议在 outcome 前冻结四个最长 base，保持 base context/question/gold 不变并追加另一条真实 HotpotQA context，且只裁剪 distractor tail；四条 serialized memory context 均精确为 32,768 token。Qwen3.5-0.8B 的官方 QA F1 为 0.3333/0/0.5926/0，均值 0.2315，2/4 非零且 2/4 包含 gold，满足较强描述性路由信号：0.8B 在 32K 下仍有可用任务能力，可以考虑 paired compressed pilot。这不是 HMO 效果证据，且增广任务不能称为官方原生 32K。formal 耗时 42.53 秒，峰值 4.81/6.35 GiB allocated/reserved，GPU1 已回到 15 MiB；未自动启动压缩实验。详见 `codex/share/2026-09-04/hotpotqa_32k_solvability_results.md`。
+
+**Codex(17:48:09)**:
+已完成获批的 P7 HotpotQA-32K-Aug 等字节 paired pilot。四个压缩臂在 4/4 样本上逐例严格等 resident bytes，平均仅为 Full KV 的 11.556%；官方 QA F1 均值 HMO / Global Fixed / Raw Exact+Slack / Scattered / Full KV 分别为 0.3357 / 0.2315 / 0.3981 / 0.4038 / 0.2315，五者均在相同 2/4 样本上取得非零 F1。HMO 正式结果相对 Fixed 为 +0.1042（2W/2T/0L），但低于 Raw 与 Scattered，差异主要来自已解样本的答案措辞，不能声称 HMO 最优。复现审计发现同一首例 smoke/formal 中 HMO 保留位置与输出完全一致，而 Fixed 因近似并列 probe 排名有 7 个位置变化、F1 从 1.0 变为 0.3333，因此 Fixed 优势只宜作方向性证据。独立 result-to-claim 判定为 `partial/supplement`、medium confidence：支持 HMO 是 32K 等字节压缩下可行的竞争方案，不支持稳健优越性。formal 耗时 147.48 秒，峰值 7.31/9.35 GiB allocated/reserved，GPU1 已回到 15 MiB；未自动启动后续实验。详见 `codex/share/2026-09-04/hotpotqa_32k_paired_pilot_results.md`。
