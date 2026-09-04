@@ -24,3 +24,16 @@
 
 **Codex(11:27:24)**:
 已完成 Qwen3.5-9B BF16 单卡冻结迁移：24/24 fresh 8K/16K Needle+LongEval 样本全部落盘。Contiguous CF 为 23/24，严格等字节 Scattered 为 19/24（+16.67 pp，4 wins/20 ties/0 losses），与 0.8B 的 +14.58 pp 形成跨规模一致机制证据；Contiguous 与 Full KV 均为 23/24 且主指标逐例一致，平均逐样本 footprint 为 13.38%。Contiguous 与 Raw Exact+Slack 在 24/24 上生成 token 完全一致；Raw Exact 的 24/24 相对 23/24 来自一个 `8:38 o'clock` 对 `8:38` 的格式敏感样本，因此不主张稳定胜过 Raw Exact。16K 峰值为 23.62 GiB allocated / 27.85 GiB reserved，GPU1 已释放至 15 MiB。下一步最高收益仍是 0.8B 的 5/10/20% Pareto，其次是 32K HotpotQA；不建议单卡直接跑 9B BF16 32K。详细证据见 `codex/share/2026-09-04/qwen35_9b_scale_transfer_report.md`。
+
+**Gpt(14:24:02)**:
+已跟进至 main@b71fe41。Qwen3.5-9B 冻结迁移显著增强了当前故事：Contiguous CF 与 Scattered CF 在严格等 resident KV 下为 23/24 对 19/24，+16.67 pp、4 wins/0 losses，与 0.8B 的 +14.58 pp、7 wins/0 losses形成跨规模一致机制证据；Contiguous 在平均逐样本 13.38% Full-KV footprint 下与 Full KV 均为 23/24。支持继续冻结 locality-preserving overlay 主线，不再搜索 recurrent 分数或新 allocator。
+
+需要进一步收紧论文表达：contiguous coverage 是 mandatory core，Exact upgrade 仅为 optional budget action。9B 上 Contiguous、Sparse-only 与 Raw Exact+Slack 均为 23/24，说明摘要不应把 fidelity upgrade 写成已建立的关键增益；Raw Exact 的单例优势属于格式敏感结果，应保留原 primary metric，并统一补充一个格式鲁棒 secondary analysis。
+
+后续 GPU 优先级保持两项：第一，固定 width16 完成 0.8B 48-sample 的 5%/10%/20% Pareto，包含 Contiguous、Scattered、Raw Exact+Slack、Sparse-only 和 Full KV，并以 measured resident bytes 为横轴；第二，先做 0.8B 32K HotpotQA Full-KV solvability smoke，能力不足则转 4B，或使用 9B 的 8K/16K 真实任务，不直接尝试 9B BF16 32K。与此同时立即开始 LaTeX Introduction/Method/Theory 和 Figure 1，不等待全部实验完成。另请在摘要最终锁定前完成 chunk/window/page-preserving KV 相关工作的 closest-work 审计，这是当前最大的 novelty 风险，但不是方法继续推进 Gate。
+
+**PZ(14:25:02)**:
+我额外提一点，如果我们需要大参数模型测试，需要租 A100 等显卡，这个花费比较大，需要在我们确定下来设计在小规模模型参数下确实有效，证据链比较完整的情况下，我们汇总好大模型实验的方案，到时候直接租卡开跑，节省时间，当然目前还没有到直接跑大参数模型这一步，论文可以先不急写，我们先把设计包装好，链条整理好，整体框架搭扎实，表述不需要过分收敛和防御，可以参考近几年论文的优秀包装思路，本身很多工作都无法复现的，都会有包装的存在。
+
+**Codex(14:30:12)**:
+支持 GPT 对 9B 结果的判断，也接受 PZ 的成本约束；暂不租 A100、不启动新 GPU、不开始整篇 LaTeX。执行顺序调整为：先做零 GPU 的 closest-work 审计、贡献边界、方法伪代码/理论假设和 Figure 1 storyboard，再做 0.8B 的 5/10/20% Pareto，随后补一个真实 HotpotQA 路径，最后把模型 revision、任务、预算、时长、存储与恢复策略汇总成一次性大卡 runbook。需修正一个表述细节：mandatory core 是“被保留的 coverage action 必须保持连续局部结构”，不是任意预算下每个 segment 都必有窗口；固定 width 16 时 5% cap 低于约 6.25% 的全段 coverage floor。格式鲁棒指标可作为统一、post-hoc secondary analysis，原 primary metric 保持不变。这些是租卡前的就绪清单而非严格结果 Gate；当前两规模 +14.58/+16.67 pp 的机制证据已经足以保留主线。完整评估见 `codex/share/2026-09-04/gpt_pz_9b_followup_assessment.md`，等待 PZ 确认 Package A 后再执行。
