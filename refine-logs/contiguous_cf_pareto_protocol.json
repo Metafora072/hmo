@@ -1,0 +1,107 @@
+{
+  "schema_version": "hmo.contiguous_cf.pareto_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "frozen_at": "2026-09-04T15:07:36+08:00",
+  "development_basis": "openchat/codex/share/2026-09-04/package_a_method_novelty_report.md",
+  "model_id": "Qwen/Qwen3.5-0.8B",
+  "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "systems": [
+    "contiguous_cf",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "scattered_cf",
+    "contiguous_sparse_only",
+    "full_kv_reference"
+  ],
+  "equal_byte_systems": [
+    "contiguous_cf",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "scattered_cf",
+    "contiguous_sparse_only"
+  ],
+  "primary_comparisons": [
+    [
+      "contiguous_cf",
+      "global_fixed_chunk_topk"
+    ],
+    [
+      "contiguous_cf",
+      "scattered_cf"
+    ]
+  ],
+  "primary_metric": "normalized_answer_contains",
+  "secondary_metrics": [
+    "normalized_exact_match",
+    "token_f1"
+  ],
+  "budget_fractions": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "max_new_tokens": 32,
+  "inference_seed": 20261009,
+  "method": {
+    "allocator": "attention_led",
+    "sparse_selector": "max_mass_window",
+    "sparse_width": 16,
+    "raw_slack_selector": "global_top_tokens_slack",
+    "global_fixed_chunk_width": 16,
+    "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1
+  },
+  "stages": {
+    "smoke": {
+      "datasets": "needle",
+      "samples_per_dataset": 1,
+      "context_length": 8192,
+      "segment_length": 256,
+      "seed": 20261008,
+      "sample_id_prefix": "contiguous_cf_pareto_smoke_s20261008_"
+    },
+    "8k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 12,
+      "context_length": 8192,
+      "segment_length": 256,
+      "seed": 20261005,
+      "sample_id_prefix": "contiguous_cf_confirm_8k_s20261005_"
+    },
+    "16k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 12,
+      "context_length": 16384,
+      "segment_length": 256,
+      "seed": 20261006,
+      "sample_id_prefix": "contiguous_cf_confirm_16k_s20261006_"
+    }
+  },
+  "execution": {
+    "smoke_sample_cases": 1,
+    "formal_sample_cases": 48,
+    "formal_budget_cases": 144,
+    "run_order": [
+      "smoke",
+      "8k/needle",
+      "8k/longeval_lines",
+      "16k/needle",
+      "16k/longeval_lines"
+    ],
+    "continuation_gate": false,
+    "resume_only_after_interruption": true,
+    "full_kv_generated_once_per_sample": true
+  },
+  "claims": [
+    "quality_memory_pareto_at_measured_resident_kv_bytes",
+    "stratified_free_start_overlay_vs_global_fixed_chunks",
+    "contiguous_vs_scattered_retention_geometry"
+  ],
+  "immutability": {
+    "sample_or_metric_changes_after_launch": false,
+    "method_parameter_changes_after_launch": false,
+    "case_filtering_after_outcomes": false,
+    "budget_gate": false
+  }
+}

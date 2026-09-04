@@ -83,3 +83,31 @@ python -m experiments.phase2.e3_v2.run_scale_transfer \
   --stage-set formal \
   --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_scale9b_formal
 ```
+
+## Qwen3.5-0.8B structured-baseline Pareto
+
+`run_pareto.py` evaluates 5%, 10%, and 20% middle-context caps on the matched
+48-case confirmation suite. Global Fixed-Chunk Top-K uses non-overlapping
+16-token boundaries and the same query probe as HMO. Contiguous CF, fixed
+chunks, Raw Exact+Slack, Scattered CF, and Sparse-only are exactly matched by
+measured resident KV bytes; Full KV is generated once per sample.
+
+```bash
+source /home/pz/miniconda3/etc/profile.d/conda.sh
+conda activate hmo_research_v6
+export CUDA_VISIBLE_DEVICES=1
+
+python -m experiments.phase2.e3_v2.run_pareto \
+  --model-path /mnt/nvme0/hmo/models/Qwen3.5-0.8B \
+  --model-revision 2fc06364715b967f1860aea9cf38778875588b17 \
+  --protocol refine-logs/contiguous_cf_pareto_protocol.json \
+  --stage-set smoke \
+  --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_pareto_smoke
+
+python -m experiments.phase2.e3_v2.run_pareto \
+  --model-path /mnt/nvme0/hmo/models/Qwen3.5-0.8B \
+  --model-revision 2fc06364715b967f1860aea9cf38778875588b17 \
+  --protocol refine-logs/contiguous_cf_pareto_protocol.json \
+  --stage-set formal \
+  --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_pareto_formal
+```

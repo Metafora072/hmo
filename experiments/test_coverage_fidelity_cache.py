@@ -8,6 +8,8 @@ import torch
 
 from experiments.phase2.e3_v2.coverage_fidelity import allocate_coverage_fidelity
 from experiments.phase2.e3_v2.coverage_fidelity_cache import (
+    GLOBAL_FIXED_CHUNK_SELECTOR,
+    build_global_fixed_chunk_topk_position_plan,
     build_raw_exact_slack_position_plan,
     build_retained_position_plan,
     make_coverage_fidelity_intervention,
@@ -135,6 +137,39 @@ class CoverageFidelityCacheTests(unittest.TestCase):
                 [0.0] * 16,
                 context_tokens=16,
                 target_context_charged_bytes=113,
+            )
+
+    def test_global_fixed_chunks_rank_globally_and_match_boundary_slack(self):
+        segments = _segments()
+        mass = [0.0] * 16
+        mass[4:8] = [1.0, 1.0, 0.0, 0.0]
+        mass[8:12] = [0.0, 3.0, 2.0, 0.0]
+        positions = build_global_fixed_chunk_topk_position_plan(
+            segments,
+            mass,
+            context_tokens=16,
+            target_context_charged_bytes=104,
+            chunk_width=2,
+        )
+        self.assertEqual(
+            positions.active_positions,
+            (0, 1, 2, 3, 4, 5, 8, 9, 10, 12, 13, 14, 15),
+        )
+        self.assertEqual(positions.context_charged_bytes, 104)
+        self.assertEqual(
+            positions.sparse_selector, GLOBAL_FIXED_CHUNK_SELECTOR
+        )
+
+    def test_global_fixed_chunks_reject_unmatchable_byte_target(self):
+        with self.assertRaisesRegex(
+            OracleContractError, "target cannot be matched exactly"
+        ):
+            build_global_fixed_chunk_topk_position_plan(
+                _segments(),
+                [0.0] * 16,
+                context_tokens=16,
+                target_context_charged_bytes=105,
+                chunk_width=2,
             )
 
 

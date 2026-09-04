@@ -16,6 +16,7 @@ from experiments.utils.memory_accounting import get_active_kv_bytes
 
 SPARSE_SELECTORS = ("top_tokens", "max_mass_window")
 RAW_EXACT_SLACK_SELECTOR = "global_top_tokens_slack"
+GLOBAL_FIXED_CHUNK_SELECTOR = "global_fixed_chunk_topk_boundary_slack"
 
 
 @dataclass(frozen=True)
@@ -267,6 +268,119 @@ def build_raw_exact_slack_position_plan(
         context_charged_bytes=target_context_charged_bytes,
         sparse_selector=RAW_EXACT_SLACK_SELECTOR,
         active_positions=tuple(active),
+        segments=tuple(retention),
+    )
+
+
+def build_global_fixed_chunk_topk_position_plan(
+    segments: Sequence[SegmentSpec],
+    token_attention_mass: Sequence[float],
+    *,
+    context_tokens: int,
+    target_context_charged_bytes: int,
+    chunk_width: int,
+) -> RetainedPositionPlan:
+    """Globally rank fixed-boundary chunks and exactly match a byte target.
+
+    Whole chunks are selected in score order. If the target has a remainder,
+    the final tokens come from the fixed-boundary prefix of the next ranked
+    chunk, preserving deterministic byte equality without a free-start window.
+    """
+    ordered = tuple(sorted(segments, key=lambda item: item.segment_id))
+    if (
+        chunk_width <= 0
+        or not ordered
+        or ordered[0].start != 0
+        or ordered[-1].end != context_tokens
+        or len(token_attention_mass) != context_tokens
+    ):
+        raise OracleContractError("global fixed-chunk inputs are misaligned")
+
+    cursor = 0
+    per_token_costs = set()
+    supported_tokens = 0
+    protected_positions = set()
+    for segment in ordered:
+        if segment.start != cursor or segment.end <= segment.start:
+            raise OracleContractError("global fixed-chunk segments must be contiguous")
+        cursor = segment.end
+        if not segment.eligible and not segment.protected:
+            raise OracleContractError(
+                "global fixed-chunk has no policy for unprotected partial segments"
+            )
+        if segment.kv_bytes % segment.token_count:
+            raise OracleContractError(
+                "global fixed-chunk segment cost is not token-divisible"
+            )
+        per_token_costs.add(segment.kv_bytes // segment.token_count)
+        supported_tokens += segment.token_count
+        if segment.protected:
+            protected_positions.update(range(segment.start, segment.end))
+    if len(per_token_costs) != 1:
+        raise OracleContractError("global fixed-chunk requires one per-token KV cost")
+    token_cost = next(iter(per_token_costs))
+    if (
+        target_context_charged_bytes < len(protected_positions) * token_cost
+        or target_context_charged_bytes > supported_tokens * token_cost
+        or target_context_charged_bytes % token_cost
+    ):
+        raise OracleContractError("global fixed-chunk target cannot be matched exactly")
+
+    remaining = (
+        target_context_charged_bytes // token_cost - len(protected_positions)
+    )
+    candidates = []
+    for segment in ordered:
+        if not segment.eligible:
+            continue
+        for start in range(segment.start, segment.end, chunk_width):
+            positions = tuple(range(start, min(start + chunk_width, segment.end)))
+            values = [float(token_attention_mass[position]) for position in positions]
+            if any(not math.isfinite(value) or value < 0 for value in values):
+                raise OracleContractError(
+                    "global fixed-chunk scores must be finite and nonnegative"
+                )
+            candidates.append((-sum(values), start, positions))
+
+    active = set(protected_positions)
+    for _, _, positions in sorted(candidates):
+        if remaining <= 0:
+            break
+        take = min(remaining, len(positions))
+        active.update(positions[:take])
+        remaining -= take
+    if remaining:
+        raise OracleContractError("global fixed-chunk target exceeds eligible context")
+
+    active_positions = tuple(sorted(active))
+    retention = []
+    for segment in ordered:
+        positions = tuple(
+            position
+            for position in range(segment.start, segment.end)
+            if position in active
+        )
+        action = (
+            "exact"
+            if len(positions) == segment.token_count
+            else "sparse"
+            if positions
+            else "recurrent_only"
+        )
+        retention.append(
+            SegmentRetention(
+                segment_id=segment.segment_id,
+                action=action,
+                positions=positions,
+            )
+        )
+    if len(active_positions) * token_cost != target_context_charged_bytes:
+        raise OracleContractError("global fixed-chunk failed its byte target")
+    return RetainedPositionPlan(
+        context_tokens=context_tokens,
+        context_charged_bytes=target_context_charged_bytes,
+        sparse_selector=GLOBAL_FIXED_CHUNK_SELECTOR,
+        active_positions=active_positions,
         segments=tuple(retention),
     )
 

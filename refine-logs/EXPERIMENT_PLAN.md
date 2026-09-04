@@ -64,3 +64,42 @@ end-task quality and baseline evidence; do not tune V2 on P2 outcomes.
 No controller, threshold, sample, or metric changes are allowed after smoke.
 The original 2K smoke was amended to 4K before any generation outcome because
 the exact 10% whole-segment budget contained zero eligible slots at 2K.
+
+## P4 Package B: Structured-Baseline Pareto
+
+**Protocol**: `contiguous_cf_pareto_protocol.json`
+
+### Claims
+
+- Map quality against measured resident KV at 5%, 10%, and 20% middle-context
+  caps on the existing 48-case 0.8B confirmation suite.
+- Separate generic chunk retention from HMO's macro-segment coverage and
+  query-guided free-start placement.
+- Recheck contiguous versus scattered geometry across all three budgets.
+
+### Systems and Metrics
+
+- Strictly equal-byte systems: Contiguous CF, Global Fixed-Chunk Top-K, Raw
+  Exact+Slack, Scattered CF, and Contiguous Sparse-only.
+- Reference: Full KV, generated once per sample and reused across budget rows.
+- Primary metric: normalized answer containment.
+- Secondary metrics: normalized exact match, token F1, paired win/tie/loss,
+  measured resident KV bytes, and fraction of Full-KV bytes.
+
+Global Fixed-Chunk partitions every eligible 256-token segment into aligned
+16-token chunks, ranks all chunks globally by the same query-attention probe,
+and retains chunks in rank order. A non-multiple byte target takes its final
+tokens from the fixed-boundary prefix of the next ranked chunk; this
+deterministic tail rule preserves exact byte equality without using a free-start
+window.
+
+### Run Order
+
+| Run | Split | Gate | Priority |
+|---|---|---|---|
+| PB-S | 1 Needle sample at 8K, all three budgets | Operational correctness only | MUST |
+| PB-P | Existing 12+12 at 8K and 12+12 at 16K, all budgets | No result gate | MUST |
+
+The smoke must verify protocol integrity, nonempty plans, exact resident-byte
+equality, parseable outputs, and successful generation. Its result does not
+control whether the formal Pareto run proceeds.
