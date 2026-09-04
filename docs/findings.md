@@ -240,3 +240,19 @@
   solvable set and remains a plausible equal-byte contender. Unsupported: HMO
   is the strongest real-task method or contiguous locality beats Scattered here.
 - Full report: experiments/results/HOTPOTQA_32K_PAIRED_PILOT_20260904.md
+
+## 2026-09-04: P8 Persistent FP32 Query-Probe Reproducibility
+
+- Final runners now persist one identity-bound FP32 token-score artifact and
+  derive all query-ranked arms from it; mismatched, incomplete, or corrupt
+  artifacts fail closed.
+- Two clean-commit repeats of the first 32K Hotpot case used the same probe ID
+  and score SHA, with cache hits false then true.
+- All four compressed retained-position hashes, all five generated token
+  sequences, and all per-system resident-byte measurements are identical across
+  repeats.
+- Each compressed arm uses 46,657,536 resident KV bytes, 11.566% of Full on the
+  case. R1/R2 completed in 42.01/37.92 seconds and GPU1 returned to 15 MiB.
+- This resolves the observed P7 ranking drift through exact artifact reuse,
+  without introducing tolerance bucketing or a new method hyperparameter.
+- Full report: experiments/results/QUERY_PROBE_REPRO_20260904.md

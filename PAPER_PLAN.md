@@ -175,7 +175,7 @@ All formal metadata and BibTeX must be verified before use.
 - [x] Add Global Fixed-Chunk Top-K and complete the 5%/10%/20% Pareto package.
 - [x] Add the 16K/10% Stratified Fixed-Chunk mechanism control.
 - [x] Add the four-case HotpotQA-32K-Aug feasibility transfer.
-- [ ] Freeze the final method/theory contract and persistent shared-probe path.
+- [x] Freeze the final method/theory contract and persistent shared-probe path.
 - [ ] Complete the final deterministic 5090 validation package.
 - [ ] Generate Figure 1 and the current-results plots.
 - [ ] Verify citations and construct the bibliography.

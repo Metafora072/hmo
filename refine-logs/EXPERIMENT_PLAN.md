@@ -255,3 +255,13 @@ external cache directory. Required invariants are probe ID/hash equality,
 second-run cache reuse, per-arm retained-position hash equality, and the existing
 equal-resident-byte contract. Generated-token equality is recorded as a useful
 determinism check, not a paper claim or a method gate.
+
+### Outcome
+
+P8 completed both repeats from clean commit 348dff2. R1 created probe
+fad4f015cbea80fd88ebdd2c808ef8b2a2713433a82e6025e9bfe54b90dd9339
+and R2 reused it. The verified score SHA is
+68bf022c3ea4f23b371da7c0f7a60c6f72c7ff93c54a29dff295a9a2b180b745.
+All required probe, position, byte, and commit invariants passed; generated token
+IDs also match for all five systems. The final path is ready for C2, which was
+not started automatically.

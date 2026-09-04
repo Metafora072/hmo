@@ -18,4 +18,4 @@
 | P6-F | HotpotQA-32K-Aug solvability | four frozen Full-KV cases | DONE; mean official F1 0.2315, nonzero 2/4, GPU1 released |
 | P7-S | HotpotQA-32K-Aug paired smoke | first frozen case, four compressed arms at 10% | DONE; 4/4 compressed arms exact equal bytes at 11.57% of Full |
 | P7-F | HotpotQA-32K-Aug paired pilot | four frozen cases, four equal-byte arms plus Full KV | DONE; HMO F1 0.3357 at 11.556% Full, partial/supplement |
-| P8-R1/R2 | persistent FP32 probe reproducibility | same first P7 case, two fresh run dirs | FROZEN; awaiting GPU1 execution |
+| P8-R1/R2 | persistent FP32 probe reproducibility | same first P7 case, two fresh run dirs | DONE; exact probe/position/output reuse, all invariants pass, GPU1 released |

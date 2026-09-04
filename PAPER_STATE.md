@@ -2,10 +2,10 @@
 
 ## 当前状态
 
-论文处于大卡前的设计与实验收敛阶段。核心方法不再继续搜索新的 recurrent
-打分公式；5%/10%/20% Pareto、结构化强基线、free-start 机制控制和
-HotpotQA-32K-Aug 路径均已完成。当前首要任务是冻结最终方法/理论合同与共享
-query probe，再用同一路径完成 5090 验证包。
+论文处于大卡前的实验收敛阶段。核心方法、理论合同与持久化 FP32 query
+probe 已冻结；5%/10%/20% Pareto、结构化强基线、free-start 机制控制、
+HotpotQA-32K-Aug 路径和跨运行确定性 smoke 均已完成。当前首要任务是在同一
+最终路径上完成 5090 的 C2 证据包。
 
 目标会议暂按 ICLR 规划，正文页数按 9 页控制。工作标题为：
 
@@ -301,6 +301,13 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - P7 原始结果：
   `/mnt/nvme0/hmo/runs/hotpotqa_32k_paired_formal_20260904_174200/`
 
+- P8 持久化 query probe 报告：
+  experiments/results/QUERY_PROBE_REPRO_20260904.md
+- P8 冻结协议：refine-logs/query_probe_repro_protocol.json
+- P8 R1/R2 原始结果：
+  /mnt/nvme0/hmo/runs/p8_probe_repro_348dff2_r1b/ 与
+  /mnt/nvme0/hmo/runs/p8_probe_repro_348dff2_r2b/
+
 
 ## 下一阶段
 
@@ -320,14 +327,22 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - 完成四条 HotpotQA-32K-Aug paired pilot；HMO 在 11.556% Full footprint
   下保持相同 2/4 solvable set，F1 0.3357，作为 partial external-validity evidence。
 
+### 已完成的最终路径验证
+
+- 最终方法/理论合同与 persistent FP32 query probe 已冻结。
+- P8 在 clean commit 348dff2 上完成同一 32K case 的两次独立运行；probe
+  ID、score SHA、四个压缩臂的位置 SHA、五个系统输出和 resident bytes
+  全部一致，R2 明确命中缓存。
+- GPU1 已释放；本轮未启动 C2 大矩阵。
+
 ### 待确认 GPU 工作
 
-1. 若继续增强真实任务证据，先冻结 query-ranking 确定性方案或重复运行
-   口径，再扩展更具代表性的 32K 样本；执行前需单独确认。
-2. 若论文机制分解仍需加强，再定义 `global allocation + free-start` 的无重叠
-   第四控制，补齐 2x2；当前不优先于真实任务。
-3. 9B 在 16K 已达到 27.85 GiB PyTorch reserved 峰值；32K 优先使用
-   0.8B/4B，不在当前单卡上直接尝试 9B BF16 或 27B/32B。
+1. C2-0.8B：在最终共享 probe 路径上重跑 48 样本、5%/10%/20% Pareto。
+2. C2-9B：重跑现有 24 样本中央 10% 设置，不扩到单卡 9B/32K。
+3. C2-native：冻结并运行 20 至 30 条未增广原生 HotpotQA/NarrativeQA
+   小包，使用官方指标且不按结果筛样本。
+4. C2 完成后再整理 C3 大卡 preflight；租卡、模型下载与付费矩阵仍需 PZ
+   单独确认。
 
 
 ## 执行原则
