@@ -103,3 +103,37 @@ window.
 The smoke must verify protocol integrity, nonempty plans, exact resident-byte
 equality, parseable outputs, and successful generation. Its result does not
 control whether the formal Pareto run proceeds.
+
+## P5 Stratified Fixed-Chunk Mechanism Control
+
+**Protocol**: `stratified_fixed_chunk_control_protocol.json`
+
+### Claim
+
+Isolate segment-internal free-start placement from macro-segment allocation.
+The control reuses the 10% Contiguous CF allocation, including protected
+segments, Exact upgrades, Sparse retained-token counts, and slack. Its only
+change is to restrict each Sparse window start to a segment-local 16-token
+boundary.
+
+### Systems And Metrics
+
+- Contiguous CF generation and measured bytes are reused from the SHA-pinned
+  Package B parent run.
+- Stratified Fixed-Chunk is newly generated and scored against dataset ground
+  truth.
+- Primary metric: normalized answer containment.
+- Secondary: exact match, token F1, paired win/tie/loss, retained-position
+  Jaccard, and measured resident KV bytes.
+
+### Run Order
+
+| Run | Split | Gate | Priority |
+|---|---|---|---|
+| P5-S | First frozen 16K Needle case at 10% | Operational correctness only | MUST |
+| P5-P | Frozen 12+12 16K suite at 10% | No result gate | MUST |
+
+The runner must recompute the parent HMO allocation and retained positions and
+match them exactly against the frozen Package B row before generating the
+control. The experiment is descriptive: either direction informs whether the
+16K advantage comes from stratification or free-start placement.

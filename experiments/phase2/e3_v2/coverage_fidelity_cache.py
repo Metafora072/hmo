@@ -17,6 +17,7 @@ from experiments.utils.memory_accounting import get_active_kv_bytes
 SPARSE_SELECTORS = ("top_tokens", "max_mass_window")
 RAW_EXACT_SLACK_SELECTOR = "global_top_tokens_slack"
 GLOBAL_FIXED_CHUNK_SELECTOR = "global_fixed_chunk_topk_boundary_slack"
+STRATIFIED_FIXED_CHUNK_SELECTOR = "stratified_fixed_chunk_aligned_window"
 
 
 @dataclass(frozen=True)
@@ -94,18 +95,62 @@ def select_max_attention_window_positions(
     )
 
 
+def select_max_attention_aligned_window_positions(
+    token_attention_mass: Sequence[float],
+    segment: SegmentSpec,
+    width: int,
+    *,
+    alignment: int,
+) -> list[int]:
+    """Select the best window whose start lies on a segment-local boundary."""
+    if (
+        width <= 0
+        or alignment <= 0
+        or len(token_attention_mass) < segment.end
+    ):
+        raise OracleContractError("invalid aligned-window Sparse selection inputs")
+    values = [float(value) for value in token_attention_mass[segment.start : segment.end]]
+    if len(values) != segment.token_count or any(
+        not math.isfinite(value) or value < 0 for value in values
+    ):
+        raise OracleContractError(
+            "aligned-window Sparse scores must be finite and nonnegative"
+        )
+    keep = min(width, segment.token_count)
+    starts = range(0, len(values) - keep + 1, alignment)
+    best_start = max(
+        starts,
+        key=lambda start: (sum(values[start : start + keep]), -start),
+    )
+    return list(
+        range(segment.start + best_start, segment.start + best_start + keep)
+    )
+
+
 def select_sparse_positions(
     token_attention_mass: Sequence[float],
     segment: SegmentSpec,
     width: int,
     *,
     selector: str,
+    alignment: int | None = None,
 ) -> list[int]:
     if selector == "top_tokens":
         return select_query_attention_positions(token_attention_mass, segment, width)
     if selector == "max_mass_window":
         return select_max_attention_window_positions(
             token_attention_mass, segment, width
+        )
+    if selector == STRATIFIED_FIXED_CHUNK_SELECTOR:
+        if alignment is None:
+            raise OracleContractError(
+                "stratified fixed-chunk selector requires an alignment"
+            )
+        return select_max_attention_aligned_window_positions(
+            token_attention_mass,
+            segment,
+            width,
+            alignment=alignment,
         )
     raise OracleContractError(f"unknown Sparse selector {selector!r}")
 
@@ -117,6 +162,7 @@ def build_retained_position_plan(
     *,
     context_tokens: int,
     sparse_selector: str = "top_tokens",
+    sparse_alignment: int | None = None,
 ) -> RetainedPositionPlan:
     """Materialize exact token positions for every allocator action."""
     ordered = tuple(sorted(segments, key=lambda item: item.segment_id))
@@ -149,6 +195,7 @@ def build_retained_position_plan(
                 segment,
                 allocation.retained_tokens,
                 selector=sparse_selector,
+                alignment=sparse_alignment,
             )
         else:
             raise OracleContractError(

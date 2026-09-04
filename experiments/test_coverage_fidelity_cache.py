@@ -9,10 +9,12 @@ import torch
 from experiments.phase2.e3_v2.coverage_fidelity import allocate_coverage_fidelity
 from experiments.phase2.e3_v2.coverage_fidelity_cache import (
     GLOBAL_FIXED_CHUNK_SELECTOR,
+    STRATIFIED_FIXED_CHUNK_SELECTOR,
     build_global_fixed_chunk_topk_position_plan,
     build_raw_exact_slack_position_plan,
     build_retained_position_plan,
     make_coverage_fidelity_intervention,
+    select_max_attention_aligned_window_positions,
     select_max_attention_window_positions,
     select_query_attention_positions,
 )
@@ -46,6 +48,21 @@ def _segments():
 
 
 class CoverageFidelityCacheTests(unittest.TestCase):
+    def test_aligned_window_removes_only_free_start(self):
+        segment = _segments()[1]
+        mass = [0.0] * 16
+        mass[4:8] = [0.0, 1.0, 4.0, 4.0]
+        self.assertEqual(
+            select_max_attention_window_positions(mass, segment, 3),
+            [5, 6, 7],
+        )
+        self.assertEqual(
+            select_max_attention_aligned_window_positions(
+                mass, segment, 3, alignment=2
+            ),
+            [4, 5, 6],
+        )
+
     def test_max_mass_window_is_contiguous_and_uses_earliest_tie(self):
         segment = _segments()[1]
         mass = [0.0] * 16
@@ -106,6 +123,31 @@ class CoverageFidelityCacheTests(unittest.TestCase):
         )
         self.assertEqual(positions.sparse_selector, "max_mass_window")
         self.assertEqual(positions.context_charged_bytes, 96)
+
+    def test_stratified_fixed_chunk_reuses_allocation_and_bytes(self):
+        segments = _segments()
+        plan = allocate_coverage_fidelity(
+            {1: 0.9, 2: 0.8},
+            {1: 0.9, 2: 0.1},
+            segments,
+            middle_kv_fraction=0.5,
+            sparse_width=1,
+            enable_exact_upgrades=False,
+        )
+        positions = build_retained_position_plan(
+            plan,
+            segments,
+            [float(index % 4) for index in range(16)],
+            context_tokens=16,
+            sparse_selector=STRATIFIED_FIXED_CHUNK_SELECTOR,
+            sparse_alignment=2,
+        )
+        self.assertEqual(positions.context_charged_bytes, plan.total_charged_bytes)
+        self.assertEqual(positions.sparse_selector, STRATIFIED_FIXED_CHUNK_SELECTOR)
+        for allocation, retention in zip(plan.allocations, positions.segments):
+            self.assertEqual(allocation.segment_id, retention.segment_id)
+            self.assertEqual(allocation.action, retention.action)
+            self.assertEqual(allocation.retained_tokens, len(retention.positions))
 
     def test_raw_exact_slack_matches_target_with_global_top_tokens(self):
         segments = _segments()

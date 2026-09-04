@@ -111,3 +111,31 @@ python -m experiments.phase2.e3_v2.run_pareto \
   --stage-set formal \
   --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_pareto_formal
 ```
+
+## Qwen3.5-0.8B Stratified Fixed-Chunk control
+
+`run_stratified_fixed_control.py` reuses the SHA-pinned 16K/10% HMO rows from
+Package B. It recomputes and exactly verifies the parent allocation and
+retained positions, then generates one new equal-byte control whose Sparse
+window starts are restricted to segment-local 16-token boundaries. Sparse
+widths, including 17/18-token slack extensions, remain unchanged.
+
+```bash
+source /home/pz/miniconda3/etc/profile.d/conda.sh
+conda activate hmo_research_v6
+export CUDA_VISIBLE_DEVICES=1
+
+COMMON_ARGS="--model-path /mnt/nvme0/hmo/models/Qwen3.5-0.8B \
+  --model-revision 2fc06364715b967f1860aea9cf38778875588b17 \
+  --parent-protocol refine-logs/contiguous_cf_pareto_protocol.json \
+  --parent-results /mnt/nvme0/hmo/runs/contiguous_cf_pareto_formal_20260904_1518/pareto_results.jsonl \
+  --protocol refine-logs/stratified_fixed_chunk_control_protocol.json"
+
+python -m experiments.phase2.e3_v2.run_stratified_fixed_control \
+  $COMMON_ARGS --stage-set smoke \
+  --run-dir /mnt/nvme0/hmo/runs/stratified_fixed_control_smoke
+
+python -m experiments.phase2.e3_v2.run_stratified_fixed_control \
+  $COMMON_ARGS --stage-set formal \
+  --run-dir /mnt/nvme0/hmo/runs/stratified_fixed_control_formal
+```

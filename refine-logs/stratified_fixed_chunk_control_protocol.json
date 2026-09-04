@@ -1,0 +1,58 @@
+{
+  "schema_version": "hmo.stratified_fixed_chunk.control_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "model_id": "Qwen/Qwen3.5-0.8B",
+  "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "parent": {
+    "protocol": "refine-logs/contiguous_cf_pareto_protocol.json",
+    "protocol_sha256": "ff064dded9813acdf82c693442f2989fa6ee1069da4c703a3b89755e6b3a7388",
+    "results_sha256": "5757ff898b921c1b0fcc6ed1e76d195667070999d56bf71189a752e38d49e1ab",
+    "source_stage": "16k",
+    "budget_fraction": 0.1,
+    "expected_sample_cases": 24
+  },
+  "systems": [
+    "contiguous_cf_parent",
+    "stratified_fixed_chunk"
+  ],
+  "primary_comparison": [
+    "stratified_fixed_chunk",
+    "contiguous_cf_parent"
+  ],
+  "primary_metric": "normalized_answer_contains",
+  "secondary_metrics": [
+    "normalized_exact_match",
+    "token_f1",
+    "paired_win_tie_loss",
+    "retained_position_jaccard",
+    "measured_resident_kv_bytes"
+  ],
+  "max_new_tokens": 32,
+  "inference_seed": 20261009,
+  "method": {
+    "allocator": "reuse_contiguous_cf_parent",
+    "exact_upgrades": "unchanged",
+    "sparse_retained_tokens": "unchanged_including_slack",
+    "window_start_alignment": 16,
+    "alignment_origin": "segment_start",
+    "aligned_window_score": "sum_query_attention_mass",
+    "aligned_window_tie_break": "earliest_start",
+    "protected_segments": "unchanged"
+  },
+  "execution": {
+    "smoke_sample_cases": 1,
+    "formal_sample_cases": 24,
+    "reuse_parent_hmo_generation": true,
+    "recompute_and_verify_parent_hmo_plan": true,
+    "candidate_search": false,
+    "continuation_gate": false
+  },
+  "claim_boundary": {
+    "supported_target": "free_start_placement_effect_under_fixed_stratified_allocation",
+    "not_claimed": [
+      "unconditional_hmo_superiority",
+      "cross_task_transfer",
+      "cross_model_transfer"
+    ]
+  }
+}

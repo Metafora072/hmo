@@ -12,3 +12,5 @@
 | P3-16K | Equal-byte end-task transfer | fresh 12+12 at 16K | DONE, -8.33 pp; final claim gate failed |
 | PB-S | Structured Pareto smoke | 1 Needle at 8K, 5/10/20% | DONE; 3/3 budget cases, exact-byte contract passed |
 | PB-P | Structured-baseline Pareto | matched 48-case 8K/16K suite, 5/10/20% | DONE; 144/144 budget cases, verdict partial/supplement |
+| P5-S | Stratified Fixed-Chunk smoke | first frozen Needle at 16K/10% | READY; protocol frozen before outcomes |
+| P5-P | Free-start mechanism isolation | frozen 12+12 suite at 16K/10% | PENDING P5-S operational check |
