@@ -256,3 +256,23 @@
 - This resolves the observed P7 ranking drift through exact artifact reuse,
   without introducing tolerance bucketing or a new method hyperparameter.
 - Full report: experiments/results/QUERY_PROBE_REPRO_20260904.md
+
+## 2026-09-04: C2 Native LongBench QA
+
+- Local result-to-claim verdict: `partial`, route `confirm C2 / proceed to C3
+  planning`, medium confidence; independent external review is pending.
+- Evidence: 12 native HotpotQA and 12 native NarrativeQA records, selected
+  before outcomes by exact 8K--16K serialized context length; no augmentation,
+  truncation, or outcome filtering.
+- HMO / Fixed / Raw+Slack / Scattered / Full official QA F1 is
+  `0.3086 / 0.3251 / 0.2873 / 0.3211 / 0.2602`.
+- HMO versus Fixed / Raw / Scattered / Full paired deltas are
+  `-0.0165 / +0.0213 / -0.0124 / +0.0485`.
+- NarrativeQA is the positive slice: HMO is highest at `0.2934`, improving over
+  Fixed, Raw, Scattered, and Full by `0.0504/0.0429/0.0474/0.0973`. HotpotQA
+  favors Fixed and Scattered; HMO is effectively tied with Raw and Full.
+- All compressed arms use exactly equal measured resident KV in 24/24 cases,
+  averaging 12.80% of Full. No generation hits its token limit.
+- Supported: native-task competitive efficiency and a task-conditioned benefit.
+  Unsupported: universal native-QA superiority or full-split LongBench claims.
+- Full report: experiments/results/NATIVE_LONGBENCH_C2_20260904.md

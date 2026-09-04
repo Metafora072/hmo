@@ -5,7 +5,7 @@
 论文处于大卡前的实验收敛阶段。核心方法、理论合同与持久化 FP32 query
 probe 已冻结；5%/10%/20% Pareto、结构化强基线、free-start 机制控制、
 HotpotQA-32K-Aug 路径和跨运行确定性 smoke 均已完成。当前首要任务是在同一
-最终路径上的 C2-0.8B 与 C2-9B 已完成；当前只剩冻结的原生 LongBench 小包。
+最终路径上的 C2-0.8B、C2-9B 与原生 LongBench 小包均已完成。
 
 目标会议暂按 ICLR 规划，正文页数按 9 页控制。工作标题为：
 
@@ -307,6 +307,8 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - P8 R1/R2 原始结果：
   /mnt/nvme0/hmo/runs/p8_probe_repro_348dff2_r1b/ 与
   /mnt/nvme0/hmo/runs/p8_probe_repro_348dff2_r2b/
+- C2 最终复跑报告：`experiments/results/C2_FINAL_RERUNS_20260904.md`
+- C2 原生 LongBench 报告：`experiments/results/NATIVE_LONGBENCH_C2_20260904.md`
 
 
 ## 下一阶段
@@ -340,14 +342,23 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - 两组 formal run 均满足逐样本等字节合同，GPU1 已释放。详细 provenance
   见 `experiments/results/C2_FINAL_RERUNS_20260904.md`。
 
-### 当前 GPU 工作
+### C2 原生任务结果
 
-1. C2-native 已在 outcome 前冻结 24 条未增广、未裁剪原生 LongBench
-   HotpotQA/NarrativeQA 样本，使用官方 QA F1 且不按结果筛选。
-2. runner 与协议通过 CPU contract 和全量 tokenizer selection audit 后，先跑
-   两条 smoke，再在同一 clean commit 上跑 24 条 formal。
-3. C2 完成后整理 C3 大卡 preflight；租卡、模型下载与付费矩阵仍需 PZ
-   单独确认。
+- 24 条未增广、未裁剪原生 LongBench HotpotQA/NarrativeQA formal 已完成；
+  样本在 outcome 前按 8K--16K 精确序列化长度冻结，不按结果筛选。
+- HMO / Fixed / Raw+Slack / Scattered / Full 官方 QA F1 为
+  0.3086 / 0.3251 / 0.2873 / 0.3211 / 0.2602。HMO 在 NarrativeQA slice
+  最高，为 0.2934；HotpotQA 则由 Fixed 和 Scattered 领先。
+- 四个压缩臂 24/24 逐样本等字节，平均为 Full KV 的 12.80%；无生成触及
+  token 上限。完整报告：`experiments/results/NATIVE_LONGBENCH_C2_20260904.md`。
+
+### 下一阶段
+
+1. C2 已完成，不再追加 5090 方法搜索。
+2. 整理 C3 大卡 preflight 与一次性运行矩阵；租卡、模型下载与付费执行仍需
+   PZ 单独确认。
+3. 原生任务 external result-to-claim 复核可由 GPT/Opus 基于 OpenChat 报告
+   完成，但不作为继续整理 C3 runbook 的严格 Gate。
 
 
 ## 执行原则

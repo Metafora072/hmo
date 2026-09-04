@@ -16,7 +16,7 @@
 | HMO remains competitive with strong Raw Exact baselines | 0.8B HMO/Raw+Slack: 30/30, 34/32, 35/35 across 5%/10%/20%; 9B generated tokens identical in 24/24 | Fairness baseline established; no stable superiority claim | Main Results, Pareto |
 | HMO improves over generic fixed chunks in the long-context coverage regime | At 10%/16K Global Fixed / Stratified Fixed / HMO are 16/17/18 overall and 6/7/8 on LongEval; HMO vs aligned is 2W/21T/1L at exact equal bytes | Partial, length-conditioned mechanism evidence | Main Results, Ablation |
 | Exact upgrades improve contiguous coverage | 0.8B: 34/48 vs 32/48; 9B: both 23/24 with opposite one-case differences | Optional component, not primary claim | Ablation |
-| The runner preserves real-task solvability at low residual-KV footprint | HotpotQA-32K-Aug: every system solves the same 2/4 cases; HMO uses 11.556% of Full-KV bytes | Four-case feasibility evidence; native-task breadth pending | Transfer section |
+| HMO remains competitive on native real tasks at low residual-KV footprint | Native 24-case QA: HMO F1 0.3086 vs Fixed 0.3251, Raw 0.2873, Scattered 0.3211, Full 0.2602 at 12.80%; HMO leads NarrativeQA | Supported as task-breadth/efficiency evidence; not universal superiority | Transfer section |
 
 ## Structure And Page Budget
 
@@ -176,7 +176,7 @@ All formal metadata and BibTeX must be verified before use.
 - [x] Add the 16K/10% Stratified Fixed-Chunk mechanism control.
 - [x] Add the four-case HotpotQA-32K-Aug feasibility transfer.
 - [x] Freeze the final method/theory contract and persistent shared-probe path.
-- [ ] Complete the final deterministic 5090 validation package.
+- [x] Complete the final deterministic 5090 validation package.
 - [ ] Generate Figure 1 and the current-results plots.
 - [ ] Verify citations and construct the bibliography.
 - [ ] Draft LaTeX section by section.

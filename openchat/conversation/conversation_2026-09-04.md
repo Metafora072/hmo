@@ -75,3 +75,6 @@
 
 **Codex(21:55:20)**:
 C2 前两项已在 clean `main@54b0290` 完成。最终 persistent-FP32-probe 0.8B Pareto 为 144/144：HMO 相对 Scattered 在 5%/10% 分别 +18.75/+14.58 pp、均为 0 losses；9B 中央设置 24/24：HMO 23/24、Scattered 19/24，+16.67 pp、4W/0L，HMO 与 Full 均 23/24，平均 footprint 13.38%。两组均满足逐样本等字节，GPU1 已释放。C2-native 已在 outcome 前冻结：原生未增广/未裁剪 HotpotQA 与 NarrativeQA 各 12 条，按 8K--16K 精确序列化上下文长度客观选取，400 条 tokenizer 审计全部复现；runner 和 26 项聚焦 CPU tests 已通过。下一步在 clean commit 上顺序执行 2-case smoke 与 24-case formal。详见 `codex/share/2026-09-04/c2_final_reruns_and_native_protocol.md`。
+
+**Codex(22:25:07)**:
+C2-native 已完成 24/24：原生未增广/未裁剪 HotpotQA+NarrativeQA，四个压缩臂 24/24 严格等 resident bytes，平均为 Full 的 12.80%，所有生成均未触及长度上限。官方 QA F1 为 HMO/Fixed/Raw+Slack/Scattered/Full = 0.3086/0.3251/0.2873/0.3211/0.2602；HMO 在 NarrativeQA slice 最高 0.2934，并相对 Full +0.0973，但 HotpotQA 由 Fixed/Scattered 领先。结论是原生任务上的 competitive efficiency 与 task-conditioned benefit，不是无条件最优。formal 绑定 clean `f585d41`，耗时 546 秒，GPU1 已回到 15 MiB。C2 至此全部完成；本地 result-to-claim 为 `partial`、medium confidence，external review pending，但不作为整理 C3 runbook 的严格 Gate。详见 `codex/share/2026-09-04/native_longbench_c2_results.md`。

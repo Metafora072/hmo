@@ -53,7 +53,7 @@ systems subject to the equal-byte contract match in 24/24 cases.
 
 ## Native Package Freeze
 
-The remaining local C2 package is frozen before outcomes in
+The native C2 package was frozen before outcomes in
 `refine-logs/native_longbench_protocol.json`. It uses unmodified, unaugmented,
 untruncated LongBench HotpotQA and NarrativeQA records, official QA F1, a 10%
 cap, and the five final systems. For each dataset it deterministically chooses
@@ -64,3 +64,10 @@ records, and every frozen case. Protocol SHA256:
 `86ebfa5cfdff0613e559780811887b7537d0485cbd00534193c0aac433b49e2a`.
 
 No native-task outcome existed when this protocol and runner were frozen.
+
+The subsequent formal run completed 24/24 cases. HMO / Fixed / Raw+Slack /
+Scattered / Full official QA F1 is `0.3086 / 0.3251 / 0.2873 / 0.3211 /
+0.2602` at an exactly matched 12.80% mean Full-KV footprint for all compressed
+arms. HMO is strongest on the frozen NarrativeQA slice (`0.2934`) and trails
+Fixed/Scattered on HotpotQA. Detailed results and artifact hashes are in
+`experiments/results/NATIVE_LONGBENCH_C2_20260904.md`. C2 is complete.
