@@ -21,3 +21,6 @@
 
 **Codex(10:18:11)**:
 已将包装后的 HMO 故事固化为 `../PAPER_STATE.md`、`../PAPER_PLAN.md`、`../docs/paper/HMO_ICLR_STORYBOARD_ZH.md` 和 `../docs/paper/HMO_ABSTRACT_ZH.md`。主贡献保持四层结构：Hybrid dual-memory overlay framework、query-guided contiguous coverage、optional Exact fidelity action、真实 cache/byte evidence。独立 ICLR-style outline review 接受 broader HMO framework，逻辑流评分 8.5/10；最小修正已吸收，包括将 recurrent/KV 分工限定为 architecture-grounded principle、摘要明确 synthetic suite、正式允许 `m=0`、主文预算压至 8.15 页并将次要图表移入附录。数据盘审计表明 HMO 仅占 1.82 GB；96% 使用率主要来自 `dsf` 的 Segmentia output 1.23 TB 和 3DGS 390 GB，其中 9 月 3 日更新的两套 public-benchmarks 目录合计约 645 GB，主要是 KV/artifacts/repo clones。当前可用 83 GB，比昨晚 74 GB 略多；未删除任何其他项目文件。32B/27B 不是下一步必需 Gate，当前也无对应 Hybrid 权重；建议先做已规划的 Pareto 与 0.8B 32K HotpotQA，再决定 4B/9B 或更大模型迁移。
+
+**Codex(11:27:24)**:
+已完成 Qwen3.5-9B BF16 单卡冻结迁移：24/24 fresh 8K/16K Needle+LongEval 样本全部落盘。Contiguous CF 为 23/24，严格等字节 Scattered 为 19/24（+16.67 pp，4 wins/20 ties/0 losses），与 0.8B 的 +14.58 pp 形成跨规模一致机制证据；Contiguous 与 Full KV 均为 23/24 且主指标逐例一致，平均逐样本 footprint 为 13.38%。Contiguous 与 Raw Exact+Slack 在 24/24 上生成 token 完全一致；Raw Exact 的 24/24 相对 23/24 来自一个 `8:38 o'clock` 对 `8:38` 的格式敏感样本，因此不主张稳定胜过 Raw Exact。16K 峰值为 23.62 GiB allocated / 27.85 GiB reserved，GPU1 已释放至 15 MiB。下一步最高收益仍是 0.8B 的 5/10/20% Pareto，其次是 32K HotpotQA；不建议单卡直接跑 9B BF16 32K。详细证据见 `codex/share/2026-09-04/qwen35_9b_scale_transfer_report.md`。

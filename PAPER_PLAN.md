@@ -11,11 +11,11 @@
 | Claim | Current evidence | Status | Paper location |
 |---|---|---|---|
 | Hybrid residual KV is better organized as a local high-fidelity overlay on recurrent global state | Qwen3.5 hybrid execution keeps DeltaNet state fixed while intervening only on Full-Attention KV | Architecture-grounded formulation; synergy not causally established | Introduction, Method |
-| Contiguous retention preserves complete span evidence better than scattered equal-cardinality retention | Span-survival proposition; fresh Contiguous vs Scattered 34/48 vs 27/48 at exact equal bytes | Strongly supported in current scope | Theory, Main Results |
-| HMO approaches Full-KV quality at a small KV footprint | 70.83% at mean per-case 13.38% footprint vs Full KV 72.92% | Supported on current suite | Abstract, Main Results |
-| Coverage-fidelity is better than raw Exact segment Top-K | 70.83% vs 66.67%, but current method uses 1.22% more bytes | Directional; needs Raw+Slack/Pareto | Main Results, Pareto |
-| Exact upgrades improve contiguous coverage | 34/48 vs Sparse-only 32/48 | Optional component, not primary claim | Ablation |
-| The result transfers to realistic tasks and larger Hybrid models | Historical V6.1 results do not test the current method | Needs experiment | Transfer section |
+| Contiguous retention preserves complete span evidence better than scattered equal-cardinality retention | 0.8B: 34/48 vs 27/48; 9B: 23/24 vs 19/24, always exact equal bytes | Strong cross-scale synthetic evidence | Theory, Main Results |
+| HMO approaches Full-KV quality at a small KV footprint | 0.8B: 70.83% vs 72.92%; 9B: both 95.83%, at mean per-case 13.38% footprint | Supported on two model sizes | Abstract, Main Results |
+| HMO remains competitive with strong Raw Exact baselines | 9B Contiguous and Raw Exact+Slack produce identical tokens in 24/24; Raw Exact is 24/24 vs 23/24 on one formatting-sensitive case | Fairness baseline established; no superiority claim | Main Results, Pareto |
+| Exact upgrades improve contiguous coverage | 0.8B: 34/48 vs 32/48; 9B: both 23/24 with opposite one-case differences | Optional component, not primary claim | Ablation |
+| The result transfers to realistic tasks and larger Hybrid models | Current method transfers from Qwen3.5-0.8B to 9B; realistic 32K task remains pending | Model scale supported; task breadth pending | Transfer section |
 
 ## Structure And Page Budget
 
@@ -25,7 +25,7 @@
 - Establish recurrent global memory versus token-level KV fidelity.
 - Expose the scattered-importance failure mode.
 - Present HMO as query-guided contiguous coverage plus optional Exact fidelity.
-- Preview 14.58 pp equal-byte gain and near-Full quality at 13.38% footprint.
+- Preview consistent 14.58/16.67 pp equal-byte gains across 0.8B/9B and near-Full quality at 13.38% footprint.
 - End with four contribution bullets aligned with the matrix.
 
 ### Section 2: Background And Related Work, 0.75 page
@@ -62,7 +62,7 @@
 - Contiguous-versus-scattered causal ablation.
 - 5%/10%/20% quality-memory Pareto with Raw Exact+Slack.
 - 32K HotpotQA transfer and official F1, subject to Full-KV solvability.
-- Optional larger Hybrid model result if a checkpoint becomes available.
+- Qwen3.5-9B frozen transfer with Raw Exact+Slack and peak-memory reporting.
 - Latency and peak-memory table.
 
 ### Section 6: Discussion And Conclusion, 0.65 page
@@ -84,7 +84,7 @@ revision headroom.
 | Figure 1 | Hero architecture | Hybrid recurrent global state + residual KV overlay; equal-byte scattered versus contiguous evidence | Manual, current method | Highest |
 | Figure 2 | Quality-memory Pareto | HMO, Raw Exact+Slack, Scattered, Full at 5%/10%/20% | Planned Pareto run | Highest |
 | Figure A1 | Appendix mechanism plot | Answer-span survival and per-case win/tie/loss across 8K/16K | Fresh confirmation JSON | Appendix |
-| Table 1 | Main results | Quality, token F1, resident bytes, footprint, task/length groups | Fresh confirmation + planned transfer | Highest |
+| Table 1 | Main results | Quality, token F1, resident bytes, footprint, task/length groups | 0.8B fresh confirmation + 9B transfer | Highest |
 | Table A1 | Appendix ablation | Contiguous, Scattered, Sparse-only, optional Exact, anchors | Fresh confirmation and limited additions | Appendix |
 | Table A2 | Appendix efficiency | Peak VRAM, TTFT, decode throughput, retained KV | Planned measurement | Appendix |
 | Table 2 | Related-work matrix | Query-guided, contiguous evidence, per-segment coverage, Hybrid residual KV, real-byte accounting | Verified papers and method properties | High |
@@ -97,9 +97,10 @@ the evidence fragmentation caused by scattered importance retention.
 ## Abstract Contract
 
 The abstract must contain the residual KV problem, dual-memory role mismatch,
-contiguous overlay, span-survival proposition, 14.58 pp equal-byte result, and
-13.38%/70.83% versus 72.92% Full-KV result. It must not claim sublinear memory,
-recurrent-aware allocation, or current large-model generalization.
+contiguous overlay, span-survival proposition, the 14.58/16.67 pp cross-scale
+equal-byte results, and the 13.38% footprint with near-Full quality. It must not
+claim sublinear memory, recurrent-aware allocation, realistic-task transfer,
+or superiority over Raw Exact.
 
 Draft source: `docs/paper/HMO_ABSTRACT_ZH.md`.
 
@@ -131,8 +132,8 @@ All formal metadata and BibTeX must be verified before use.
 - The complexity statement was corrected from an invalid asymptotic reduction
   to a retention-coefficient result.
 - Mean per-case footprint 13.38% is separated from ratio-of-means 13.03%.
-- A local audit found no currently available 27B Hybrid checkpoint, so large
-  model transfer is an enhancement rather than an immediate assumption.
+- Qwen3.5-9B BF16 was acquired and completed the frozen 24-case transfer on one
+  RTX 5090; 16K peaked at 27.85 GiB PyTorch reserved memory.
 - Independent outline review scored logical flow 8.5/10 and accepted the broader
   HMO framework. It requested that recurrent/KV division remain a design
   principle rather than a proven synergy, that the abstract name the synthetic
@@ -143,7 +144,8 @@ All formal metadata and BibTeX must be verified before use.
 
 - [x] Freeze the paper story, claim ladder, theoretical core, and abstract V1.
 - [ ] Cross-review this outline and apply only the minimum coherence fixes.
-- [ ] Implement Raw Exact+Slack and the 5%/10%/20% Pareto package after PZ approval.
+- [x] Implement Raw Exact+Slack and complete the frozen 10% Qwen3.5-9B transfer.
+- [ ] Run the 5%/10%/20% Pareto package after PZ approval.
 - [ ] Add 32K HotpotQA transfer after PZ approval.
 - [ ] Generate Figure 1 and the current-results plots.
 - [ ] Verify citations and construct the bibliography.

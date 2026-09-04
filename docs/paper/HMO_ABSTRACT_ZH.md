@@ -4,7 +4,7 @@
 
 HMO: A Locality-Preserving KV Overlay for Hybrid-Attention Language Models
 
-## 摘要 V1
+## 摘要 V2
 
 Hybrid-Attention Language Model 通过 recurrent state 压缩大部分全局上下文，
 但其中保留的 Full-Attention 层仍需要随序列长度线性增长的 KV cache。现有
@@ -15,13 +15,14 @@ HMO 保持模型原生 recurrent state 不变，将有限 KV 预算组织为两�
 首先通过 query-guided contiguous windows 建立广泛的局部证据覆盖，再将少量
 高需求区域升级为 Exact KV 以补充 fidelity。我们证明，在固定 token 预算且
 任务证据由未知连续区间构成时，连续保留最大化能够被完整覆盖的局部证据
-区间数量。在 Qwen3.5-0.8B 上包含 48 个全新 8K/16K 样本的 synthetic
-retrieval and line-reasoning suite 中，HMO 在逐样本严格等字节条件下比
-scattered Top-token retention 提高 14.58 个百分点，并在平均仅使用 13.38%
-Full-KV footprint 时达到 70.83% 的 answer containment，接近 Full KV 的
-72.92%。这些结果表明，在当前 Hybrid 模型和任务范围内，residual KV 更适合
-被组织为 recurrent global memory 之上的局部高保真 overlay，而不是独立
-重要 token 的无结构集合。
+区间数量。在 Qwen3.5-0.8B 和 9B 上分别包含 48 和 24 个全新 8K/16K
+样本的 synthetic retrieval and line-reasoning suite 中，HMO 在逐样本
+严格等字节条件下相对 scattered Top-token retention 分别提高 14.58 和
+16.67 个百分点。在平均仅使用约 13.38% Full-KV footprint 时，0.8B 上
+HMO 达到 70.83% answer containment，接近 Full KV 的 72.92%；9B 上二者
+均达到 95.83%。这些跨规模结果表明，在当前 Hybrid 模型和任务范围内，
+residual KV 更适合被组织为 recurrent global memory 之上的局部高保真
+overlay，而不是独立重要 token 的无结构集合。
 
 ## 摘要写作边界
 

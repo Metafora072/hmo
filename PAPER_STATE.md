@@ -123,24 +123,46 @@ Contiguous CF 相对 Scattered CF 在逐样本严格等字节条件下提升 14.
 的平均逐样本 KV footprint 为 Full KV 的 13.38%，质量与 Full KV 仅相差
 2.08 pp。
 
+Qwen3.5-9B 的冻结 scale transfer 使用同样的 8K/16K、Needle 与
+LongEval-Lines 配置，共 24 个 fresh 样本，并加入严格等字节的 Raw
+Exact+Slack。
+
+| 系统 | Answer Containment | Mean Resident KV |
+|---|---:|---:|
+| Contiguous CF | 23/24，95.83% | 51,757,056 bytes |
+| Raw Exact+Slack | 23/24，95.83% | 51,757,056 bytes |
+| Scattered CF | 19/24，79.17% | 51,757,056 bytes |
+| Contiguous Sparse-only | 23/24，95.83% | 51,757,056 bytes |
+| Raw Exact Top-K | 24/24，100.00% | 51,134,464 bytes |
+| Full KV | 23/24，95.83% | 397,164,544 bytes |
+
+9B 上 Contiguous 相对严格等字节 Scattered 提升 16.67 pp，4 wins、20
+ties、0 losses；平均逐样本 footprint 为 13.38%，与 Full KV 的主指标逐例
+完全一致。Contiguous 与 Raw Exact+Slack 在 24/24 个样本上生成 token
+完全一致。Raw Exact 唯一的主指标优势来自一个格式敏感的 Needle 答案：
+Raw 输出 `8:38 o'clock`，而 Contiguous、Raw+Slack 与 Full 均输出
+语义相同但字符串规则未命中的 `8:38`。
+
 ## Claim Ladder
 
 ### 正文核心主张
 
 Hybrid LLM 的 residual KV 应承担局部高保真 overlay，而不应继续采用纯
 singleton importance 进行离散保留。Query-guided contiguous retention 在
-相同 KV bytes 下显著改善当前模型上的长上下文生成质量。
+相同 KV bytes 下在 0.8B 和 9B 两个规模均改善长上下文生成质量。
 
 ### 系统主张
 
-HMO 将 Full-Attention KV footprint 降至平均约 13.38%，同时在当前评测中
-达到接近 Full KV 的 answer containment。
+HMO 将 Full-Attention KV footprint 降至平均约 13.38%。在 0.8B 上质量
+接近 Full KV；在 9B transfer 上 Contiguous 与 Full KV 均达到 23/24，
+且二者的主指标逐例一致。
 
 ### 方向性主张
 
-完整 coverage-fidelity policy 相对 Raw Exact Top-K 得到 4.17 pp 的正向
-点估计，优势主要来自 16K LongEval-Lines。该结果用于支持 Pareto 趋势，
-不单独承担全文贡献。
+Raw Exact 不是当前贡献需要击败的主线：0.8B 上 Contiguous 相对 Raw
+Exact 有 +4.17 pp 点估计但字节略多；9B 上 Contiguous 与严格等字节
+Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多记一次
+命中。Raw 系列保留为强公平基线，不包装为 HMO 的稳定优势。
 
 ### 当前不需要承担的主张
 
@@ -161,21 +183,30 @@ HMO 将 Full-Attention KV footprint 降至平均约 13.38%，同时在当前评�
 - 冻结实验协议：`refine-logs/contiguous_cf_confirmation_protocol.json`
 - 原始结果：
   `/mnt/nvme0/hmo/runs/contiguous_cf_confirmation_8k16k_s20261005_06_20260903_221800/`
+- 9B scale-transfer 报告：
+  `openchat/codex/share/2026-09-04/qwen35_9b_scale_transfer_report.md`
+- 9B 冻结协议：`refine-logs/contiguous_cf_scale_transfer_9b_protocol.json`
+- 9B 原始结果：
+  `/mnt/nvme0/hmo/runs/contiguous_cf_scale9b_formal_c202236_20260904/`
+
 
 ## 下一阶段
 
-### 已授权
+### 已完成
 
 - 固化 PAPER_STATE、中文故事板、论文计划和摘要草稿。
 - 修正理论复杂度与显存统计口径。
+- 实现 Raw Exact+Slack，并完成 Qwen3.5-9B 单卡 24 样本规模迁移。
 
 ### 待确认 GPU 工作
 
-1. Raw Exact+Slack 严格等字节基线，并扩展 5%/10%/20% Pareto。
+1. 在 0.8B 的 48 样本集扩展 5%/10%/20% Pareto，并全程包含 Raw
+   Exact+Slack。
 2. 32K HotpotQA 真实任务 transfer，先验证当前 0.8B 路径的 Full-KV
    solvability。
-3. 根据磁盘和模型能力选择 Qwen3.5-4B/9B 的规模迁移；不默认下载缺失的
-   27B/32B 权重。
+3. 9B 在 16K 已达到 27.85 GiB PyTorch reserved 峰值；32K 优先使用
+   0.8B/4B，不在当前单卡上直接尝试 9B BF16 或 27B/32B。
+
 
 ## 执行原则
 
