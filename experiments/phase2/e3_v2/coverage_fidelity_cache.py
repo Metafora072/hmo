@@ -15,6 +15,7 @@ from experiments.utils.memory_accounting import get_active_kv_bytes
 
 
 SPARSE_SELECTORS = ("top_tokens", "max_mass_window")
+RAW_EXACT_SLACK_SELECTOR = "global_top_tokens_slack"
 
 
 @dataclass(frozen=True)
@@ -172,6 +173,99 @@ def build_retained_position_plan(
         context_tokens=context_tokens,
         context_charged_bytes=charged,
         sparse_selector=sparse_selector,
+        active_positions=tuple(active),
+        segments=tuple(retention),
+    )
+
+
+def build_raw_exact_slack_position_plan(
+    segments: Sequence[SegmentSpec],
+    selected_exact_segment_ids: Sequence[int],
+    token_attention_mass: Sequence[float],
+    *,
+    context_tokens: int,
+    target_context_charged_bytes: int,
+) -> RetainedPositionPlan:
+    """Spend Raw Exact segment-rounding slack on top remaining query tokens."""
+    ordered = tuple(sorted(segments, key=lambda item: item.segment_id))
+    selected_exact = {int(value) for value in selected_exact_segment_ids}
+    eligible_ids = {item.segment_id for item in ordered if item.eligible}
+    if (
+        not ordered
+        or ordered[0].start != 0
+        or ordered[-1].end != context_tokens
+        or len(token_attention_mass) != context_tokens
+        or not selected_exact
+        or not selected_exact <= eligible_ids
+    ):
+        raise OracleContractError("raw Exact+Slack inputs are misaligned")
+
+    cursor = 0
+    per_token_costs = set()
+    for segment in ordered:
+        if segment.start != cursor or segment.end <= segment.start:
+            raise OracleContractError("raw Exact+Slack segments must be contiguous")
+        cursor = segment.end
+        if segment.kv_bytes % segment.token_count:
+            raise OracleContractError("raw Exact+Slack segment cost is not token-divisible")
+        per_token_costs.add(segment.kv_bytes // segment.token_count)
+    if len(per_token_costs) != 1:
+        raise OracleContractError("raw Exact+Slack requires one per-token KV cost")
+    token_cost = next(iter(per_token_costs))
+
+    exact_ids = selected_exact | {
+        item.segment_id for item in ordered if item.protected
+    }
+    exact_bytes = sum(item.kv_bytes for item in ordered if item.segment_id in exact_ids)
+    slack_bytes = target_context_charged_bytes - exact_bytes
+    if slack_bytes < 0 or slack_bytes % token_cost:
+        raise OracleContractError("raw Exact+Slack target cannot be matched exactly")
+    slack_tokens = slack_bytes // token_cost
+
+    candidates = []
+    for segment in ordered:
+        if not segment.eligible or segment.segment_id in selected_exact:
+            continue
+        for position in range(segment.start, segment.end):
+            mass = float(token_attention_mass[position])
+            if not math.isfinite(mass) or mass < 0:
+                raise OracleContractError(
+                    "raw Exact+Slack token scores must be finite and nonnegative"
+                )
+            candidates.append((-mass, position))
+    if slack_tokens > len(candidates):
+        raise OracleContractError("raw Exact+Slack target exceeds remaining context")
+    slack_positions = {
+        position for _, position in sorted(candidates)[:slack_tokens]
+    }
+
+    active = []
+    retention = []
+    for segment in ordered:
+        if segment.segment_id in exact_ids:
+            positions = tuple(range(segment.start, segment.end))
+            action = "exact"
+        else:
+            positions = tuple(
+                position
+                for position in range(segment.start, segment.end)
+                if position in slack_positions
+            )
+            action = "sparse" if positions else "recurrent_only"
+        active.extend(positions)
+        retention.append(
+            SegmentRetention(
+                segment_id=segment.segment_id,
+                action=action,
+                positions=positions,
+            )
+        )
+    if len(active) * token_cost != target_context_charged_bytes:
+        raise OracleContractError("raw Exact+Slack failed its byte target")
+    return RetainedPositionPlan(
+        context_tokens=context_tokens,
+        context_charged_bytes=target_context_charged_bytes,
+        sparse_selector=RAW_EXACT_SLACK_SELECTOR,
         active_positions=tuple(active),
         segments=tuple(retention),
     )

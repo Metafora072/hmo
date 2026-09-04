@@ -8,12 +8,13 @@ import torch
 
 from experiments.phase2.e3_v2.coverage_fidelity import allocate_coverage_fidelity
 from experiments.phase2.e3_v2.coverage_fidelity_cache import (
+    build_raw_exact_slack_position_plan,
     build_retained_position_plan,
     make_coverage_fidelity_intervention,
     select_max_attention_window_positions,
     select_query_attention_positions,
 )
-from experiments.phase2.e3_v2.oracle import SegmentSpec
+from experiments.phase2.e3_v2.oracle import OracleContractError, SegmentSpec
 
 
 class _Layer:
@@ -103,6 +104,38 @@ class CoverageFidelityCacheTests(unittest.TestCase):
         )
         self.assertEqual(positions.sparse_selector, "max_mass_window")
         self.assertEqual(positions.context_charged_bytes, 96)
+
+    def test_raw_exact_slack_matches_target_with_global_top_tokens(self):
+        segments = _segments()
+        mass = [0.0] * 16
+        mass[8:12] = [0.3, 0.9, 0.8, 0.1]
+        positions = build_raw_exact_slack_position_plan(
+            segments,
+            [1],
+            mass,
+            context_tokens=16,
+            target_context_charged_bytes=112,
+        )
+        self.assertEqual(
+            positions.active_positions,
+            (0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13, 14, 15),
+        )
+        self.assertEqual(positions.context_charged_bytes, 112)
+        retention = {item.segment_id: item for item in positions.segments}
+        self.assertEqual(retention[1].action, "exact")
+        self.assertEqual(retention[2].action, "sparse")
+
+    def test_raw_exact_slack_rejects_unmatchable_byte_target(self):
+        with self.assertRaisesRegex(
+            OracleContractError, "target cannot be matched exactly"
+        ):
+            build_raw_exact_slack_position_plan(
+                _segments(),
+                [1],
+                [0.0] * 16,
+                context_tokens=16,
+                target_context_charged_bytes=113,
+            )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,93 @@
+{
+  "schema_version": "hmo.contiguous_cf.scale_transfer_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "frozen_at": "2026-09-04T10:59:26+08:00",
+  "development_basis": "refine-logs/contiguous_cf_confirmation_protocol.json",
+  "model_id": "Qwen/Qwen3.5-9B",
+  "model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "systems": [
+    "contiguous_cf",
+    "raw_alpha_exact_slack",
+    "raw_alpha_exact_topk",
+    "scattered_cf",
+    "contiguous_sparse_only",
+    "full_kv_reference"
+  ],
+  "primary_comparison": [
+    "contiguous_cf",
+    "raw_alpha_exact_slack"
+  ],
+  "primary_metric": "normalized_answer_contains",
+  "secondary_metrics": [
+    "normalized_exact_match",
+    "token_f1"
+  ],
+  "max_new_tokens": 32,
+  "inference_seed": 20261010,
+  "method": {
+    "allocator": "attention_led",
+    "middle_kv_fraction": 0.1,
+    "sparse_selector": "max_mass_window",
+    "sparse_width": 16,
+    "raw_slack_selector": "global_top_tokens_slack",
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1
+  },
+  "stages": {
+    "smoke": {
+      "datasets": "needle",
+      "samples_per_dataset": 1,
+      "context_length": 8192,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "seed": 20261011,
+      "sample_id_prefix": "scale9b_smoke_s20261011_"
+    },
+    "8k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 6,
+      "context_length": 8192,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "seed": 20261012,
+      "sample_id_prefix": "scale9b_8k_s20261012_"
+    },
+    "16k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 6,
+      "context_length": 16384,
+      "segment_length": 256,
+      "middle_kv_fraction": 0.1,
+      "seed": 20261013,
+      "sample_id_prefix": "scale9b_16k_s20261013_"
+    }
+  },
+  "execution": {
+    "operational_smoke_case_count": 1,
+    "formal_case_count": 24,
+    "formal_run_order": [
+      "8k/needle",
+      "8k/longeval_lines",
+      "16k/needle",
+      "16k/longeval_lines"
+    ],
+    "continuation_gate": false,
+    "resume_after_interruption": true
+  },
+  "claims": [
+    "larger_model_transfer_without_retuning",
+    "end_task_quality_at_strictly_equal_resident_kv_bytes",
+    "contiguous_local_coverage_mechanism"
+  ],
+  "excluded_claims": [
+    "recurrent_aware_allocation",
+    "cross_architecture_generalization",
+    "statistical_significance_as_a_continuation_gate"
+  ],
+  "immutability": {
+    "formal_samples_or_metrics_change_after_smoke": false,
+    "method_parameter_changes_after_smoke": false,
+    "case_filtering_after_outcomes": false,
+    "smoke_outcome_gate": false
+  }
+}

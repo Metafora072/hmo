@@ -2,7 +2,7 @@
 
 **Project**: Hybrid Memory Orchestration (HMO) for NeurIPS 2026
 **Created**: 2026-04-14
-**Conda Env**: `hmo_research`
+**Conda Env**: `hmo_research_v6`
 
 ---
 
@@ -17,7 +17,7 @@
 ## Conda Environment
 
 ```bash
-conda activate hmo_research
+conda activate hmo_research_v6
 ```
 
 - Python: 3.11
@@ -83,7 +83,7 @@ experiments/
 所有实验脚本统一使用 GPU 1：
 
 ```bash
-source /home/dsf/anaconda3/etc/profile.d/conda.sh
-conda activate hmo_research
+source /home/pz/miniconda3/etc/profile.d/conda.sh
+conda activate hmo_research_v6
 CUDA_VISIBLE_DEVICES=1 python experiments/v1_saturation/run.py
 ```

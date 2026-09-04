@@ -54,3 +54,32 @@ collects fresh equal-byte oracle labels but deliberately performs no candidate
 analysis. `enrich_query_accessibility.py` then requires the frozen V2 config,
 the prospective protocol, and its stage name; it verifies their hashes and
 reports only frozen V2 versus corrected raw alpha.
+
+## Qwen3.5-9B scale transfer
+
+`run_scale_transfer.py` evaluates the frozen contiguous coverage-fidelity
+method on Qwen3.5-9B without retuning. It adds Raw Exact+Slack, which first
+selects raw-alpha Exact segments and then spends the segment-rounding residual
+on globally top query-attention tokens outside those segments. This arm is
+strictly resident-byte matched to the contiguous, scattered, and sparse-only
+arms.
+
+```bash
+source /home/pz/miniconda3/etc/profile.d/conda.sh
+conda activate hmo_research_v6
+export CUDA_VISIBLE_DEVICES=1
+
+python experiments/phase2/e3_v2/run_scale_transfer.py \
+  --model-path /mnt/nvme0/hmo/models/Qwen3.5-9B \
+  --model-revision c202236235762e1c871ad0ccb60c8ee5ba337b9a \
+  --protocol refine-logs/contiguous_cf_scale_transfer_9b_protocol.json \
+  --stage-set smoke \
+  --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_scale9b_smoke
+
+python experiments/phase2/e3_v2/run_scale_transfer.py \
+  --model-path /mnt/nvme0/hmo/models/Qwen3.5-9B \
+  --model-revision c202236235762e1c871ad0ccb60c8ee5ba337b9a \
+  --protocol refine-logs/contiguous_cf_scale_transfer_9b_protocol.json \
+  --stage-set formal \
+  --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_scale9b_formal
+```
