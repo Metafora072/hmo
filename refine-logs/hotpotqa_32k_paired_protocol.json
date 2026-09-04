@@ -1,0 +1,82 @@
+{
+  "schema_version": "hmo.hotpotqa_32k_paired_protocol.v1",
+  "status": "frozen_before_compressed_outcomes",
+  "frozen_at": "2026-09-04T17:30:00+08:00",
+  "development_basis": "experiments/results/HOTPOTQA_32K_SOLVABILITY_20260904.md",
+  "model_id": "Qwen/Qwen3.5-0.8B",
+  "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "solvability_protocol_sha256": "7a6821b4021b7e26afc4984a084278847324bf49c6a541dfad190a75ddc41cda",
+  "full_kv_parent": {
+    "results_sha256": "65afcf742f79a816f712124ae24e5778805e665f356ed0be1ef3b2017945a6b0",
+    "summary_sha256": "25fc2e203c79df03215f9467ead6c75ee3df1334f94001c7e8b6b14214c97229",
+    "manifest_id": "db61ee4020505f6d42732d27517f9c0b865832cd3c8cbc282c1a4bb0e7a4a5c5",
+    "code_commit": "cfd0cb6a997e35c9a083385839c244152a9d0ae7"
+  },
+  "systems": [
+    "contiguous_cf",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "scattered_cf",
+    "full_kv_reference"
+  ],
+  "equal_byte_systems": [
+    "contiguous_cf",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "scattered_cf"
+  ],
+  "primary_comparisons": [
+    [
+      "contiguous_cf",
+      "global_fixed_chunk_topk"
+    ],
+    [
+      "contiguous_cf",
+      "raw_alpha_exact_slack"
+    ],
+    [
+      "contiguous_cf",
+      "scattered_cf"
+    ],
+    [
+      "contiguous_cf",
+      "full_kv_reference"
+    ]
+  ],
+  "primary_metric": "official_qa_f1",
+  "secondary_metrics": [
+    "normalized_answer_contains",
+    "normalized_exact_match"
+  ],
+  "middle_kv_fraction": 0.1,
+  "max_new_tokens": 32,
+  "inference_seed": 20261014,
+  "method": {
+    "allocator": "attention_led",
+    "sparse_selector": "max_mass_window",
+    "sparse_width": 16,
+    "raw_slack_selector": "global_top_tokens_slack",
+    "global_fixed_chunk_width": 16,
+    "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
+    "segment_length": 256,
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1
+  },
+  "execution": {
+    "smoke_case_count": 1,
+    "formal_case_count": 4,
+    "full_kv_reused_from_parent": true,
+    "continuation_gate": false,
+    "case_filtering_after_outcomes": false,
+    "automatic_followup": false
+  },
+  "claims": [
+    "paired_real_task_quality_at_strictly_equal_measured_compressed_resident_bytes",
+    "retained_locality_geometry_on_transparently_augmented_32k_hotpotqa"
+  ],
+  "scope_limits": [
+    "four_case_pilot_not_benchmark_level_estimate",
+    "augmented_32k_not_native_longbench_32k",
+    "single_model_single_budget"
+  ]
+}

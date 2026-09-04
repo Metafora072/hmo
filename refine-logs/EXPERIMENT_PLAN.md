@@ -186,3 +186,36 @@ QA F1 is `0.3333/0/0.5926/0`, with mean `0.2315`, nonzero F1 on `2/4`, and
 normalized gold containment on `2/4`. This supports the scoped routing judgment
 that Qwen3.5-0.8B retains some usable 32K HotpotQA ability and that a paired
 compressed pilot is reasonable. It does not yet provide HMO evidence.
+
+## P7 HotpotQA-32K-Aug Equal-Byte Paired Pilot
+
+**Protocol**: `hotpotqa_32k_paired_protocol.json`
+
+### Claim
+
+Test whether HMO's locality-preserving retention remains competitive on the
+same four real-question 32K augmented cases that showed nonzero Full-KV
+solvability. This is a small external-validity pilot, not a benchmark-level
+estimate.
+
+### Systems And Metrics
+
+- Strictly equal measured compressed resident bytes: Contiguous CF, Global
+  Fixed-Chunk Top-K, Raw Exact+Slack, and Scattered CF.
+- Reference: the SHA-pinned P6 Full-KV generations, reconstructed and checked
+  against the same context, query, answers, token counts, and byte accounting.
+- Fixed budget: 10% middle-context cap, 256-token segments, 16-token base Sparse
+  width, one protected prefix and suffix segment.
+- Primary metric: official LongBench QA F1. Secondary metrics: normalized answer
+  containment and normalized exact match.
+
+### Run Order
+
+| Run | Split | Gate | Priority |
+|---|---|---|---|
+| P7-S | first frozen case, four compressed arms | operational correctness only | MUST |
+| P7-F | all four frozen cases | no result gate | MUST |
+
+The smoke checks successful generation, exact compressed resident-byte equality,
+parent Full-KV identity, and parseable outputs. Formal execution is descriptive;
+no case filtering, tuning, or automatic follow-up is allowed.

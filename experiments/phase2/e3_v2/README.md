@@ -166,3 +166,31 @@ python -m experiments.phase2.e3_v2.run_hotpot_solvability \
   $COMMON_ARGS --stage-set formal \
   --run-dir /mnt/nvme0/hmo/runs/hotpotqa_32k_solvability_formal
 ```
+
+## Qwen3.5-0.8B HotpotQA-32K-Aug paired pilot
+
+`run_hotpot_paired.py` evaluates the frozen 10% HMO method and three structured
+controls on the same four augmented cases. The four compressed arms are matched
+by measured post-query resident attention-KV bytes. Full KV is reused from the
+SHA-pinned P6 artifact and revalidated against the reconstructed sample.
+
+```bash
+source /home/pz/miniconda3/etc/profile.d/conda.sh
+conda activate hmo_research_v6
+export CUDA_VISIBLE_DEVICES=1
+
+COMMON_ARGS="--model-path /mnt/nvme0/hmo/models/Qwen3.5-0.8B \
+  --model-revision 2fc06364715b967f1860aea9cf38778875588b17 \
+  --archive /mnt/nvme0/hmo/datasets/LongBench/5e628be450b7e67fb7ae6e201bd6d8f7056f7672/data.zip \
+  --solvability-protocol refine-logs/hotpotqa_32k_solvability_protocol.json \
+  --full-kv-results /mnt/nvme0/hmo/runs/hotpotqa_32k_solvability_formal_20260904_171905/hotpot_solvability_results.jsonl \
+  --protocol refine-logs/hotpotqa_32k_paired_protocol.json"
+
+python -m experiments.phase2.e3_v2.run_hotpot_paired \
+  $COMMON_ARGS --stage-set smoke \
+  --run-dir /mnt/nvme0/hmo/runs/hotpotqa_32k_paired_smoke
+
+python -m experiments.phase2.e3_v2.run_hotpot_paired \
+  $COMMON_ARGS --stage-set formal \
+  --run-dir /mnt/nvme0/hmo/runs/hotpotqa_32k_paired_formal
+```

@@ -16,3 +16,5 @@
 | P5-P | Free-start mechanism isolation | frozen 12+12 suite at 16K/10% | DONE; HMO 18/24 vs aligned 17/24, verdict partial/supplement |
 | P6-S | HotpotQA-32K-Aug Full-KV smoke | first frozen real-task augmented case | DONE; 32K exact, official F1 0.3333, exit 0 |
 | P6-F | HotpotQA-32K-Aug solvability | four frozen Full-KV cases | DONE; mean official F1 0.2315, nonzero 2/4, GPU1 released |
+| P7-S | HotpotQA-32K-Aug paired smoke | first frozen case, four compressed arms at 10% | READY; protocol frozen before compressed outcomes |
+| P7-F | HotpotQA-32K-Aug paired pilot | four frozen cases, four equal-byte arms plus Full KV | READY; official QA F1, no result gate |
