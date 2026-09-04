@@ -5,7 +5,7 @@
 论文处于大卡前的实验收敛阶段。核心方法、理论合同与持久化 FP32 query
 probe 已冻结；5%/10%/20% Pareto、结构化强基线、free-start 机制控制、
 HotpotQA-32K-Aug 路径和跨运行确定性 smoke 均已完成。当前首要任务是在同一
-最终路径上完成 5090 的 C2 证据包。
+最终路径上的 C2-0.8B 与 C2-9B 已完成；当前只剩冻结的原生 LongBench 小包。
 
 目标会议暂按 ICLR 规划，正文页数按 9 页控制。工作标题为：
 
@@ -150,7 +150,7 @@ Qwen3.5-0.8B 的同一 48 样本集已完成 5%/10%/20% middle-cap 扫描；五�
 |---:|---:|---:|---:|---:|---:|---:|
 | 5% | 8.57% | 30/48 | **36/48** | 30/48 | 21/48 | 35/48 |
 | 10% | 13.38% | 34/48 | **36/48** | 32/48 | 27/48 | 35/48 |
-| 20% | 23.01% | 35/48 | 35/48 | 35/48 | **36/48** | 35/48 |
+| 20% | 23.01% | 35/48 | 35/48 | **36/48** | **36/48** | 35/48 |
 
 HMO 相对 Scattered 在 5% 与 10% 分别提升 18.75 与 14.58 pp，均为零
 逐样本 losses；20% 时各结构化方法进入饱和区。Fixed chunk 在紧预算和
@@ -333,15 +333,20 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - P8 在 clean commit 348dff2 上完成同一 32K case 的两次独立运行；probe
   ID、score SHA、四个压缩臂的位置 SHA、五个系统输出和 resident bytes
   全部一致，R2 明确命中缓存。
-- GPU1 已释放；本轮未启动 C2 大矩阵。
+- C2-0.8B 在 clean commit 54b0290 上完成 144/144 Pareto budget cases；5%
+  与 10% 上 HMO 相对 Scattered 分别为 +18.75/+14.58 pp，逐例零 losses。
+- C2-9B 在同一 clean commit 上完成 24/24 中央设置；HMO 为 23/24，
+  Scattered 为 19/24，+16.67 pp、4 wins/0 losses，平均 footprint 13.38%。
+- 两组 formal run 均满足逐样本等字节合同，GPU1 已释放。详细 provenance
+  见 `experiments/results/C2_FINAL_RERUNS_20260904.md`。
 
-### 待确认 GPU 工作
+### 当前 GPU 工作
 
-1. C2-0.8B：在最终共享 probe 路径上重跑 48 样本、5%/10%/20% Pareto。
-2. C2-9B：重跑现有 24 样本中央 10% 设置，不扩到单卡 9B/32K。
-3. C2-native：冻结并运行 20 至 30 条未增广原生 HotpotQA/NarrativeQA
-   小包，使用官方指标且不按结果筛样本。
-4. C2 完成后再整理 C3 大卡 preflight；租卡、模型下载与付费矩阵仍需 PZ
+1. C2-native 已在 outcome 前冻结 24 条未增广、未裁剪原生 LongBench
+   HotpotQA/NarrativeQA 样本，使用官方 QA F1 且不按结果筛选。
+2. runner 与协议通过 CPU contract 和全量 tokenizer selection audit 后，先跑
+   两条 smoke，再在同一 clean commit 上跑 24 条 formal。
+3. C2 完成后整理 C3 大卡 preflight；租卡、模型下载与付费矩阵仍需 PZ
    单独确认。
 
 

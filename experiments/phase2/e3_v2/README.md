@@ -199,3 +199,31 @@ python -m experiments.phase2.e3_v2.run_hotpot_paired \
   $COMMON_ARGS --stage-set formal \
   --run-dir /mnt/nvme0/hmo/runs/hotpotqa_32k_paired_formal
 ```
+
+## Qwen3.5-0.8B native LongBench QA package
+
+`run_native_tasks.py` evaluates 12 unmodified HotpotQA and 12 unmodified
+NarrativeQA records selected before outcomes by exact serialized context length.
+It uses official LongBench QA F1, the persistent FP32 probe, and four strictly
+equal-byte compressed systems plus Full KV. Run smoke and formal in separate
+directories from the same clean commit.
+
+```bash
+source /home/pz/miniconda3/etc/profile.d/conda.sh
+conda activate hmo_research_v6
+export CUDA_VISIBLE_DEVICES=1
+
+COMMON_ARGS="--model-path /mnt/nvme0/hmo/models/Qwen3.5-0.8B \
+  --model-revision 2fc06364715b967f1860aea9cf38778875588b17 \
+  --archive /mnt/nvme0/hmo/datasets/LongBench/5e628be450b7e67fb7ae6e201bd6d8f7056f7672/data.zip \
+  --protocol refine-logs/native_longbench_protocol.json \
+  --probe-cache-dir /mnt/nvme0/hmo/probes/query_fp32_v1"
+
+python -m experiments.phase2.e3_v2.run_native_tasks \
+  $COMMON_ARGS --stage-set smoke \
+  --run-dir /mnt/nvme0/hmo/runs/c2_native_smoke
+
+python -m experiments.phase2.e3_v2.run_native_tasks \
+  $COMMON_ARGS --stage-set formal \
+  --run-dir /mnt/nvme0/hmo/runs/c2_native_formal
+```

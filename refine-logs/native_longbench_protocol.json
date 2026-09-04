@@ -1,0 +1,288 @@
+{
+  "schema_version": "hmo.native_longbench_qa_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "frozen_at": "2026-09-04T21:05:00+08:00",
+  "purpose": "native_non_augmented_real_task_external_validity",
+  "development_basis": "openchat/gpt/share/2026-09-04/hmo_pre_a100_convergence_and_one_shot_run_plan.md",
+  "model_id": "Qwen/Qwen3.5-0.8B",
+  "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "dataset_source": {
+    "repository": "zai-org/LongBench",
+    "revision": "5e628be450b7e67fb7ae6e201bd6d8f7056f7672",
+    "archive_type": "zip",
+    "archive_sha256": "cb45b11a4133c6bc1d6a44b0f8e701335ff1e543195db1103472e575857f7f64",
+    "metric_revision": "2e00731f8d0bff23dc4325161044d0ed8af94c1e"
+  },
+  "selection": {
+    "rule": "longest_exact_serialized_memory_context_within_inclusive_token_band_then_record_index",
+    "min_memory_context_tokens": 8192,
+    "max_memory_context_tokens": 16384,
+    "samples_per_dataset": 12,
+    "source_context_unchanged": true,
+    "augmentation": false,
+    "truncation": false,
+    "outcome_conditioned_selection": false,
+    "boundary_alignment": "if_one_token_crosses_the_semantic_context_boundary_move_that_complete_token_into_memory_context",
+    "record_sha256_semantics": "sha256_of_raw_jsonl_record_bytes_without_line_ending"
+  },
+  "datasets": {
+    "hotpotqa": {
+      "member": "data/hotpotqa.jsonl",
+      "record_count": 200,
+      "eligible_count": 108,
+      "official_metric": "qa_f1_score",
+      "cases": [
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16302,
+          "index": 88,
+          "query_tokens": 60,
+          "record_sha256": "7e234420b4203783e871fe8c8836d3c7281e9b036b254e25569a188d030923ac"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16285,
+          "index": 180,
+          "query_tokens": 70,
+          "record_sha256": "96353007be33c9fa294de68cd5bc11c62e19143350e65fb9a57504588084d85a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16249,
+          "index": 86,
+          "query_tokens": 57,
+          "record_sha256": "b3ac24a2d64678394dbca3570ef5e106113ed44e7eb6de92a00ee57c7d0190c5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16233,
+          "index": 36,
+          "query_tokens": 58,
+          "record_sha256": "8c8d2b9de73ab1477edafe5eeb69e5877c5f8abe4513dbe07e48db3c2f6168ac"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16126,
+          "index": 146,
+          "query_tokens": 50,
+          "record_sha256": "34e172a5d1b1657a03f20f7567cd52fa7af026edf5a24f3a3c85db1f2c619a9d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16104,
+          "index": 21,
+          "query_tokens": 50,
+          "record_sha256": "3ccfafd9300dfe8542d4e02e83dcc9872854dee8e93a2c44a956566b33bda184"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16082,
+          "index": 19,
+          "query_tokens": 62,
+          "record_sha256": "35e91f39451f05e4236be402feec996b002daf2e8993b00a58dea239d199ec5d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16064,
+          "index": 112,
+          "query_tokens": 64,
+          "record_sha256": "68cf5aea7820d5d6da26013bf85cb7cd203daa4e9303468d8f2ed6eda8c82b91"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16062,
+          "index": 170,
+          "query_tokens": 54,
+          "record_sha256": "3be21462f31c222df749278f33f95d68eb4ec5dc11492071e497313e4cc47a0a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16030,
+          "index": 65,
+          "query_tokens": 48,
+          "record_sha256": "592e9d20bb1c239515a50c61eb6935b91266ca58c233b837511b2094cfdb01ad"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15974,
+          "index": 12,
+          "query_tokens": 67,
+          "record_sha256": "60d516336e66de88e086625dbbd79b7c82578c4c24f49eb9d6731823f1abc7bd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15970,
+          "index": 186,
+          "query_tokens": 50,
+          "record_sha256": "ab4117414f1a000deb47a90847907efb25a82da94b560b58f374058e4ff28b1f"
+        }
+      ]
+    },
+    "narrativeqa": {
+      "member": "data/narrativeqa.jsonl",
+      "record_count": 200,
+      "eligible_count": 61,
+      "official_metric": "qa_f1_score",
+      "cases": [
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 5,
+          "query_tokens": 66,
+          "record_sha256": "877b59ddd663f7e812095c13fd3b2819d9972366849b1934df54bb5151428fe5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 20,
+          "query_tokens": 61,
+          "record_sha256": "eb2da74d2ac553e83e651b8714e7e1665300412096606a66ecb5df0f90f0dcf5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 37,
+          "query_tokens": 56,
+          "record_sha256": "6987925bf148cddd3e0cf71d3ec32a036ba0e5cd409204c8d8223301301f92a5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 64,
+          "query_tokens": 59,
+          "record_sha256": "6323f07c59d863b626c58287702a5c7036792979c2ec113aa4d2fe3cb2a3bce4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 76,
+          "query_tokens": 60,
+          "record_sha256": "1cf61348551975b3cf7c6ec99759b375cea50a9a531240cea702c83445fc5801"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 84,
+          "query_tokens": 60,
+          "record_sha256": "a1863ea1f9d0e70f1bd01fb16f0fd0f6e87b069473f31255d341b39f1b26f4c2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 108,
+          "query_tokens": 58,
+          "record_sha256": "7163b8c74c4da85ff855bc3330e415473a26629b1e1215456fffb54321a3cb02"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 134,
+          "query_tokens": 61,
+          "record_sha256": "e85fdba5a916e9f2687f4527fcd894c13fa0ecad58391737af147bae496c2d3d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 157,
+          "query_tokens": 58,
+          "record_sha256": "6ad3225f515049d5988ac7098b6f70f20dc7ac28e4730a9708d72bb3ef605aae"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 192,
+          "query_tokens": 60,
+          "record_sha256": "d1bf7b55d08f85d4b55c5a2b06a35103eca7869794965b3d9bd457077735cf3f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 195,
+          "query_tokens": 52,
+          "record_sha256": "54d098d9f0da55a0427764918079f593039cb3d28b02135614867144fab8aef2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 196,
+          "query_tokens": 54,
+          "record_sha256": "dd6be91ff148695756b615d013e800108a5ef5d271751c536cff8cedbf26716a"
+        }
+      ]
+    }
+  },
+  "systems": [
+    "contiguous_cf",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "scattered_cf",
+    "full_kv_reference"
+  ],
+  "equal_byte_systems": [
+    "contiguous_cf",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "scattered_cf"
+  ],
+  "primary_comparisons": [
+    [
+      "contiguous_cf",
+      "global_fixed_chunk_topk"
+    ],
+    [
+      "contiguous_cf",
+      "raw_alpha_exact_slack"
+    ],
+    [
+      "contiguous_cf",
+      "scattered_cf"
+    ],
+    [
+      "contiguous_cf",
+      "full_kv_reference"
+    ]
+  ],
+  "primary_metric": "official_qa_f1",
+  "secondary_metrics": [
+    "normalized_answer_contains",
+    "normalized_exact_match"
+  ],
+  "middle_kv_fraction": 0.1,
+  "method": {
+    "allocator": "attention_led",
+    "sparse_selector": "max_mass_window",
+    "sparse_width": 16,
+    "raw_slack_selector": "global_top_tokens_slack",
+    "global_fixed_chunk_width": 16,
+    "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
+    "segment_length": 256,
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1
+  },
+  "generation": {
+    "decoding": "greedy",
+    "inference_seed": 20261014,
+    "max_new_tokens": {
+      "hotpotqa": 32,
+      "narrativeqa": 128
+    }
+  },
+  "execution": {
+    "smoke_case_count": 2,
+    "formal_case_count": 24,
+    "smoke_selection": "first_frozen_case_per_dataset",
+    "continuation_gate": false,
+    "resume_after_interruption": true,
+    "case_filtering_after_outcomes": false
+  },
+  "claims": [
+    "native_non_augmented_real_task_external_validity",
+    "quality_at_strictly_equal_resident_kv_bytes",
+    "locality_preserving_overlay_on_hybrid_attention"
+  ],
+  "excluded_claims": [
+    "official_full_longbench_score",
+    "outcome_selected_subset",
+    "cross_architecture_generalization"
+  ]
+}

@@ -17,7 +17,7 @@ from experiments.phase2.e3_v2.context_query import (
     full_kv_intervention,
     generate_greedy,
     run_post_intervention_prompt,
-    tokenize_prompt_parts,
+    tokenize_sample_prompt_aligned,
 )
 from experiments.phase2.e3_v2.oracle import OracleContractError
 from experiments.phase2.e3_v2.real_model_preflight import (
@@ -32,12 +32,7 @@ from experiments.phase2.e3_v2.run_coverage_fidelity import (
     _cleanup_cuda,
 )
 from experiments.utils.dataset_utils import EvalSample
-from experiments.utils.eval_harness import (
-    PromptTextParts,
-    build_prompt_parts,
-    get_ground_truths,
-    score_prediction,
-)
+from experiments.utils.eval_harness import get_ground_truths, score_prediction
 from experiments.utils.memory_accounting import get_active_kv_bytes
 from experiments.utils.model_loader import (
     get_full_attention_indices,
@@ -228,27 +223,7 @@ def validate_longest_base_selection(
 
 def tokenize_hotpot_prompt(sample: EvalSample, tokenizer):
     """Align the semantic context boundary to the next exact tokenizer boundary."""
-    parts = build_prompt_parts(sample, tokenizer)
-    nominal_boundary = len(parts.memory_context)
-    encoded = tokenizer(
-        parts.full_prompt,
-        add_special_tokens=False,
-        return_offsets_mapping=True,
-    )
-    aligned_boundary = nominal_boundary
-    for start, end in encoded["offset_mapping"]:
-        start, end = int(start), int(end)
-        if start < nominal_boundary < end:
-            aligned_boundary = end
-            break
-    if aligned_boundary >= len(parts.full_prompt):
-        raise OracleContractError("Hotpot query vanished during token-boundary alignment")
-    aligned = PromptTextParts(
-        memory_context=parts.full_prompt[:aligned_boundary],
-        query_suffix=parts.full_prompt[aligned_boundary:],
-    )
-    return tokenize_prompt_parts(tokenizer, aligned), aligned_boundary - nominal_boundary
-
+    return tokenize_sample_prompt_aligned(sample, tokenizer)
 
 def build_augmented_sample(
     base: Mapping,

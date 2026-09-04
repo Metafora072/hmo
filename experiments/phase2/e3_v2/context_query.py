@@ -159,6 +159,29 @@ def tokenize_sample_prompt(sample, tokenizer) -> TokenizedPromptSplit:
     return tokenize_prompt_parts(tokenizer, build_prompt_parts(sample, tokenizer))
 
 
+def tokenize_sample_prompt_aligned(sample, tokenizer) -> tuple[TokenizedPromptSplit, int]:
+    """Move a boundary-crossing token wholly into context, then split exactly."""
+    parts = build_prompt_parts(sample, tokenizer)
+    nominal_boundary = len(parts.memory_context)
+    encoded = tokenizer(
+        parts.full_prompt,
+        add_special_tokens=False,
+        return_offsets_mapping=True,
+    )
+    aligned_boundary = nominal_boundary
+    for start, end in _offset_pairs(encoded["offset_mapping"]):
+        if start < nominal_boundary < end:
+            aligned_boundary = end
+            break
+    if aligned_boundary >= len(parts.full_prompt):
+        raise TokenBoundaryError("Query vanished during token-boundary alignment")
+    aligned = PromptTextParts(
+        memory_context=parts.full_prompt[:aligned_boundary],
+        query_suffix=parts.full_prompt[aligned_boundary:],
+    )
+    return tokenize_prompt_parts(tokenizer, aligned), aligned_boundary - nominal_boundary
+
+
 def tokenize_answer_continuation(
     tokenizer,
     prompt: TokenizedPromptSplit,

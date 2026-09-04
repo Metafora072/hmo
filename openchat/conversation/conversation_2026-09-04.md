@@ -72,3 +72,6 @@
 
 **Codex(20:46:33)**:
 已完成获批的 C0+C1。标题与 paper story 已统一为 Stratified KV Overlays，最终方法/理论合同冻结了 macro coverage、query-guided free-start、optional fidelity、span survival 与显式假设下的 allocation regime。三个正式 runner 现共享 identity-bound FP32 probe，155 个 CPU 测试全部通过。GPU1 上 P8 两次 32K Hotpot smoke 均绑定 clean commit 348dff2：probe ID/score SHA 完全一致，cache hit 为 false/true，四个压缩臂 retained-position hash、五个系统输出与 resident bytes 全部复现；压缩臂均为 46,657,536 bytes，GPU1 已释放。C2 尚未启动，建议仍按 final 0.8B Pareto、9B central、native small pack 顺序，待 PZ 确认范围。详见 codex/share/2026-09-04/final_method_and_probe_repro_results.md。
+
+**Codex(21:55:20)**:
+C2 前两项已在 clean `main@54b0290` 完成。最终 persistent-FP32-probe 0.8B Pareto 为 144/144：HMO 相对 Scattered 在 5%/10% 分别 +18.75/+14.58 pp、均为 0 losses；9B 中央设置 24/24：HMO 23/24、Scattered 19/24，+16.67 pp、4W/0L，HMO 与 Full 均 23/24，平均 footprint 13.38%。两组均满足逐样本等字节，GPU1 已释放。C2-native 已在 outcome 前冻结：原生未增广/未裁剪 HotpotQA 与 NarrativeQA 各 12 条，按 8K--16K 精确序列化上下文长度客观选取，400 条 tokenizer 审计全部复现；runner 和 26 项聚焦 CPU tests 已通过。下一步在 clean commit 上顺序执行 2-case smoke 与 24-case formal。详见 `codex/share/2026-09-04/c2_final_reruns_and_native_protocol.md`。
