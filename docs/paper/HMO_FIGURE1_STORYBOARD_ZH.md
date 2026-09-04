@@ -3,9 +3,9 @@
 ## 图的任务
 
 Figure 1 不负责展示全部算法，也不宣称 HMO 首次使用 contiguous chunks。
-它需要让读者在十秒内理解三个事实：Hybrid 模型已经有一条固定大小的全局
-记忆通道；剩余 KV 应承担可直接寻址的局部高保真职责；相同 KV 字节下，
-retention structure 会改变证据是否完整存活。
+它需要让读者在十秒内理解四个事实：Hybrid 模型已经有一条固定大小的全局
+记忆通道；剩余 KV 应承担可直接寻址的局部高保真职责；HMO 同时组织区域
+coverage 与区域内 placement；最合适的组织会随预算和上下文长度变化。
 
 ## 横向三面板
 
@@ -24,13 +24,14 @@ fixed-size recurrent state    length-growing Full-Attention KV
 
 禁止画成两个独立模型，也不要暗示 recurrent state 能按 token 精确读取。
 
-### Panel B: Equal bytes, different organization
+### Panel B: Two-level residual-KV organization
 
 使用同一条带有目标 evidence span 的长上下文，画上下两行严格等数量 token。
 
-上行 `Scattered importance`：高分位置被离散保留，但目标短语中的连接词、数字
-或实体边界缺失。下行 `HMO stratified local overlay`：不同 macro-segments
-各有一个小窗口，目标 segment 内的窗口可滑动到 evidence span，并完整覆盖。
+上行 `Global concentration / scattered importance`：预算集中在少数全局
+高分单元，或把目标关系拆成离散 token。下行 `HMO stratified overlay`：
+macro coverage 先分布到不同区域，目标区域内的 free-start window 再滑动到
+evidence span，并完整覆盖。
 
 角落加入一个很小的 `Global fixed chunks` 轮廓作为 related-work 提示，配文
 `structured, but globally ranked / fixed boundaries`。它不是结果 bar，也不应
@@ -56,13 +57,22 @@ different retention geometry
 下方单独标注 `13.38% mean per-case Full-KV footprint`。Full KV 可用细横线
 表示 0.8B 的 72.92 和 9B 的 95.83，但不要形成第三组粗 bar 抢走结构对照。
 
+在 paired bars 下增加一条很窄的 regime strip：
+
+```text
+below coverage floor       long-context coverage regime       saturation
+global concentration       stratified coverage                convergence
+5%                         10% / 16K                           20%
+```
+
 ## Caption V1
 
 > HMO organizes the residual Full-Attention cache of a Hybrid-Attention LLM
-> as a locality-preserving overlay on an unchanged recurrent global state.
-> Under the same query probe and measured resident KV bytes, stratified
-> contiguous windows preserve complete local evidence that scattered token
-> retention can fragment, yielding consistent gains at Qwen3.5-0.8B and 9B.
+> as a two-level stratified overlay on an unchanged recurrent global state.
+> Macro-region coverage distributes scarce exact memory across long contexts,
+> while query-guided free-start windows preserve complete local evidence.
+> Exact-byte experiments expose a budget-length transition and consistent
+> gains over scattered retention at Qwen3.5-0.8B and 9B.
 
 ## 视觉编码
 

@@ -231,3 +231,27 @@ is `11.556%` of Full and all four compressed arms are equal-byte in `4/4` cases.
 An independent review returns `partial/supplement`, medium confidence. A
 smoke/formal near-tie ranking difference weakens the Fixed comparison and should
 be addressed before making a stronger real-task superiority claim.
+
+## P8 Persistent Query-Probe Reproducibility
+
+**Protocol**: query_probe_repro_protocol.json
+
+### Claim
+
+Verify the final execution path operationally: one identity-bound FP32 query
+probe is persisted once, reused exactly, and induces the same retained positions
+on a repeated HotpotQA-32K-Aug smoke case. This run is excluded from quality
+claims and has no continuation gate.
+
+### Run Order
+
+| Run | Split | Check | Priority |
+|---|---|---|---|
+| P8-R1 | first frozen P7 case | populate shared probe artifact | MUST |
+| P8-R2 | same case, fresh run dir | cache hit and identical probe/position hashes | MUST |
+
+The two runs use the same committed code, model revision, paired protocol, and
+external cache directory. Required invariants are probe ID/hash equality,
+second-run cache reuse, per-arm retained-position hash equality, and the existing
+equal-resident-byte contract. Generated-token equality is recorded as a useful
+determinism check, not a paper claim or a method gate.

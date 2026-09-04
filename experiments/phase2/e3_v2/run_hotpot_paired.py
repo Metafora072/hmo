@@ -35,6 +35,12 @@ from experiments.phase2.e3_v2.oracle import (
 from experiments.phase2.e3_v2.query_accessibility import (
     collect_hybrid_query_token_probe,
 )
+from experiments.phase2.e3_v2.query_probe_cache import (
+    QUERY_PROBE_AGGREGATION,
+    QUERY_PROBE_CACHE_SCHEMA,
+    get_or_create_query_probe,
+    retained_positions_sha256,
+)
 from experiments.phase2.e3_v2.real_model_preflight import (
     REFERENCE_BACKEND,
     _force_torch_reference_backend,
@@ -377,6 +383,7 @@ def run(args: argparse.Namespace) -> dict:
     _validate_case_records(records, raw_lines, solvability["cases"])
     full_parent = load_full_kv_parent(Path(args.full_kv_results).resolve(), protocol)
     run_dir = Path(args.run_dir).resolve()
+    probe_cache_dir = Path(args.probe_cache_dir).resolve()
     model_path = Path(args.model_path).resolve()
     model_identity = model_provenance(
         model_path, args.model_id, revision=args.model_revision
@@ -393,6 +400,7 @@ def run(args: argparse.Namespace) -> dict:
             "model_id": args.model_id,
             "model_revision": args.model_revision,
             "protocol_sha256": protocol_sha,
+            "probe_cache_dir": str(probe_cache_dir),
             "solvability_protocol_sha256": solvability_sha,
             "stage_set": args.stage_set,
             "max_new_tokens": protocol["max_new_tokens"],
@@ -416,6 +424,8 @@ def run(args: argparse.Namespace) -> dict:
             "cases": selected_cases,
             "candidate_search": False,
             "continuation_gate": False,
+            "query_probe_cache_schema": QUERY_PROBE_CACHE_SCHEMA,
+            "query_probe_aggregation": QUERY_PROBE_AGGREGATION,
         },
         model=model_identity,
         project_root=PROJECT_ROOT,
@@ -481,14 +491,25 @@ def run(args: argparse.Namespace) -> dict:
         del context_outputs
         _cleanup_cuda()
 
-        probe = collect_hybrid_query_token_probe(
-            model,
-            prompt,
+        cached_probe = get_or_create_query_probe(
+            probe_cache_dir,
+            model_identity=model_identity,
+            prompt=prompt,
             attention_layer_indices=attention_layers,
             recurrent_layer_indices=recurrent_layers,
             segments=segments,
             segment_length=method["segment_length"],
+            collector=lambda: collect_hybrid_query_token_probe(
+                model,
+                prompt,
+                attention_layer_indices=attention_layers,
+                recurrent_layer_indices=recurrent_layers,
+                segments=segments,
+                segment_length=method["segment_length"],
+            ),
         )
+        probe = cached_probe.result
+        query_probe_provenance = cached_probe.provenance()
         attention = probe.alpha.as_dict()
         accessibility = probe.accessibility.field_dict("read_share")
         token_attention_mass = tuple(float(value) for value in probe.token_attention_mass)
@@ -612,10 +633,14 @@ def run(args: argparse.Namespace) -> dict:
                 "full_post_query_resident_bytes": full_expected,
             },
             "raw_alpha_selection": raw_selection,
+            "query_probe": query_probe_provenance,
             "plans": {
                 "contiguous_cf": {
                     "allocation": exact_plan.to_dict(),
                     "retention": position_plans["contiguous_cf"].to_dict(),
+                    "active_positions_sha256": retained_positions_sha256(
+                        position_plans["contiguous_cf"].active_positions
+                    ),
                     "action_counts": _eligible_action_counts(exact_plan, protected_ids),
                 },
                 "global_fixed_chunk_topk": {
@@ -624,16 +649,25 @@ def run(args: argparse.Namespace) -> dict:
                         middle_retained_tokens % method["global_fixed_chunk_width"]
                     ),
                     "retention": position_plans["global_fixed_chunk_topk"].to_dict(),
+                    "active_positions_sha256": retained_positions_sha256(
+                        position_plans["global_fixed_chunk_topk"].active_positions
+                    ),
                 },
                 "raw_alpha_exact_slack": {
                     "selected_exact_segment_ids": list(
                         raw_selection["raw_alpha_segment_ids"]
                     ),
                     "retention": position_plans["raw_alpha_exact_slack"].to_dict(),
+                    "active_positions_sha256": retained_positions_sha256(
+                        position_plans["raw_alpha_exact_slack"].active_positions
+                    ),
                 },
                 "scattered_cf": {
                     "allocation": exact_plan.to_dict(),
                     "retention": position_plans["scattered_cf"].to_dict(),
+                    "active_positions_sha256": retained_positions_sha256(
+                        position_plans["scattered_cf"].active_positions
+                    ),
                     "action_counts": _eligible_action_counts(exact_plan, protected_ids),
                 },
             },
@@ -693,6 +727,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--full-kv-results", required=True)
     parser.add_argument("--protocol", required=True)
     parser.add_argument("--run-dir", required=True)
+    parser.add_argument("--probe-cache-dir", required=True)
     parser.add_argument("--stage-set", choices=tuple(STAGE_CASE_COUNTS), default="formal")
     parser.add_argument("--resume", action="store_true")
     return parser.parse_args()

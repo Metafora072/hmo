@@ -1,6 +1,6 @@
 # HMO Paper Plan
 
-**Working title**: HMO: A Locality-Preserving KV Overlay for Hybrid-Attention Language Models  
+**Working title**: HMO: Stratified KV Overlays for Hybrid-Attention Language Models
 **Target venue**: ICLR  
 **Paper type**: Method + analysis + systems evaluation  
 **Date**: 2026-09-04  
@@ -16,7 +16,7 @@
 | HMO remains competitive with strong Raw Exact baselines | 0.8B HMO/Raw+Slack: 30/30, 34/32, 35/35 across 5%/10%/20%; 9B generated tokens identical in 24/24 | Fairness baseline established; no stable superiority claim | Main Results, Pareto |
 | HMO improves over generic fixed chunks in the long-context coverage regime | At 10%/16K Global Fixed / Stratified Fixed / HMO are 16/17/18 overall and 6/7/8 on LongEval; HMO vs aligned is 2W/21T/1L at exact equal bytes | Partial, length-conditioned mechanism evidence | Main Results, Ablation |
 | Exact upgrades improve contiguous coverage | 0.8B: 34/48 vs 32/48; 9B: both 23/24 with opposite one-case differences | Optional component, not primary claim | Ablation |
-| The result transfers to realistic tasks and larger Hybrid models | Current method transfers from Qwen3.5-0.8B to 9B; realistic 32K task remains pending | Model scale supported; task breadth pending | Transfer section |
+| The runner preserves real-task solvability at low residual-KV footprint | HotpotQA-32K-Aug: every system solves the same 2/4 cases; HMO uses 11.556% of Full-KV bytes | Four-case feasibility evidence; native-task breadth pending | Transfer section |
 
 ## Structure And Page Budget
 
@@ -25,7 +25,9 @@
 - Open with residual Full-Attention KV growth in Hybrid LLMs.
 - Establish recurrent global memory versus token-level KV fidelity.
 - Expose the scattered-importance failure mode.
-- Present HMO as query-guided contiguous coverage plus optional Exact fidelity.
+- Present HMO as macro-region stratified coverage plus query-guided free-start
+  windows and optional Exact fidelity.
+- Introduce the budget-by-length transition around the regional coverage floor.
 - Preview consistent 14.58/16.67 pp equal-byte gains across 0.8B/9B and near-Full quality at 13.38% footprint.
 - End with three contribution bullets aligned with the matrix.
 
@@ -34,9 +36,10 @@
 - Hybrid/linear attention and recurrent state.
 - KV eviction, heavy hitters, query-aware compression, and budget allocation.
 - Local windows, chunks, sentence/semantic units, and span-structured evidence.
-- Treat ChunkKV as the closest method: do not claim locality or chunks as new.
-- Position HMO through Hybrid residual-memory roles, coverage-first
-  macro-segments, and query-guided free-start micro-windows.
+- Present token selection, structured retention, and HMO as a progression.
+- Position HMO through Hybrid residual-memory roles, stratified macro coverage,
+  and query-guided free-start micro-windows; do not claim locality or chunks as
+  new.
 
 ### Section 3: Hybrid Memory Overlay, 1.85 pages
 
@@ -51,13 +54,15 @@
 - State clearly that recurrent memory is preserved but not used as a validated
   per-segment reliability score.
 
-### Section 4: Local Evidence Analysis, 0.90 page
+### Section 4: Local Evidence And Allocation Regimes, 0.90 page
 
 - Proposition on complete `ell`-span coverage.
 - Main proof sketch via consecutive-run decomposition and merging.
 - Corollary for max-attention-mass placement within the locality class.
 - General retention coefficient `(cw + m(L-w) + s)/T`, with `w/L` only as
   the full-coverage approximation.
+- Stylized separable-concave allocation model explaining when first-region
+  coverage outranks repeated concentration.
 - Move full boundary cases and weighted-span extensions to appendix.
 
 ### Section 5: Experiments, 2.80 pages
@@ -67,7 +72,8 @@
 - Contiguous-versus-scattered causal ablation.
 - 5%/10%/20% quality-memory Pareto with Raw Exact+Slack and Global
   Fixed-Chunk Top-K.
-- 32K HotpotQA transfer and official F1, subject to Full-KV solvability.
+- HotpotQA-32K-Aug feasibility and official F1, followed by a native task
+  package on the final shared-probe runner.
 - Qwen3.5-9B frozen transfer with Raw Exact+Slack and peak-memory reporting.
 - Stratified Fixed-Chunk at 16K/10% to separate macro-segment allocation from
   free-start placement.
@@ -105,10 +111,11 @@ the evidence fragmentation caused by scattered importance retention.
 ## Abstract Contract
 
 The abstract must contain the residual KV problem, dual-memory role mismatch,
-contiguous overlay, span-survival proposition, the 14.58/16.67 pp cross-scale
+stratified macro coverage, query-guided free-start windows, the span-survival
+proposition, the budget-by-length transition, the 14.58/16.67 pp cross-scale
 equal-byte results, and the 13.38% footprint with near-Full quality. It must not
-claim sublinear memory, recurrent-aware allocation, realistic-task transfer,
-or superiority over Raw Exact or fixed-boundary chunks.
+claim sublinear memory, recurrent-aware allocation, or universal superiority
+over Raw Exact or fixed-boundary chunks.
 
 Draft source: `docs/paper/HMO_ABSTRACT_ZH.md`.
 
@@ -167,7 +174,9 @@ All formal metadata and BibTeX must be verified before use.
 - [x] Implement Raw Exact+Slack and complete the frozen 10% Qwen3.5-9B transfer.
 - [x] Add Global Fixed-Chunk Top-K and complete the 5%/10%/20% Pareto package.
 - [x] Add the 16K/10% Stratified Fixed-Chunk mechanism control.
-- [ ] Add 32K HotpotQA transfer after PZ approval.
+- [x] Add the four-case HotpotQA-32K-Aug feasibility transfer.
+- [ ] Freeze the final method/theory contract and persistent shared-probe path.
+- [ ] Complete the final deterministic 5090 validation package.
 - [ ] Generate Figure 1 and the current-results plots.
 - [ ] Verify citations and construct the bibliography.
 - [ ] Draft LaTeX section by section.

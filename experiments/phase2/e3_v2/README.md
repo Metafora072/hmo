@@ -74,6 +74,7 @@ python -m experiments.phase2.e3_v2.run_scale_transfer \
   --model-revision c202236235762e1c871ad0ccb60c8ee5ba337b9a \
   --protocol refine-logs/contiguous_cf_scale_transfer_9b_protocol.json \
   --stage-set smoke \
+  --probe-cache-dir /mnt/nvme0/hmo/probes/query_fp32_v1 \\
   --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_scale9b_smoke
 
 python -m experiments.phase2.e3_v2.run_scale_transfer \
@@ -81,6 +82,7 @@ python -m experiments.phase2.e3_v2.run_scale_transfer \
   --model-revision c202236235762e1c871ad0ccb60c8ee5ba337b9a \
   --protocol refine-logs/contiguous_cf_scale_transfer_9b_protocol.json \
   --stage-set formal \
+  --probe-cache-dir /mnt/nvme0/hmo/probes/query_fp32_v1 \\
   --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_scale9b_formal
 ```
 
@@ -102,6 +104,7 @@ python -m experiments.phase2.e3_v2.run_pareto \
   --model-revision 2fc06364715b967f1860aea9cf38778875588b17 \
   --protocol refine-logs/contiguous_cf_pareto_protocol.json \
   --stage-set smoke \
+  --probe-cache-dir /mnt/nvme0/hmo/probes/query_fp32_v1 \\
   --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_pareto_smoke
 
 python -m experiments.phase2.e3_v2.run_pareto \
@@ -109,6 +112,7 @@ python -m experiments.phase2.e3_v2.run_pareto \
   --model-revision 2fc06364715b967f1860aea9cf38778875588b17 \
   --protocol refine-logs/contiguous_cf_pareto_protocol.json \
   --stage-set formal \
+  --probe-cache-dir /mnt/nvme0/hmo/probes/query_fp32_v1 \\
   --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_pareto_formal
 ```
 
@@ -184,7 +188,8 @@ COMMON_ARGS="--model-path /mnt/nvme0/hmo/models/Qwen3.5-0.8B \
   --archive /mnt/nvme0/hmo/datasets/LongBench/5e628be450b7e67fb7ae6e201bd6d8f7056f7672/data.zip \
   --solvability-protocol refine-logs/hotpotqa_32k_solvability_protocol.json \
   --full-kv-results /mnt/nvme0/hmo/runs/hotpotqa_32k_solvability_formal_20260904_171905/hotpot_solvability_results.jsonl \
-  --protocol refine-logs/hotpotqa_32k_paired_protocol.json"
+  --protocol refine-logs/hotpotqa_32k_paired_protocol.json \\
+  --probe-cache-dir /mnt/nvme0/hmo/probes/query_fp32_v1"
 
 python -m experiments.phase2.e3_v2.run_hotpot_paired \
   $COMMON_ARGS --stage-set smoke \

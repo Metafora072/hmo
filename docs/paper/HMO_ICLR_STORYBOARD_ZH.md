@@ -3,11 +3,12 @@
 ## 叙事总纲
 
 这篇论文不把 HMO 描述为一个新的 token 打分公式，而是提出一种面向
-Hybrid-Attention Language Model 的 memory organization。Recurrent state
-负责低成本的全局上下文基础，Full-Attention KV 负责局部高保真关系。现有
-KV compression 将后者压缩为一组离散高分 token，忽略了关系证据的连续
-结构。HMO 将 residual KV 重构为 locality-preserving overlay，并通过
-coverage-fidelity hierarchy 在固定预算下实现该分工。
+Hybrid-Attention Language Model 的 residual-memory organization。Recurrent
+state 负责低成本的全局上下文基础，Full-Attention KV 负责可直接寻址的局部
+高保真关系。HMO 将 residual KV 组织成两级 stratified overlay：macro-region
+coverage 决定预算覆盖哪些区域，query-guided free-start windows 决定区域内
+保留哪里，剩余预算再用于可选 fidelity。该组织随预算和上下文长度在 global
+concentration、stratified coverage 与 saturation 三个工作区间之间变化。
 
 读者最终需要记住的不是 `width=16`，而是以下判断：
 
@@ -38,13 +39,14 @@ Top-token selection 将每个 token 的 utility 独立建模，并保留得分�
 由连续实体、数字、句法结构和跨 token 关系共同构成。离散高分 token 可能
 命中证据，却没有完整保留证据。
 
-### 第四步：从 token importance 转向 relational completeness
+### 第四步：从 structured retention 推进到 residual-memory organization
 
-HMO 的核心观察是，KV 的价值不仅取决于保留了哪些 token，还取决于这些
-token 是否形成可被 attention 直接读取的完整局部单元。因此，在相同 token
-预算下，连续窗口构成了一种简单而强的结构先验。
+Token importance 说明哪些位置相关，ChunkKV 等 structured-retention 工作
+说明连续单元值得保留。HMO 进一步追问：当 Hybrid 模型已有 recurrent global
+base 时，稀缺的 residual KV 应如何在长上下文区域间分布，并在每个区域内
+保留最相关的完整局部关系。
 
-### 第五步：Coverage-Fidelity Overlay
+### 第五步：Stratified Coverage-Fidelity Overlay
 
 HMO 先保护 prefix/suffix anchors，再将中间上下文划分为 segment。Coverage
 阶段在 segment 内选择 query-attention mass 最大的连续窗口，使有限 KV
@@ -62,7 +64,7 @@ HMO 先保护 prefix/suffix anchors，再将中间上下文划分为 segment。C
 完整存活的局部证据区间。HMO 再在所有连续窗口中最大化 query-attention
 mass，从而同时获得 locality class 内的关系完整性与 query relevance。
 
-### 第七步：经验闭环
+### 第七步：预算与长度的经验闭环
 
 在 Qwen3.5-0.8B 的 48 个全新 8K/16K 样本上，Contiguous CF 与 Scattered
 CF 使用逐样本完全相同的 resident KV bytes，前者得到 70.83%，后者得到
@@ -70,7 +72,9 @@ CF 使用逐样本完全相同的 resident KV bytes，前者得到 70.83%，后�
 72.92%。在 Qwen3.5-9B 的 24 个冻结迁移样本上，Contiguous 与等字节
 Scattered 为 95.83% 对 79.17%，再次得到正向结构效应；Contiguous 与 Full
 均为 95.83%。两模型的 format-robust secondary 差值分别为 +12.50 pp 和
-+16.67 pp。该结果把问题观察、结构先验、理论命题和 end-task generation
++16.67 pp。5%/10%/20% Pareto 进一步显示：coverage floor 以下 global
+concentration 更强，10%/16K 时 stratified coverage 开始占优，20% 时结构化
+方法接近饱和。该结果把问题观察、结构先验、理论命题和 end-task generation
 串成跨规模证据链。
 
 ## 章节故事板
@@ -110,15 +114,13 @@ bytes 下执行。
 
 ### Contribution bullets
 
-1. 提出 Hybrid memory overlay 视角，明确 recurrent global state 与 local
-   high-fidelity KV 的职责分工。
-2. 提出 HMO coverage-fidelity policy，以 query-guided contiguous windows
-   替代无结构的 scattered token retention。
-3. 证明连续保留在固定 token 数下最大化未知局部证据区间的完整覆盖，并给出
-   KV retention coefficient。
-4. 在真实 cache intervention 和逐样本字节核算下验证 HMO，以约 13.38%
-   Full-KV footprint 达到接近 Full KV 的质量，并显著优于等字节 scattered
-   retention。
+1. 提出 Hybrid residual-memory formulation，将 recurrent state 定义为全局
+   压缩基础，将 residual Full-Attention KV 定义为精确可寻址 overlay。
+2. 提出 HMO 两级 allocator：跨 macro-regions 的 stratified coverage 与区域内
+   query-guided free-start windows，并在真实字节预算下支持可选 fidelity。
+3. 给出 span survival 与 budget-by-length regime 的理论解释，并通过真实 cache
+   intervention 证明 HMO 在 0.8B/9B 上稳定优于等字节 scattered retention，
+   以约 13.38% Full-KV footprint 达到接近或匹配 Full-KV 的质量。
 
 ## 第二章 Background And Related Work
 
@@ -137,12 +139,12 @@ tokens，而是主流目标函数更偏向 singleton importance，通常没有�
 
 ### Locality and span-structured evidence
 
-ChunkKV、SentenceKV、ProtoKV 和 Kara 已分别覆盖 fixed chunk、sentence、
-semantic cluster 和 flexible chunk，故 HMO 不声称 locality 本身是新发现。
-定位差异是：HMO 面向 Hybrid residual KV，在 macro-segments 间采用
-coverage-first 分配，再在每个被覆盖 segment 内使用 query-guided free-start
-micro-window。它不是固定 recent window，也不是外部 chunk retrieval。完整
-矩阵见 `docs/design/HMO_METHOD_AND_NOVELTY_DOSSIER_ZH.md`。
+Token selection 建立 importance-aware eviction；ChunkKV、SentenceKV、
+ProtoKV 和 Kara 将保留单位推进到 fixed chunk、sentence、semantic cluster
+和 flexible chunk。HMO 沿这条进展扩展到 Hybrid residual KV：在 recurrent
+global substrate 之上先组织 macro-region coverage，再在每个被覆盖 segment
+内使用 query-guided free-start micro-window。完整矩阵见
+`docs/design/HMO_METHOD_AND_NOVELTY_DOSSIER_ZH.md`。
 
 ## 第三章 Hybrid Memory Overlay
 

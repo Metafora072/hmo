@@ -1,0 +1,44 @@
+{
+  "automatic_followup": false,
+  "continuation_gate": false,
+  "execution": {
+    "first_repeat_populates_cache": true,
+    "fresh_run_directory_per_repeat": true,
+    "repeat_count": 2,
+    "second_repeat_must_reuse_cache": true,
+    "visible_cuda_device": 1
+  },
+  "model_id": "Qwen/Qwen3.5-0.8B",
+  "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "parent_hotpot_paired_protocol": {
+    "path": "refine-logs/hotpotqa_32k_paired_protocol.json",
+    "sha256": "1af7d542023c812b15f5e5f74f60dfab951a62becdacae37052f56a789c19268"
+  },
+  "probe_contract": {
+    "aggregation_version": "token_fp32_segment_fsum.v1",
+    "fail_closed_on_incomplete_or_hash_mismatch": true,
+    "schema_version": "hmo.query_probe_cache.v1",
+    "shared_cache_directory": "/mnt/nvme0/hmo/probes/query_fp32_v1",
+    "storage_dtype": "float32"
+  },
+  "purpose": "Operational reproducibility check for the final persistent FP32 query-probe path; excluded from quality claims.",
+  "required_invariants": [
+    "probe_id_equal",
+    "token_scores_sha256_equal",
+    "second_repeat_cache_hit_true",
+    "active_positions_sha256_equal_for_all_compressed_systems",
+    "post_query_resident_bytes_equal_for_all_compressed_systems"
+  ],
+  "sample": {
+    "base_index": 29,
+    "donor_index": 168,
+    "sample_id": "hotpotqa_32k_aug_b0029_d0168",
+    "stage_set": "smoke"
+  },
+  "schema_version": "hmo.query_probe_repro_protocol.v1",
+  "status": "frozen_before_repro_outputs",
+  "supplementary_checks": [
+    "generated_token_ids_equal_per_system",
+    "official_qa_f1_equal_per_system"
+  ]
+}

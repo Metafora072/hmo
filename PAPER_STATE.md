@@ -2,20 +2,21 @@
 
 ## 当前状态
 
-论文处于故事冻结与外部效度扩展阶段。核心方法不再继续搜索新的 recurrent
-打分公式；5%/10%/20% Pareto、结构化强基线与 free-start 机制控制均已
-完成。当前首要任务是把已经成形的 locality-preserving mechanism 扩展到
-真实长上下文任务。
+论文处于大卡前的设计与实验收敛阶段。核心方法不再继续搜索新的 recurrent
+打分公式；5%/10%/20% Pareto、结构化强基线、free-start 机制控制和
+HotpotQA-32K-Aug 路径均已完成。当前首要任务是冻结最终方法/理论合同与共享
+query probe，再用同一路径完成 5090 验证包。
 
 目标会议暂按 ICLR 规划，正文页数按 9 页控制。工作标题为：
 
-> HMO: A Locality-Preserving KV Overlay for Hybrid-Attention Language Models
+> HMO: Stratified KV Overlays for Hybrid-Attention Language Models
 
 ## 一句话贡献
 
-HMO 将 Hybrid LLM 中仍然线性增长的 Full-Attention KV 重构为 recurrent
-state 之上的局部高保真 overlay，并通过 query-guided contiguous coverage
-在固定显存下避免离散 token 保留对完整关系证据的破坏。
+HMO 将 Hybrid LLM 中仍然线性增长的 Full-Attention KV 组织为 recurrent
+global state 之上的两级 overlay：先在 macro-regions 间建立分层覆盖，再在
+区域内放置 query-guided free-start windows，并随预算与上下文长度在全局
+集中和区域覆盖之间形成可解释的工作区间。
 
 ## 论文靶子
 
@@ -32,18 +33,20 @@ quantity。该处理能够保留较高的 attention mass，却可能把一个完
 关系拆成彼此孤立的 token。HMO 针对的是 importance retention 与 relational
 completeness 之间的错配。
 
-### Closest-work 后的新颖性边界
+### Structured retention 之后的 HMO 扩展
 
-ChunkKV 已经提出用连续 fixed-boundary chunks 缓解离散 token compression
-造成的语义破碎；SentenceKV、ProtoKV 和 Kara 也覆盖了 sentence、semantic
-cluster 和 flexible chunk。因此 HMO 不再声称首次发现 locality 或首次使用
-chunk。
+Token eviction 建立了 importance-aware retention，ChunkKV 等工作进一步
+建立了 structured units 的价值，SentenceKV、ProtoKV 和 Kara 又把结构扩展
+到 sentence、semantic cluster 与 flexible chunk。HMO 沿这条进展继续解决
+Hybrid LLM 的 residual-memory organization，而不把 locality 或 chunk 本身
+包装成首创。
 
-当前差异收敛为 Hybrid residual-memory organization：HMO 在不改变 recurrent
-state 的前提下，将 Full-Attention KV 组织成 stratified local overlay。
+HMO 在不改变 recurrent state 的前提下，将 Full-Attention KV 组织成
+stratified local overlay。
 它先在 macro-segments 间执行 coverage-first 分配，再在 segment 内选择
 query-guided free-start window，最后才执行可选 Exact fidelity。完整审计见
-`docs/design/HMO_METHOD_AND_NOVELTY_DOSSIER_ZH.md`。
+`docs/design/HMO_METHOD_AND_NOVELTY_DOSSIER_ZH.md`；最终系统与理论合同见
+`docs/design/HMO_FINAL_METHOD_AND_THEORY_ZH.md`。
 
 新增的 Global Fixed-Chunk Top-K 表明，通用固定块本身是强基线：它在 5%
 与整体 10% 上优于 HMO，在 20% 与 HMO 持平；但 HMO 在 10%/16K 上反超

@@ -36,6 +36,12 @@ from experiments.phase2.e3_v2.oracle import (
 from experiments.phase2.e3_v2.query_accessibility import (
     collect_hybrid_query_token_probe,
 )
+from experiments.phase2.e3_v2.query_probe_cache import (
+    QUERY_PROBE_AGGREGATION,
+    QUERY_PROBE_CACHE_SCHEMA,
+    get_or_create_query_probe,
+    retained_positions_sha256,
+)
 from experiments.phase2.e3_v2.real_model_preflight import (
     REFERENCE_BACKEND,
     _force_torch_reference_backend,
@@ -268,6 +274,7 @@ def run(args: argparse.Namespace) -> dict:
     stage_names = STAGE_SETS[args.stage_set]
     method = protocol["method"]
     run_dir = Path(args.run_dir).resolve()
+    probe_cache_dir = Path(args.probe_cache_dir).resolve()
     model_path = Path(args.model_path).resolve()
     model_identity = model_provenance(
         model_path, args.model_id, revision=args.model_revision
@@ -279,6 +286,7 @@ def run(args: argparse.Namespace) -> dict:
             "model_id": args.model_id,
             "model_revision": args.model_revision,
             "protocol_sha256": protocol_sha,
+            "probe_cache_dir": str(probe_cache_dir),
             "stage_set": args.stage_set,
             "max_new_tokens": protocol["max_new_tokens"],
             "inference_seed": protocol["inference_seed"],
@@ -298,6 +306,8 @@ def run(args: argparse.Namespace) -> dict:
             "stages": list(stage_names),
             "candidate_search": False,
             "continuation_gate": False,
+            "query_probe_cache_schema": QUERY_PROBE_CACHE_SCHEMA,
+            "query_probe_aggregation": QUERY_PROBE_AGGREGATION,
         },
         model=model_identity,
         project_root=PROJECT_ROOT,
@@ -371,14 +381,25 @@ def run(args: argparse.Namespace) -> dict:
         del context_outputs
         _cleanup_cuda()
 
-        probe = collect_hybrid_query_token_probe(
-            model,
-            prompt,
+        cached_probe = get_or_create_query_probe(
+            probe_cache_dir,
+            model_identity=model_identity,
+            prompt=prompt,
             attention_layer_indices=attention_layers,
             recurrent_layer_indices=recurrent_layers,
             segments=segments,
             segment_length=stage_config["segment_length"],
+            collector=lambda: collect_hybrid_query_token_probe(
+                model,
+                prompt,
+                attention_layer_indices=attention_layers,
+                recurrent_layer_indices=recurrent_layers,
+                segments=segments,
+                segment_length=stage_config["segment_length"],
+            ),
         )
+        probe = cached_probe.result
+        query_probe_provenance = cached_probe.provenance()
         attention = probe.alpha.as_dict()
         accessibility = probe.accessibility.field_dict("read_share")
         allocator_attention, allocator_accessibility = restrict_eligible_signals(
@@ -599,6 +620,10 @@ def run(args: argparse.Namespace) -> dict:
                 ),
             },
         }
+        for name, plan_payload in plans.items():
+            plan_payload["active_positions_sha256"] = retained_positions_sha256(
+                position_plans[name].active_positions
+            )
         row = {
             "stage": stage,
             "sample_id": sample.sample_id,
@@ -607,6 +632,7 @@ def run(args: argparse.Namespace) -> dict:
             "context_tokens": prompt.context_tokens,
             "query_tokens": prompt.query_tokens,
             "raw_alpha_selection": raw_selection,
+            "query_probe": query_probe_provenance,
             "byte_accounting": {
                 "token_kv_bytes": token_unit_bytes,
                 "query_kv_bytes": query_kv_bytes,
@@ -673,6 +699,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-revision", required=True)
     parser.add_argument("--protocol", required=True)
     parser.add_argument("--run-dir", required=True)
+    parser.add_argument("--probe-cache-dir", required=True)
     parser.add_argument(
         "--stage-set", choices=tuple(STAGE_SETS), default="formal"
     )
