@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ "${HMO_ALLOW_LEGACY_PHASE2:-0}" != "1" ]]; then
+  echo "[fatal] run_single_a100.sh is the retired V6.1 E1-E6 launcher." >&2
+  echo "[fatal] Use run_c3_27b.sh, or set HMO_ALLOW_LEGACY_PHASE2=1 for historical reproduction." >&2
+  exit 2
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="${HMO_PROJECT_ROOT:-$(cd "${SCRIPT_DIR}/../.." && pwd)}"
 cd "$ROOT"

@@ -19,3 +19,9 @@
 | P7-S | HotpotQA-32K-Aug paired smoke | first frozen case, four compressed arms at 10% | DONE; 4/4 compressed arms exact equal bytes at 11.57% of Full |
 | P7-F | HotpotQA-32K-Aug paired pilot | four frozen cases, four equal-byte arms plus Full KV | DONE; HMO F1 0.3357 at 11.556% Full, partial/supplement |
 | P8-R1/R2 | persistent FP32 probe reproducibility | same first P7 case, two fresh run dirs | DONE; exact probe/position/output reuse, all invariants pass, GPU1 released |
+| C2-P | final persistent-probe Pareto rerun | 0.8B, 48 cases x 3 budgets | DONE; 144/144 budget rows, exact-byte contract passed |
+| C2-S | final scale transfer | 9B, 24 frozen mechanism cases at 10% | DONE; 24/24, HMO 23 vs Scattered 19, exact bytes |
+| C2-N | native LongBench external validity | 12 HotpotQA + 12 NarrativeQA at 10% | DONE; 24/24, HMO competitive overall and best on NarrativeQA slice |
+| C3-PF | paid-run fit and cost calibration | 27B BF16, one exact-32K Needle, HMO + Full | READY; 2 generation cells, awaits PZ rental/download confirmation |
+| C3-S | 27B mechanism and Pareto core | 12+12 exact-32K cases, 5/10/20% | FROZEN; 312 generation cells, run after preflight cost confirmation |
+| C3-N | 27B native QA core | same frozen C2 native cases at 10% | FROZEN; 120 generation cells, run after C3-S without result gate |

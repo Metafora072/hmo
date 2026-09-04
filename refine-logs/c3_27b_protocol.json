@@ -1,0 +1,116 @@
+{
+  "schema_version": "hmo.c3.large_model_protocol.v1",
+  "status": "frozen_before_27b_outcomes",
+  "frozen_at": "2026-09-05T00:00:00+08:00",
+  "development_basis": "openchat/gpt/share/2026-09-04/hmo_pre_a100_convergence_and_one_shot_run_plan.md",
+  "model": {
+    "id": "Qwen/Qwen3.5-27B",
+    "revision": "fc05daec18b0a78c049392ed2e771dde82bdf654",
+    "dtype": "bfloat16",
+    "weight_bytes": 55563022432
+  },
+  "hardware": {
+    "visible_gpu_count": 1,
+    "minimum_device_memory_gib": 80,
+    "persistent_free_space_gib": 120
+  },
+  "systems": [
+    "contiguous_cf",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "scattered_cf",
+    "full_kv_reference"
+  ],
+  "equal_byte_systems": [
+    "contiguous_cf",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "scattered_cf"
+  ],
+  "primary_comparisons": [
+    ["contiguous_cf", "global_fixed_chunk_topk"],
+    ["contiguous_cf", "scattered_cf"]
+  ],
+  "method": {
+    "allocator": "attention_led",
+    "sparse_selector": "max_mass_window",
+    "sparse_width": 16,
+    "raw_slack_selector": "global_top_tokens_slack",
+    "global_fixed_chunk_width": 16,
+    "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
+    "segment_length": 256,
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1
+  },
+  "synthetic": {
+    "budget_fractions": [0.05, 0.1, 0.2],
+    "max_new_tokens": 32,
+    "inference_seed": 20261017,
+    "stage_sets": {
+      "preflight": ["preflight_32k"],
+      "core": ["core_32k"]
+    },
+    "stages": {
+      "preflight_32k": {
+        "datasets": "needle",
+        "samples_per_dataset": 1,
+        "context_length": 32768,
+        "segment_length": 256,
+        "seed": 20261015,
+        "sample_id_prefix": "c3_27b_preflight_32k_s20261015_",
+        "budget_fractions": [0.1],
+        "systems": ["contiguous_cf", "full_kv_reference"],
+        "expected_generation_cells": 2
+      },
+      "core_32k": {
+        "datasets": "needle,longeval_lines",
+        "samples_per_dataset": 12,
+        "context_length": 32768,
+        "segment_length": 256,
+        "seed": 20261016,
+        "sample_id_prefix": "c3_27b_core_32k_s20261016_",
+        "budget_fractions": [0.05, 0.1, 0.2],
+        "systems": [
+          "contiguous_cf",
+          "global_fixed_chunk_topk",
+          "raw_alpha_exact_slack",
+          "scattered_cf",
+          "full_kv_reference"
+        ],
+        "expected_generation_cells": 312
+      }
+    }
+  },
+  "native": {
+    "parent_protocol": "refine-logs/native_longbench_protocol.json",
+    "parent_protocol_sha256": "86ebfa5cfdff0613e559780811887b7537d0485cbd00534193c0aac433b49e2a",
+    "stage_set": "formal",
+    "datasets": ["hotpotqa", "narrativeqa"],
+    "cases_per_dataset": 12,
+    "middle_kv_fraction": 0.1,
+    "expected_generation_cells": 120
+  },
+  "mandatory_core": {
+    "synthetic_generation_cells": 312,
+    "native_generation_cells": 120,
+    "total_generation_cells": 432,
+    "continuation_gate": false
+  },
+  "extension": {
+    "increase_synthetic_to_30_per_dataset_cells": 468,
+    "native_20pct_compressed_cells_full_reused": 96,
+    "hotpotqa_32k_aug_central_cells": 20,
+    "small_64k_stress_cells": 40,
+    "automatic": false
+  },
+  "claims": [
+    "At exact matched resident KV bytes, contiguous HMO transfers to Qwen3.5-27B at 32K and improves the quality-memory frontier over fixed, raw, and scattered retention.",
+    "The frozen HMO policy remains competitive on non-augmented long-context QA at about one tenth of Full Attention KV, with task-stratified reporting."
+  ],
+  "immutability": {
+    "method_or_budget_changes_after_launch": false,
+    "case_filtering_after_outcomes": false,
+    "preflight_is_a_result_gate": false,
+    "extension_requires_new_decision": true
+  }
+}

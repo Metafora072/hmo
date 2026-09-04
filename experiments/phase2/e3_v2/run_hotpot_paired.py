@@ -240,6 +240,7 @@ def _generate_system(
     sample,
     max_new_tokens: int,
 ) -> dict:
+    started = time.perf_counter()
     state = run_post_intervention_prompt(
         model,
         prompt,
@@ -256,6 +257,7 @@ def _generate_system(
         "generated_text": answer.text,
         "generated_token_ids": [int(value) for value in answer.token_ids[0].tolist()],
         "post_query_resident_kv_bytes": int(resident_bytes),
+        "system_elapsed_seconds": time.perf_counter() - started,
     }
     del state
     _cleanup_cuda()

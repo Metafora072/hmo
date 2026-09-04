@@ -1,5 +1,9 @@
 # Experiment Plan
 
+> **Current-plan pointer (2026-09-05):** this file preserves the completed
+> P2--P8 development history. Future large-model execution is governed by
+> `C3_EXPERIMENT_PLAN.md` and machine-readable `c3_27b_protocol.json`.
+
 **Problem**: prospective validation of query-conditioned recurrent-state-aware exact-KV allocation
 
 **Method**: frozen dual-confidence abstention V2

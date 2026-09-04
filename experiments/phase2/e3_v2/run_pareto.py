@@ -1,4 +1,4 @@
-"""Frozen 0.8B quality-memory Pareto evaluation for HMO."""
+"""Frozen quality-memory Pareto evaluation for HMO."""
 from __future__ import annotations
 
 import argparse
@@ -13,6 +13,11 @@ from typing import Mapping, Sequence
 import numpy as np
 import torch
 
+from experiments.phase2.e3_v2.c3_protocol import (
+    C3_SCHEMA,
+    load_c3_protocol,
+    pareto_protocol_view,
+)
 from experiments.phase2.e3_v2.context_query import (
     full_kv_intervention,
     generate_greedy,
@@ -104,6 +109,13 @@ def load_pareto_protocol(path: Path) -> tuple[dict, str]:
     except (OSError, json.JSONDecodeError) as exc:
         raise OracleContractError(f"cannot read Pareto protocol: {path}") from exc
 
+    if payload.get("schema_version") == C3_SCHEMA:
+        try:
+            c3_payload, protocol_sha, _ = load_c3_protocol(path, PROJECT_ROOT)
+        except ValueError as exc:
+            raise OracleContractError(str(exc)) from exc
+        return pareto_protocol_view(c3_payload), protocol_sha
+
     method = payload.get("method", {})
     stages = payload.get("stages", {})
     shapes = {
@@ -188,7 +200,11 @@ def _load_completed(path: Path) -> list[dict]:
     return rows
 
 
-def summarize_pareto_results(rows: Sequence[Mapping]) -> dict:
+def summarize_pareto_results(
+    rows: Sequence[Mapping],
+    system_names: Sequence[str] = SYSTEMS,
+    equal_byte_systems: Sequence[str] = EQUAL_BYTE_SYSTEMS,
+) -> dict:
     if not rows:
         raise OracleContractError("Pareto summary requires result rows")
     by_budget = {}
@@ -196,14 +212,14 @@ def summarize_pareto_results(rows: Sequence[Mapping]) -> dict:
         selected = [
             row for row in rows if float(row["budget_fraction"]) == fraction
         ]
-        systems = {
+        system_metrics = {
             system: {
                 metric: float(
                     np.mean([row["systems"][system][metric] for row in selected])
                 )
                 for metric in METRICS
             }
-            for system in SYSTEMS
+            for system in system_names
         }
         mean_resident = {
             system: float(
@@ -214,12 +230,12 @@ def summarize_pareto_results(rows: Sequence[Mapping]) -> dict:
                     ]
                 )
             )
-            for system in SYSTEMS
+            for system in system_names
         }
         by_budget[_budget_key(fraction)] = {
             "budget_fraction": fraction,
             "case_count": len(selected),
-            "systems": systems,
+            "systems": system_metrics,
             "by_stage_dataset": {
                 f"{stage}/{dataset}": {
                     "case_count": sum(
@@ -240,7 +256,7 @@ def summarize_pareto_results(rows: Sequence[Mapping]) -> dict:
                             )
                             for metric in METRICS
                         }
-                        for system in SYSTEMS
+                        for system in system_names
                     },
                 }
                 for stage, dataset in sorted(
@@ -251,7 +267,7 @@ def summarize_pareto_results(rows: Sequence[Mapping]) -> dict:
                 f"contiguous_cf_vs_{system}": _pair_summary(
                     selected, "contiguous_cf", system
                 )
-                for system in SYSTEMS
+                for system in system_names
                 if system != "contiguous_cf"
             },
             "mean_post_query_resident_kv_bytes": mean_resident,
@@ -269,13 +285,13 @@ def summarize_pareto_results(rows: Sequence[Mapping]) -> dict:
                         ]
                     )
                 )
-                for system in SYSTEMS
+                for system in system_names
             },
             "equal_resident_byte_cases": sum(
                 len(
                     {
                         row["systems"][system]["post_query_resident_kv_bytes"]
-                        for system in EQUAL_BYTE_SYSTEMS
+                        for system in equal_byte_systems
                     }
                 )
                 == 1
@@ -301,6 +317,7 @@ def _generate_system(
     sample,
     max_new_tokens,
 ):
+    started = time.perf_counter()
     state = run_post_intervention_prompt(
         model,
         prompt,
@@ -320,10 +337,52 @@ def _generate_system(
         "generated_text": answer.text,
         "generated_token_ids": [int(value) for value in answer.token_ids[0].tolist()],
         "post_query_resident_kv_bytes": int(resident_bytes),
+        "system_elapsed_seconds": time.perf_counter() - started,
     }
     del state
     _cleanup_cuda()
     return payload
+
+
+def resolve_pareto_stage_set(
+    protocol: Mapping, stage_set: str
+) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...], tuple[float, ...]]:
+    stage_sets = protocol.get("stage_sets", STAGE_SETS)
+    if stage_set not in stage_sets:
+        raise OracleContractError(f"unknown Pareto stage set: {stage_set}")
+    stage_names = tuple(stage_sets[stage_set])
+    if not stage_names or any(
+        stage not in protocol["stages"] for stage in stage_names
+    ):
+        raise OracleContractError("Pareto stage set references unknown stages")
+    systems_by_stage = {
+        tuple(protocol["stages"][stage].get("systems", protocol["systems"]))
+        for stage in stage_names
+    }
+    budgets_by_stage = {
+        tuple(
+            float(value)
+            for value in protocol["stages"][stage].get(
+                "budget_fractions", protocol["budget_fractions"]
+            )
+        )
+        for stage in stage_names
+    }
+    if len(systems_by_stage) != 1 or len(budgets_by_stage) != 1:
+        raise OracleContractError(
+            "Pareto stages in one run must share systems and budgets"
+        )
+    systems = next(iter(systems_by_stage))
+    if "full_kv_reference" not in systems:
+        raise OracleContractError("Pareto run requires a Full-KV reference")
+    equal_byte_systems = tuple(
+        name for name in protocol["equal_byte_systems"] if name in systems
+    )
+    if not equal_byte_systems or set(systems) != set(equal_byte_systems) | {
+        "full_kv_reference"
+    }:
+        raise OracleContractError("Pareto stage contains unsupported system subset")
+    return stage_names, systems, equal_byte_systems, next(iter(budgets_by_stage))
 
 
 def run(args: argparse.Namespace) -> dict:
@@ -336,9 +395,10 @@ def run(args: argparse.Namespace) -> dict:
     ):
         raise OracleContractError("model identity disagrees with Pareto protocol")
 
-    stage_names = STAGE_SETS[args.stage_set]
+    stage_names, systems, equal_byte_systems, fractions = resolve_pareto_stage_set(
+        protocol, args.stage_set
+    )
     method = protocol["method"]
-    fractions = tuple(float(value) for value in protocol["budget_fractions"])
     run_dir = Path(args.run_dir).resolve()
     probe_cache_dir = Path(args.probe_cache_dir).resolve()
     model_path = Path(args.model_path).resolve()
@@ -362,11 +422,11 @@ def run(args: argparse.Namespace) -> dict:
         selections={
             "scope": (
                 "operational_smoke_excluded_from_claims"
-                if args.stage_set == "smoke"
+                if args.stage_set in {"smoke", "preflight"}
                 else "matched_confirmation_suite_pareto"
             ),
-            "systems": list(SYSTEMS),
-            "equal_byte_systems": list(EQUAL_BYTE_SYSTEMS),
+            "systems": list(systems),
+            "equal_byte_systems": list(equal_byte_systems),
             "primary_comparisons": protocol["primary_comparisons"],
             "budget_fractions": list(fractions),
             "allocator_schema": ALLOCATION_SCHEMA,
@@ -399,7 +459,9 @@ def run(args: argparse.Namespace) -> dict:
     torch.set_float32_matmul_precision("highest")
     torch.cuda.reset_peak_memory_stats()
     started = time.perf_counter()
+    model_load_started = time.perf_counter()
     model, tokenizer = _load_model(model_path)
+    model_load_seconds = time.perf_counter() - model_load_started
     attention_layers = tuple(get_full_attention_indices(model.config))
     recurrent_layers = tuple(get_linear_attention_indices(model.config))
     if not attention_layers or not recurrent_layers:
@@ -434,6 +496,7 @@ def run(args: argparse.Namespace) -> dict:
         if not missing_fractions:
             continue
         stage_config = protocol["stages"][stage]
+        sample_prepare_started = time.perf_counter()
         prompt = tokenize_sample_prompt(sample, tokenizer)
         with torch.no_grad():
             context_outputs = model.model(
@@ -480,6 +543,7 @@ def run(args: argparse.Namespace) -> dict:
         )
         del probe
         _cleanup_cuda()
+        sample_prepare_seconds = time.perf_counter() - sample_prepare_started
 
         existing = next(
             (
@@ -616,12 +680,12 @@ def run(args: argparse.Namespace) -> dict:
                     sample,
                     protocol["max_new_tokens"],
                 )
-                for name in EQUAL_BYTE_SYSTEMS
+                for name in equal_byte_systems
             }
             generated["full_kv_reference"] = dict(full_generated)
             equal_resident = {
                 generated[name]["post_query_resident_kv_bytes"]
-                for name in EQUAL_BYTE_SYSTEMS
+                for name in equal_byte_systems
             }
             compressed_expected = exact_plan.total_charged_bytes + query_kv_bytes
             if equal_resident != {compressed_expected}:
@@ -630,7 +694,7 @@ def run(args: argparse.Namespace) -> dict:
                 )
 
             compressed_cap = exact_plan.total_budget_limit_bytes + query_kv_bytes
-            for name in EQUAL_BYTE_SYSTEMS:
+            for name in equal_byte_systems:
                 generated[name].update(
                     {
                         "post_query_budget_limit_bytes": compressed_cap,
@@ -648,7 +712,7 @@ def run(args: argparse.Namespace) -> dict:
                 segment.segment_id for segment in segments if segment.protected
             }
             middle_retained_tokens = exact_plan.middle_charged_bytes // token_unit_bytes
-            plans = {
+            all_plans = {
                 "contiguous_cf": {
                     "allocation": exact_plan.to_dict(),
                     "retention": position_plans["contiguous_cf"].to_dict(),
@@ -691,6 +755,7 @@ def run(args: argparse.Namespace) -> dict:
                     ),
                 },
             }
+            plans = {name: all_plans[name] for name in equal_byte_systems}
             for name, plan_payload in plans.items():
                 plan_payload["active_positions_sha256"] = retained_positions_sha256(
                     position_plans[name].active_positions
@@ -706,6 +771,7 @@ def run(args: argparse.Namespace) -> dict:
                 "budget_key": _budget_key(fraction),
                 "raw_alpha_selection": raw_selection,
                 "query_probe": query_probe_provenance,
+                "sample_prepare_seconds": sample_prepare_seconds,
                 "byte_accounting": {
                     "token_kv_bytes": token_unit_bytes,
                     "query_kv_bytes": query_kv_bytes,
@@ -722,15 +788,10 @@ def run(args: argparse.Namespace) -> dict:
             print(
                 f"[{case_index}/{len(cases)}] {stage} {sample.dataset} "
                 f"{sample.sample_id} {_budget_key(fraction)}: "
-                f"hmo={generated['contiguous_cf']['normalized_answer_contains']:.0f} "
-                "fixed="
-                f"{generated['global_fixed_chunk_topk']['normalized_answer_contains']:.0f} "
-                "raw+slack="
-                f"{generated['raw_alpha_exact_slack']['normalized_answer_contains']:.0f} "
-                f"scattered={generated['scattered_cf']['normalized_answer_contains']:.0f} "
-                "sparse="
-                f"{generated['contiguous_sparse_only']['normalized_answer_contains']:.0f} "
-                f"full={generated['full_kv_reference']['normalized_answer_contains']:.0f}",
+                + " ".join(
+                    f"{name}={generated[name]['normalized_answer_contains']:.0f}"
+                    for name in systems
+                ),
                 flush=True,
             )
 
@@ -757,14 +818,15 @@ def run(args: argparse.Namespace) -> dict:
         "status": "complete",
         "scope": (
             "operational_smoke_excluded_from_claims"
-            if args.stage_set == "smoke"
+            if args.stage_set in {"smoke", "preflight"}
             else "matched_confirmation_suite_pareto"
         ),
         "manifest_id": manifest["manifest_id"],
         "protocol_sha256": protocol_sha,
-        "analysis": summarize_pareto_results(rows),
+        "analysis": summarize_pareto_results(rows, systems, equal_byte_systems),
         "runtime": {
             "elapsed_seconds": time.perf_counter() - started,
+            "model_load_seconds": model_load_seconds,
             "gpu_name": torch.cuda.get_device_name(0),
             "max_memory_allocated_bytes": torch.cuda.max_memory_allocated(),
             "max_memory_reserved_bytes": torch.cuda.max_memory_reserved(),
@@ -783,9 +845,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol", required=True)
     parser.add_argument("--run-dir", required=True)
     parser.add_argument("--probe-cache-dir", required=True)
-    parser.add_argument(
-        "--stage-set", choices=tuple(STAGE_SETS), default="formal"
-    )
+    parser.add_argument("--stage-set", default="formal")
     parser.add_argument("--resume", action="store_true")
     return parser.parse_args()
 

@@ -360,6 +360,20 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 3. 原生任务 external result-to-claim 复核可由 GPT/Opus 基于 OpenChat 报告
    完成，但不作为继续整理 C3 runbook 的严格 Gate。
 
+### C3 已冻结执行包（尚无 27B 结果）
+
+- 目标模型为 Qwen3.5-27B BF16，固定 revision
+  `fc05daec18b0a78c049392ed2e771dde82bdf654`，单张 80GB GPU。
+- 先跑一条 exact-32K Needle 的 HMO+Full 两-cell preflight，只测可运行性、
+  显存与耗时，不按答案质量设 Gate。
+- 必跑核心缩为 432 generation cells：24 条 exact-32K Needle/LongEval 在
+  5%/10%/20% 下的 312 cells，以及同一批 C2 原生 QA 的 120 cells。
+- 原 GPT 方案约 1,080 cells 的规模降为可选扩展，不占用首次付费预算。
+- 冻结协议：`refine-logs/c3_27b_protocol.json`；当前 runbook：
+  `experiments/C3_27B_ONE_SHOT_RUNBOOK.md`。
+- 当前只完成零 GPU 实现和协议校验。27B 权重下载、租卡与 GPU 执行均未启动，
+  需要 PZ 在 preflight 前确认资源，并在实测费用投影后确认核心运行。
+
 
 ## 执行原则
 

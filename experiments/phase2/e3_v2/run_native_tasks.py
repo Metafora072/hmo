@@ -12,6 +12,12 @@ from typing import Mapping, Sequence
 
 import torch
 
+from experiments.phase2.e3_v2.c3_protocol import (
+    C3_MODEL_ID,
+    C3_SCHEMA,
+    load_c3_protocol,
+    native_protocol_view,
+)
 from experiments.phase2.e3_v2.context_query import (
     full_kv_intervention,
     tokenize_sample_prompt_aligned,
@@ -88,6 +94,16 @@ def load_native_protocol(path: Path) -> tuple[dict, str]:
     except (OSError, json.JSONDecodeError) as exc:
         raise OracleContractError(f"cannot read native LongBench protocol: {path}") from exc
 
+    is_c3 = payload.get("schema_version") == C3_SCHEMA
+    if is_c3:
+        try:
+            c3_payload, protocol_sha, parent = load_c3_protocol(path, PROJECT_ROOT)
+        except ValueError as exc:
+            raise OracleContractError(str(exc)) from exc
+        payload = native_protocol_view(c3_payload, parent)
+    else:
+        protocol_sha = _sha256_bytes(encoded)
+
     method = payload.get("method", {})
     selection = payload.get("selection", {})
     execution = payload.get("execution", {})
@@ -111,10 +127,12 @@ def load_native_protocol(path: Path) -> tuple[dict, str]:
         "protected_suffix_segments": 1,
     }
     if (
-        payload.get("schema_version") != PROTOCOL_SCHEMA
-        or payload.get("status") != "frozen_before_outcomes"
+        payload.get("schema_version") != (C3_SCHEMA if is_c3 else PROTOCOL_SCHEMA)
+        or payload.get("status")
+        != ("frozen_before_27b_outcomes" if is_c3 else "frozen_before_outcomes")
         or payload.get("purpose") != "native_non_augmented_real_task_external_validity"
-        or payload.get("model_id") != "Qwen/Qwen3.5-0.8B"
+        or payload.get("model_id")
+        != (C3_MODEL_ID if is_c3 else "Qwen/Qwen3.5-0.8B")
         or not payload.get("model_revision")
         or tuple(payload.get("systems", ())) != SYSTEMS
         or tuple(payload.get("equal_byte_systems", ())) != EQUAL_BYTE_SYSTEMS
@@ -176,7 +194,7 @@ def load_native_protocol(path: Path) -> tuple[dict, str]:
             )
         ):
             raise OracleContractError(f"native LongBench dataset mismatch: {name}")
-    return payload, _sha256_bytes(encoded)
+    return payload, protocol_sha
 
 
 def select_longest_candidates(

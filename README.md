@@ -2,7 +2,9 @@
 
 Hybrid Memory Orchestration(HMO) 是一个面向 hybrid-attention LLM 的无训练推理时记忆控制器。它联合使用 DeltaNet recurrent-state saturation 与 full-attention dependence 信号，在固定 Attention KV 字节预算下，为长上下文 segment 分配 `KV`、`Refresh`、`RTS` 或 `Drop` 动作。
 
-当前论文主线聚焦证据型长上下文问答与检索。已有正式结果以 Qwen3.5-27B、32K context、10% middle-KV budget 为核心设置。
+当前论文主线聚焦证据型长上下文问答与检索。已有正式证据覆盖
+Qwen3.5-0.8B/9B 的 8K--16K 机制任务，以及 0.8B 原生 LongBench QA；
+Qwen3.5-27B/32K 是已经冻结、尚未付费执行的 C3 最终验证包。
 
 ## 目录
 
@@ -23,7 +25,10 @@ Hybrid Memory Orchestration(HMO) 是一个面向 hybrid-attention LLM 的无训�
 
 本机路径、Conda 环境和缓存位置通过环境变量配置。可从 `env.example.sh` 建立本地的 `env.local.sh`，后者已被 `.gitignore` 排除。
 
-正式单卡环境和模型准备流程见 [experiments/PHASE2_A100_RUNBOOK.md](experiments/PHASE2_A100_RUNBOOK.md)。当前代码支持通过以下变量覆盖部署路径：
+C3 正式单卡环境和模型准备流程见
+[experiments/C3_27B_ONE_SHOT_RUNBOOK.md](experiments/C3_27B_ONE_SHOT_RUNBOOK.md)。
+旧 [experiments/PHASE2_A100_RUNBOOK.md](experiments/PHASE2_A100_RUNBOOK.md)
+仅用于 V6.1 历史复现。当前代码支持通过以下变量覆盖部署路径：
 
 - `HMO_PROJECT_ROOT`
 - `HMO_DATA_ROOT`
@@ -40,23 +45,17 @@ Hybrid Memory Orchestration(HMO) 是一个面向 hybrid-attention LLM 的无训�
 python experiments/test_controller.py
 ```
 
-Phase 2 预检：
+C3 零 GPU 协议检查：
 
 ```bash
-bash experiments/phase2/run_single_a100.sh preflight
+HMO_PYTHON=/path/to/hmo/python bash experiments/phase2/run_c3_27b.sh validate
 ```
 
-最小 E1：
+历史 Phase 2 入口需要显式设置 `HMO_ALLOW_LEGACY_PHASE2=1`，不应混入 C3。
+最小 C3 GPU preflight 在获得租卡/下载确认后执行：
 
 ```bash
-python experiments/phase2/e1_main/run.py \
-  --model qwen3.5-0.8b \
-  --gpu_id 0 \
-  --n_samples 2 \
-  --benchmarks needle \
-  --context-lengths 8192 \
-  --methods full_kv,hmo_full \
-  --run-name smoke_check
+CUDA_VISIBLE_DEVICES=0 bash experiments/phase2/run_c3_27b.sh preflight
 ```
 
 ## Git 边界
