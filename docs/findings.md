@@ -1,5 +1,31 @@
 # Research Findings
 
+## 2026-09-04: Fresh Contiguous Coverage-Fidelity Confirmation
+
+- Result-to-claim verdict: `partial`, medium confidence.
+- Evidence: 48 fresh, unfiltered Qwen3.5-0.8B samples across 8K/16K Needle and
+  LongEval-Lines under a frozen 10% middle-KV protocol.
+- Contiguous CF versus scattered CF at exactly equal resident bytes: 34/48
+  versus 27/48, +14.58 pp [+6.25,+25.00], 7 wins/41 ties/0 losses, exact sign
+  p=0.0156. The advantage is positive at both lengths.
+- Contiguous CF versus raw-alpha Exact Top-K: 34/48 versus 32/48, +4.17 pp
+  [-4.17,+12.50], 3 wins/44 ties/1 loss, p=0.6250. Raw uses 1.22% fewer
+  resident bytes because whole-segment selection leaves rounding slack.
+- Contiguous CF versus contiguous Sparse-only: 34/48 versus 32/48, +4.17 pp
+  [-8.33,+16.67], p=0.7539. Exact upgrades are not separately validated.
+- Memory: contiguous CF uses 13.383% of Full-KV resident bytes and scores
+  70.83%, versus Full KV at 72.92%.
+- Supported claim: contiguous max-attention-mass windows preserve useful local
+  evidence better than scattered top-attention tokens at equal bytes in this
+  model and synthetic suite.
+- Unsupported: a strong win over raw Exact, recurrent-aware allocation,
+  cross-task/model generality, or necessity of the fidelity upgrade.
+- Constraint: do not retune on these confirmation labels. Next evidence should
+  address raw byte matching/Pareto, another fresh seed, and a less-synthetic
+  task as needed.
+- Full report:
+  openchat/codex/share/2026-09-04/contiguous_cf_fresh_confirmation_report.md
+
 ## 2026-09-03: One-Swap Boundary Exchange Offline Screen
 
 - Verdict for the exact policy: `no`; stop without a fresh GPU confirmation.
