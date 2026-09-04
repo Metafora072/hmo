@@ -139,3 +139,30 @@ python -m experiments.phase2.e3_v2.run_stratified_fixed_control \
   $COMMON_ARGS --stage-set formal \
   --run-dir /mnt/nvme0/hmo/runs/stratified_fixed_control_formal
 ```
+
+## Qwen3.5-0.8B HotpotQA-32K-Aug Full-KV solvability
+
+The pinned LongBench HotpotQA split has no native 32K examples. This runner
+preserves a frozen base record and appends a second real HotpotQA context as a
+post-target distractor, truncating only the distractor tail to reach a 32,768
+token serialized memory context. It runs Full KV only and uses the vendored
+official LongBench QA F1; it does not automatically launch a compressed arm.
+
+```bash
+source /home/pz/miniconda3/etc/profile.d/conda.sh
+conda activate hmo_research_v6
+export CUDA_VISIBLE_DEVICES=1
+
+COMMON_ARGS="--model-path /mnt/nvme0/hmo/models/Qwen3.5-0.8B \
+  --model-revision 2fc06364715b967f1860aea9cf38778875588b17 \
+  --archive /mnt/nvme0/hmo/datasets/LongBench/5e628be450b7e67fb7ae6e201bd6d8f7056f7672/data.zip \
+  --protocol refine-logs/hotpotqa_32k_solvability_protocol.json"
+
+python -m experiments.phase2.e3_v2.run_hotpot_solvability \
+  $COMMON_ARGS --stage-set smoke \
+  --run-dir /mnt/nvme0/hmo/runs/hotpotqa_32k_solvability_smoke
+
+python -m experiments.phase2.e3_v2.run_hotpot_solvability \
+  $COMMON_ARGS --stage-set formal \
+  --run-dir /mnt/nvme0/hmo/runs/hotpotqa_32k_solvability_formal
+```

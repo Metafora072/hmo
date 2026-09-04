@@ -146,3 +146,35 @@ LongEval. Together with the parent Global Fixed result of 16/24, this provides
 directional support for both macro organization and free-start placement, but
 the sample-level gains are complementary rather than a nested additive ladder.
 The result-to-claim verdict is `partial/supplement` with medium confidence.
+
+## P6 HotpotQA-32K-Aug Full-KV Solvability
+
+**Protocol**: `hotpotqa_32k_solvability_protocol.json`
+
+### Purpose
+
+Determine whether Qwen3.5-0.8B can answer any real HotpotQA questions at a 32K
+memory-context length before spending GPU time on matched compressed systems.
+This is a model/task routing check, not HMO evidence.
+
+LongBench HotpotQA contains no native 32K records under the pinned Qwen3.5
+tokenizer: its 200 contexts range from roughly 1.8K to 17.7K tokens. The frozen
+`HotpotQA-32K-Aug` variant therefore keeps each selected base context, question,
+and all gold answers unchanged, then appends a second real HotpotQA context as a
+post-target distractor. Only the distractor tail may be truncated to fit 32,768
+serialized memory-context tokens. Dataset/archive and record SHA-256 values are
+frozen before generation outcomes.
+
+### Run Order
+
+| Run | Split | Interpretation | Priority |
+|---|---|---|---|
+| P6-S | first frozen case, Full KV only | operational smoke, excluded from claims | MUST |
+| P6-F | four frozen cases, Full KV only | descriptive solvability/routing evidence | MUST |
+
+The primary metric is the pinned official LongBench QA F1. Normalized exact
+match and answer containment are secondary diagnostics. One or more nonzero-F1
+cases is initial evidence that the path is viable; two or more is stronger
+support for proposing a matched compressed pilot. These are descriptive routing
+signals, not hard scientific gates. No compressed experiment starts
+automatically after P6.

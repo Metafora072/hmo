@@ -1,0 +1,68 @@
+{
+  "schema_version": "hmo.hotpotqa_32k_solvability_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "purpose": "full_kv_solvability_only_before_any_compressed_hotpotqa_arm",
+  "model_id": "Qwen/Qwen3.5-0.8B",
+  "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "dataset": {
+    "archive_sha256": "cb45b11a4133c6bc1d6a44b0f8e701335ff1e543195db1103472e575857f7f64",
+    "archive_type": "zip",
+    "member": "data/hotpotqa.jsonl",
+    "metric": "qa_f1_score",
+    "metric_revision": "2e00731f8d0bff23dc4325161044d0ed8af94c1e",
+    "repository": "zai-org/LongBench",
+    "revision": "5e628be450b7e67fb7ae6e201bd6d8f7056f7672"
+  },
+  "benchmark_variant": "longbench_hotpotqa_32k_aug",
+  "construction": {
+    "base_context_unchanged": true,
+    "boundary_alignment": "if_one_token_crosses_the_semantic_context_boundary_move_that_complete_token_into_memory_context",
+    "candidate_selection": "four_longest_base_records_selected_by_token_length_before_outcomes",
+    "delimiter": "\n\n[Additional distractor passages begin]\n\n",
+    "distractor_source": "another_real_hotpotqa_context",
+    "distractor_truncation": "tail_only_after_tokenizer_decode_of_longest_fitting_prefix",
+    "gold_answer_source": "base_record_answers_unchanged",
+    "max_memory_context_tokens": 32768,
+    "max_shortfall_tokens": 2,
+    "outcome_conditioned_selection": false,
+    "record_sha256_semantics": "sha256_of_raw_jsonl_record_bytes_without_line_ending"
+  },
+  "generation": {
+    "decoding": "greedy",
+    "inference_seed": 20261013,
+    "max_new_tokens": 32
+  },
+  "system": "full_kv_reference",
+  "execution": {
+    "formal_case_count": 4,
+    "smoke_case_count": 1,
+    "automatic_compressed_continuation": false,
+    "routing_interpretation": "one_or_more_nonzero_f1_cases_is_initial_solvability_evidence; two_or_more_is_stronger_support_for_a_matched_compressed_pilot"
+  },
+  "cases": [
+    {
+      "base_index": 29,
+      "base_record_sha256": "ccb11a748de89dad465b1674d089a4f57bbdb7c4d8c8a08fb7ed088b75200fab",
+      "donor_index": 168,
+      "donor_record_sha256": "bb0f13e6eda5cb35b2353edbed7fea86c388d32ba3b6c09525bd02effc96906c"
+    },
+    {
+      "base_index": 119,
+      "base_record_sha256": "bfa8f8b3425b58d10456a43c88b6b53107408403584c3e6fc741c749bba4891d",
+      "donor_index": 2,
+      "donor_record_sha256": "1389812e4fafd99943a7e0d59dfe8ea3c3a3fa34fb618af966c9bcf3445796ca"
+    },
+    {
+      "base_index": 84,
+      "base_record_sha256": "a06fb7a11934ee85104fcb3c19789180a73d25383993f4b08394841f8ee66794",
+      "donor_index": 96,
+      "donor_record_sha256": "ba6887910fc7eacd6ed8c53e0134e11eb7c6b169a462c4665ff9665292aad70e"
+    },
+    {
+      "base_index": 108,
+      "base_record_sha256": "1df91de22fe19514291d6a6e59441a8873f7b58f62a997b0bd7a43381555fe34",
+      "donor_index": 30,
+      "donor_record_sha256": "4e71cd30b435b09e8000dac0a4951fd76223ba255358c5099e02020d650b1ba8"
+    }
+  ]
+}
