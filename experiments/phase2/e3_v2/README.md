@@ -69,14 +69,14 @@ source /home/pz/miniconda3/etc/profile.d/conda.sh
 conda activate hmo_research_v6
 export CUDA_VISIBLE_DEVICES=1
 
-python experiments/phase2/e3_v2/run_scale_transfer.py \
+python -m experiments.phase2.e3_v2.run_scale_transfer \
   --model-path /mnt/nvme0/hmo/models/Qwen3.5-9B \
   --model-revision c202236235762e1c871ad0ccb60c8ee5ba337b9a \
   --protocol refine-logs/contiguous_cf_scale_transfer_9b_protocol.json \
   --stage-set smoke \
   --run-dir /mnt/nvme0/hmo/runs/contiguous_cf_scale9b_smoke
 
-python experiments/phase2/e3_v2/run_scale_transfer.py \
+python -m experiments.phase2.e3_v2.run_scale_transfer \
   --model-path /mnt/nvme0/hmo/models/Qwen3.5-9B \
   --model-revision c202236235762e1c871ad0ccb60c8ee5ba337b9a \
   --protocol refine-logs/contiguous_cf_scale_transfer_9b_protocol.json \
