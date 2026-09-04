@@ -14,5 +14,5 @@
 | PB-P | Structured-baseline Pareto | matched 48-case 8K/16K suite, 5/10/20% | DONE; 144/144 budget cases, verdict partial/supplement |
 | P5-S | Stratified Fixed-Chunk smoke | first frozen Needle at 16K/10% | DONE; parent plan exact, equal bytes, 56/60 Sparse windows changed |
 | P5-P | Free-start mechanism isolation | frozen 12+12 suite at 16K/10% | DONE; HMO 18/24 vs aligned 17/24, verdict partial/supplement |
-| P6-S | HotpotQA-32K-Aug Full-KV smoke | first frozen real-task augmented case | READY; protocol frozen before outcomes |
+| P6-S | HotpotQA-32K-Aug Full-KV smoke | first frozen real-task augmented case | DONE; 32K exact, official F1 0.3333, exit 0 |
 | P6-F | HotpotQA-32K-Aug solvability | four frozen Full-KV cases | READY; no automatic compressed continuation |
