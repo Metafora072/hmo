@@ -155,3 +155,28 @@
   oracle-to-generation mismatch before defining a new prospective method.
 - Full report:
   openchat/codex/share/2026-09-03/query_accessibility_v2_end_task_report.md
+
+## 2026-09-04: Package B Structured-Baseline Pareto
+
+- Result-to-claim verdict: `partial`, route `supplement`, high confidence.
+- Evidence: Qwen3.5-0.8B, matched 48-case 8K/16K Needle and LongEval-Lines
+  suite, 5%/10%/20% middle-context caps, and five compressed arms with exact
+  measured resident-byte equality in 48/48 cases at every cap.
+- HMO/Fixed/Raw+Slack/Scattered/Sparse-only/Full correct counts were
+  `30/36/30/21/30/35` at 5%, `34/36/32/27/32/35` at 10%, and
+  `35/35/35/36/33/35` at 20%.
+- Supported: HMO beats Scattered at 5% by +18.75 pp (9 wins, 0 losses,
+  sign p=.0039) and at 10% by +14.58 pp (7 wins, 0 losses, sign p=.0156).
+- Partial support: at 10% and 16K, HMO beats Fixed 18/24 to 16/24; on 16K
+  LongEval it is 8/12 versus 6/12 for Fixed, Raw, and Full.
+- Unsupported: an unconditional HMO win over fixed chunks. Fixed wins overall
+  at 5% (36/48 versus 30/48), remains ahead at 10% (36/48 versus 34/48), and
+  ties at 20%.
+- Budget interpretation: 5% is below the approximately 6.25% full-coverage
+  floor and HMO equals Sparse-only in 48/48 cases; 10% activates full
+  macro-segment coverage and shows a 16K benefit; 20% is largely saturated.
+- The Fixed comparison changes both global/stratified allocation and
+  fixed/free-start placement, so it does not isolate free-start alone.
+- Next evidence: one low-cost 16K/10% Stratified Fixed-Chunk control under the
+  identical HMO allocation and bytes, followed by realistic-task transfer.
+- Full report: experiments/results/PARETO_PACKAGE_B_20260904.md

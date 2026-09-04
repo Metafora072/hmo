@@ -10,5 +10,5 @@
 | P3-S | End-task smoke | fresh 1+1 at amended 4K | DONE, exact-byte contract passed |
 | P3-8K | Equal-byte end-task quality | fresh 12+12 at 8K | DONE, +4.17 pp; continuation gate passed |
 | P3-16K | Equal-byte end-task transfer | fresh 12+12 at 16K | DONE, -8.33 pp; final claim gate failed |
-| PB-S | Structured Pareto smoke | 1 Needle at 8K, 5/10/20% | READY; protocol and code frozen |
-| PB-P | Structured-baseline Pareto | matched 48-case 8K/16K suite, 5/10/20% | PENDING PB-S operational check |
+| PB-S | Structured Pareto smoke | 1 Needle at 8K, 5/10/20% | DONE; 3/3 budget cases, exact-byte contract passed |
+| PB-P | Structured-baseline Pareto | matched 48-case 8K/16K suite, 5/10/20% | DONE; 144/144 budget cases, verdict partial/supplement |

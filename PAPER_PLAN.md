@@ -11,9 +11,10 @@
 | Claim | Current evidence | Status | Paper location |
 |---|---|---|---|
 | Hybrid residual KV is better organized as a local high-fidelity overlay on recurrent global state | Qwen3.5 hybrid execution keeps DeltaNet state fixed while intervening only on Full-Attention KV | Architecture-grounded formulation; synergy not causally established | Introduction, Method |
-| Contiguous retention preserves complete span evidence better than scattered equal-cardinality retention | 0.8B: 34/48 vs 27/48; 9B: 23/24 vs 19/24, always exact equal bytes | Strong cross-scale synthetic evidence | Theory, Main Results |
-| HMO approaches Full-KV quality at a small KV footprint | 0.8B: 70.83% vs 72.92%; 9B: both 95.83%, at mean per-case 13.38% footprint | Supported on two model sizes | Abstract, Main Results |
-| HMO remains competitive with strong Raw Exact baselines | 9B Contiguous and Raw Exact+Slack produce identical tokens in 24/24; Raw Exact is 24/24 vs 23/24 on one formatting-sensitive case | Fairness baseline established; no superiority claim | Main Results, Pareto |
+| Contiguous retention preserves complete span evidence better than scattered equal-cardinality retention | 0.8B Pareto: +18.75/+14.58 pp at 5%/10%, zero losses; 20% saturates. 9B 10%: +16.67 pp | Strong cross-scale, tight/mid-budget synthetic evidence | Theory, Main Results |
+| HMO approaches Full-KV quality at a small KV footprint | 0.8B: 34/48 vs 35/48 at 13.38%, and both 35/48 at 23.01%; 9B: both 23/24 at 13.38% | Supported on two model sizes | Abstract, Main Results |
+| HMO remains competitive with strong Raw Exact baselines | 0.8B HMO/Raw+Slack: 30/30, 34/32, 35/35 across 5%/10%/20%; 9B generated tokens identical in 24/24 | Fairness baseline established; no stable superiority claim | Main Results, Pareto |
+| HMO improves over generic fixed chunks in the long-context coverage regime | Overall Fixed leads at 5%/10% and ties at 20%; at 10%/16K HMO is 18/24 vs 16/24, including LongEval 8/12 vs 6/12 | Partial, length-conditioned; needs mechanism isolation | Main Results, Ablation |
 | Exact upgrades improve contiguous coverage | 0.8B: 34/48 vs 32/48; 9B: both 23/24 with opposite one-case differences | Optional component, not primary claim | Ablation |
 | The result transfers to realistic tasks and larger Hybrid models | Current method transfers from Qwen3.5-0.8B to 9B; realistic 32K task remains pending | Model scale supported; task breadth pending | Transfer section |
 
@@ -64,11 +65,12 @@
 - Setup, tasks, model, metrics, and real cache intervention.
 - Main result table and exact byte accounting.
 - Contiguous-versus-scattered causal ablation.
-- 5%/10%/20% quality-memory Pareto with Raw Exact+Slack.
+- 5%/10%/20% quality-memory Pareto with Raw Exact+Slack and Global
+  Fixed-Chunk Top-K.
 - 32K HotpotQA transfer and official F1, subject to Full-KV solvability.
 - Qwen3.5-9B frozen transfer with Raw Exact+Slack and peak-memory reporting.
-- Global Fixed-Chunk Top-K under the same query probe and exact target bytes,
-  separating generic chunking from stratified coverage/free-start placement.
+- Stratified Fixed-Chunk at 16K/10% to separate macro-segment allocation from
+  free-start placement.
 - Latency and peak-memory table.
 
 ### Section 6: Discussion And Conclusion, 0.65 page
@@ -88,7 +90,7 @@ revision headroom.
 | ID | Type | Content | Data source | Priority |
 |---|---|---|---|---|
 | Figure 1 | Hero architecture | Hybrid memory anatomy; equal-byte retention geometry; cross-scale result | `docs/paper/HMO_FIGURE1_STORYBOARD_ZH.md` | Highest |
-| Figure 2 | Quality-memory Pareto | HMO, Global Fixed-Chunk, Raw Exact+Slack, Scattered, Full at 5%/10%/20% | Planned Pareto run | Highest |
+| Figure 2 | Quality-memory Pareto | HMO, Global Fixed-Chunk, Raw Exact+Slack, Scattered, Full at 5%/10%/20% | `experiments/results/PARETO_PACKAGE_B_20260904.md` | Highest |
 | Figure A1 | Appendix mechanism plot | Answer-span survival and per-case win/tie/loss across 8K/16K | Fresh confirmation JSON | Appendix |
 | Table 1 | Main results | Quality, token F1, resident bytes, footprint, task/length groups | 0.8B fresh confirmation + 9B transfer | Highest |
 | Table A1 | Appendix ablation | Contiguous, Scattered, Sparse-only, optional Exact, anchors | Fresh confirmation and limited additions | Appendix |
@@ -106,7 +108,7 @@ The abstract must contain the residual KV problem, dual-memory role mismatch,
 contiguous overlay, span-survival proposition, the 14.58/16.67 pp cross-scale
 equal-byte results, and the 13.38% footprint with near-Full quality. It must not
 claim sublinear memory, recurrent-aware allocation, realistic-task transfer,
-or superiority over Raw Exact.
+or superiority over Raw Exact or fixed-boundary chunks.
 
 Draft source: `docs/paper/HMO_ABSTRACT_ZH.md`.
 
@@ -147,6 +149,10 @@ All formal metadata and BibTeX must be verified before use.
   principle rather than a proven synergy, that the abstract name the synthetic
   suite, that fidelity remain optional, and that the main-body plan leave
   formatting headroom.
+- Package B completed the frozen structured-baseline Pareto. Independent
+  result-to-claim review returned `partial/supplement` with high confidence:
+  contiguous versus scattered is supported at 5-10%, while fixed-chunk
+  superiority is length-conditioned and requires one mechanism control.
 
 ## Next Steps
 
@@ -154,8 +160,8 @@ All formal metadata and BibTeX must be verified before use.
 - [x] Audit closest work and freeze the revised contribution/method boundary.
 - [x] Specify Figure 1 and add the post-hoc format-robust secondary analysis.
 - [x] Implement Raw Exact+Slack and complete the frozen 10% Qwen3.5-9B transfer.
-- [ ] Add Global Fixed-Chunk Top-K, then run the 5%/10%/20% Pareto package
-  after PZ approval.
+- [x] Add Global Fixed-Chunk Top-K and complete the 5%/10%/20% Pareto package.
+- [ ] Add the 16K/10% Stratified Fixed-Chunk mechanism control after PZ approval.
 - [ ] Add 32K HotpotQA transfer after PZ approval.
 - [ ] Generate Figure 1 and the current-results plots.
 - [ ] Verify citations and construct the bibliography.
