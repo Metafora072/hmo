@@ -31,6 +31,23 @@ quantity。该处理能够保留较高的 attention mass，却可能把一个完
 关系拆成彼此孤立的 token。HMO 针对的是 importance retention 与 relational
 completeness 之间的错配。
 
+### Closest-work 后的新颖性边界
+
+ChunkKV 已经提出用连续 fixed-boundary chunks 缓解离散 token compression
+造成的语义破碎；SentenceKV、ProtoKV 和 Kara 也覆盖了 sentence、semantic
+cluster 和 flexible chunk。因此 HMO 不再声称首次发现 locality 或首次使用
+chunk。
+
+当前差异收敛为 Hybrid residual-memory organization：HMO 在不改变 recurrent
+state 的前提下，将 Full-Attention KV 组织成 stratified local overlay。
+它先在 macro-segments 间执行 coverage-first 分配，再在 segment 内选择
+query-guided free-start window，最后才执行可选 Exact fidelity。完整审计见
+`docs/design/HMO_METHOD_AND_NOVELTY_DOSSIER_ZH.md`。
+
+现有 equal-byte scattered 对照隔离了 retention geometry 的因果效应，但尚未
+证明 HMO 优于已有 structured chunk 方法；下一轮应加入 Global Fixed-Chunk
+Top-K。
+
 ### V6.1 与当前版本的关系
 
 V6.1 与当前版本拥有相同的系统对象、显存目标和双记忆视角。V6.1 试图用
@@ -45,19 +62,25 @@ state 提供全局、有损、低成本的上下文基础，KV overlay 保留 qu
 
 1. 固定保护 prefix 与 suffix anchor。
 2. 将中间上下文划分为长度为 256 token 的 segment。
-3. 在覆盖阶段，为 segment 保留一个由 query attention 选择的连续窗口。
+3. 在覆盖阶段，为可负担的 segment 保留一个由 query attention 选择的连续
+   窗口；预算足够时先覆盖全部 eligible segments，否则优先覆盖高需求
+   segments。
 4. 在 fidelity 阶段，将少量高需求 segment 从 Sparse 升级为 Exact KV。
-5. 在整个执行过程中保持 DeltaNet recurrent state 不变，并按真实 resident
+5. 将不足以完成 upgrade 的逐 token slack 用于扩展 Sparse window。
+6. 在整个执行过程中保持 DeltaNet recurrent state 不变，并按真实 resident
    KV bytes 进行预算核算。
 
 当前实验配置使用 16-token contiguous window 和 10% eligible-middle cap。
 Exact upgrade 是框架中的可选 fidelity 层，不作为现阶段唯一或首要贡献。
+其中 16 是 base width；slack 扩展后单个 Sparse segment 可保留 17/18 token。
 
-正式定义上，`HMO family = mandatory locality-preserving coverage + optional
-fidelity upgrades`。主算法允许 `m=0`，因此当前最强的 locality evidence 与
-完整 action hierarchy 可以同时成立。Recurrent global memory 与 KV overlay
-的分工属于 architecture-grounded design principle，不表述为已经由实验
-单独证明的协同效应。
+正式定义上，`HMO family = locality-preserving coverage actions + optional
+fidelity upgrades`。mandatory 指被 coverage 的 segment 必须保留连续局部
+结构，而不是所有预算下每个 segment 都必须覆盖。固定 `w=16,L=256` 时全段
+coverage floor 约为 6.25%，所以 5% cap 必然只覆盖部分 segment。主算法允许
+`m=0`。Recurrent global memory 与 KV overlay 的分工属于
+architecture-grounded design principle，不表述为已经由实验单独证明的协同
+效应。
 
 ## 理论状态
 
@@ -89,21 +112,23 @@ scattered Top-token 的 singleton mass，而是把局部完整性约束与 query
 
 ### KV 保留比例
 
-对长度为 `T` 的中间上下文、segment 长度 `L`、Sparse 宽度 `w` 和 `m` 个
-Exact upgrade，保留 token 数满足：
+对长度为 `T` 的中间上下文、segment 长度 `L`、base Sparse 宽度 `w`、
+`c` 个被覆盖 segment、其中 `m` 个 Exact upgrade，以及 `s` 个 slack
+extension token，保留 token 数为：
 
 $$
-N_{\mathrm{keep}}\leq \left\lceil\frac{T}{L}\right\rceil w+m(L-w).
+N_{\mathrm{keep}}=cw+m(L-w)+s.
 $$
 
-忽略边界取整时，中间上下文的 KV 保留比例满足：
+相应的中间上下文 KV 保留比例为：
 
 $$
-\rho_{\mathrm{middle}}\lesssim\frac{w}{L}+\frac{m(L-w)}{T}.
+\rho_{\mathrm{middle}}=\frac{cw+m(L-w)+s}{T}.
 $$
 
-固定 `L`、`w` 和 upgrade 比例时，空间复杂度仍是 `O(T)`；贡献是显著降低
-线性项系数，而不是改变渐近复杂度阶数。
+只有当全部约 `T/L` 个 segment 被覆盖且 `s` 很小时，第一项才近似为
+`w/L`。固定参数时空间复杂度仍是 `O(T)`；贡献是显著降低线性项系数，
+而不是改变渐近复杂度阶数。
 
 ## 当前核心证据
 
@@ -142,6 +167,16 @@ ties、0 losses；平均逐样本 footprint 为 13.38%，与 Full KV 的主指�
 完全一致。Raw Exact 唯一的主指标优势来自一个格式敏感的 Needle 答案：
 Raw 输出 `8:38 o'clock`，而 Contiguous、Raw+Slack 与 Full 均输出
 语义相同但字符串规则未命中的 `8:38`。
+
+统一的 post-hoc format-robust secondary analysis 保持主指标与原始结果不变，
+只对 Needle clock answer 增加确定性格式 alias。0.8B 上 Contiguous 为 34/48、
+Scattered 为 28/48，差值 `+12.50 pp`、6 wins/0 losses；9B 上分别为 24/24
+和 20/24，差值仍为 `+16.67 pp`、4 wins/0 losses。9B 的 Contiguous、
+Raw Exact+Slack、Raw Exact 和 Full 在该 secondary metric 下均为 24/24。
+
+因此格式复算消除了 Raw Exact 的单例表面优势，同时也诚实扣除了 0.8B 上
+Scattered 的一个格式假阴性；两种口径都支持跨规模 locality 机制。完整结果见
+`experiments/results/FORMAT_ROBUST_SECONDARY_20260904.md`。
 
 ## Claim Ladder
 
@@ -189,6 +224,12 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - 9B 原始结果：
   `/mnt/nvme0/hmo/runs/contiguous_cf_scale9b_formal_c202236_20260904/`
 
+- 方法与 closest-work dossier：
+  `docs/design/HMO_METHOD_AND_NOVELTY_DOSSIER_ZH.md`
+- Figure 1 storyboard：`docs/paper/HMO_FIGURE1_STORYBOARD_ZH.md`
+- 格式鲁棒 secondary report：
+  `experiments/results/FORMAT_ROBUST_SECONDARY_20260904.md`
+
 
 ## 下一阶段
 
@@ -197,11 +238,14 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - 固化 PAPER_STATE、中文故事板、论文计划和摘要草稿。
 - 修正理论复杂度与显存统计口径。
 - 实现 Raw Exact+Slack，并完成 Qwen3.5-9B 单卡 24 样本规模迁移。
+- 完成 closest-work 审计、方法伪代码/理论假设、Figure 1 storyboard 和统一
+  format-robust secondary analysis。
 
 ### 待确认 GPU 工作
 
 1. 在 0.8B 的 48 样本集扩展 5%/10%/20% Pareto，并全程包含 Raw
-   Exact+Slack。
+   Exact+Slack；加入同 probe、同 resident bytes 的 Global Fixed-Chunk
+   Top-K structured baseline。
 2. 32K HotpotQA 真实任务 transfer，先验证当前 0.8B 路径的 Full-KV
    solvability。
 3. 9B 在 16K 已达到 27.85 GiB PyTorch reserved 峰值；32K 优先使用

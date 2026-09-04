@@ -50,8 +50,10 @@ HMO 先保护 prefix/suffix anchors，再将中间上下文划分为 segment。C
 阶段在 segment 内选择 query-attention mass 最大的连续窗口，使有限 KV
 广泛覆盖局部关系。Fidelity 阶段利用剩余预算将高 query demand segment
 升级为 Exact KV。DeltaNet recurrent state 始终保留，不被压缩或重置。
-正式方法族将 coverage 定义为必选机制，将 fidelity upgrade 定义为可选动作，
-并允许 `m=0`。
+正式方法族要求所有 coverage action 保持连续局部结构，将 fidelity upgrade
+定义为可选动作，并允许 `m=0`。它不要求任意预算下每个 segment 都被覆盖：
+当 base width 16、segment length 256 时，低于约 6.25% 的 middle cap 只能
+优先覆盖高 query demand segments。
 
 ### 第六步：理论解释
 
@@ -65,8 +67,11 @@ mass，从而同时获得 locality class 内的关系完整性与 query relevanc
 在 Qwen3.5-0.8B 的 48 个全新 8K/16K 样本上，Contiguous CF 与 Scattered
 CF 使用逐样本完全相同的 resident KV bytes，前者得到 70.83%，后者得到
 56.25%。Contiguous CF 以平均 13.38% Full-KV footprint 接近 Full KV 的
-72.92%。该结果把问题观察、结构先验、理论命题和 end-task generation 串成
-完整证据链。
+72.92%。在 Qwen3.5-9B 的 24 个冻结迁移样本上，Contiguous 与等字节
+Scattered 为 95.83% 对 79.17%，再次得到正向结构效应；Contiguous 与 Full
+均为 95.83%。两模型的 format-robust secondary 差值分别为 +12.50 pp 和
++16.67 pp。该结果把问题观察、结构先验、理论命题和 end-task generation
+串成跨规模证据链。
 
 ## 章节故事板
 
@@ -132,9 +137,12 @@ tokens，而是主流目标函数更偏向 singleton importance，通常没有�
 
 ### Locality and span-structured evidence
 
-讨论 local window、chunk retrieval 和 span-level reasoning 的结构先验。
-定位 HMO 的区别：它不是固定 recent window，也不是检索完整外部 chunk，
-而是在 Hybrid 模型原生 KV cache 内进行 query-guided local overlay。
+ChunkKV、SentenceKV、ProtoKV 和 Kara 已分别覆盖 fixed chunk、sentence、
+semantic cluster 和 flexible chunk，故 HMO 不声称 locality 本身是新发现。
+定位差异是：HMO 面向 Hybrid residual KV，在 macro-segments 间采用
+coverage-first 分配，再在每个被覆盖 segment 内使用 query-guided free-start
+micro-window。它不是固定 recent window，也不是外部 chunk retrieval。完整
+矩阵见 `docs/design/HMO_METHOD_AND_NOVELTY_DOSSIER_ZH.md`。
 
 ## 第三章 Hybrid Memory Overlay
 
@@ -146,8 +154,10 @@ segment、protected anchors 和 query suffix。明确 recurrent state 在所有
 
 ### Coverage action
 
-每个被覆盖 segment 保留宽度为 `w` 的连续窗口。窗口位置由 token-level
-query-attention mass 的 sliding sum 决定，tie 时选择最早起点，保证结果确定。
+每个被覆盖 segment 先获得 base width `w` 的连续窗口。窗口位置由
+token-level query-attention mass 的 sliding sum 决定，tie 时选择最早起点。
+预算不足以覆盖全部 segments 时按 query demand 排序；逐 token slack 可扩展
+实际窗口宽度并重新做 sliding-sum placement。
 
 ### Fidelity action
 
@@ -244,23 +254,8 @@ Contiguous overlay 可以应用到其他 Hybrid 或 Full-Attention 模型，但�
 
 ## Figure 1 故事板
 
-Figure 1 应横向包含三个部分。
-
-左侧画 Hybrid 模型的 memory anatomy：多数 DeltaNet layers 对应固定大小
-global recurrent state，少数 Full-Attention layers 对应随上下文增长的 KV
-cache。用不同颜色明确两者职责，不画成两个完全独立模型。
-
-中间画同一答案证据 span 的两种等字节保留。Scattered Top-token 命中多个
-高 attention token，但答案 span 被打断；HMO contiguous window 完整覆盖
-关系证据。视觉重点是相同 token 数、不同结构完整性。
-
-右侧画结果小图：Contiguous 70.83、Scattered 56.25、Full KV 72.92，并标注
-Contiguous 使用平均 13.38% Full-KV footprint。
-
-建议 caption：HMO treats the residual Full-Attention cache as a local
-high-fidelity overlay on top of recurrent global memory. At equal resident KV
-bytes, contiguous coverage preserves complete relational evidence that
-scattered importance retention fragments, closing most of the gap to Full KV.
+完整三面板构图、跨规模数字、caption 和视觉编码已经独立冻结在
+`docs/paper/HMO_FIGURE1_STORYBOARD_ZH.md`。
 
 ## Reviewer 预期问题与回答
 

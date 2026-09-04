@@ -1,0 +1,458 @@
+{
+  "schema_version": "hmo.format_robust_secondary.v1",
+  "metric_role": "post_hoc_secondary_only",
+  "primary_metric_unchanged": true,
+  "rule": "Use frozen normalized containment first; only for Needle truths in N o'clock form, treat colonized H:MM predictions with optional o'clock/AM/PM suffixes as the same clock-format alias. Other datasets receive no extra aliasing.",
+  "runs": [
+    {
+      "label": "qwen35_0p8b",
+      "source": "/mnt/nvme0/hmo/runs/contiguous_cf_confirmation_8k16k_s20261005_06_20260903_221800/contiguous_cf_confirmation_results.jsonl",
+      "source_sha256": "e038436be9b7027d321aba1e124cb9f422d1ccd2d8ac32459046f0b5fd124dad",
+      "case_count": 48,
+      "systems": {
+        "contiguous_cf": {
+          "primary_correct": 34,
+          "secondary_correct": 34,
+          "case_count": 48,
+          "primary_accuracy": 0.7083333333333334,
+          "secondary_accuracy": 0.7083333333333334,
+          "upgrades": 0,
+          "downgrades": 0
+        },
+        "contiguous_sparse_only": {
+          "primary_correct": 32,
+          "secondary_correct": 32,
+          "case_count": 48,
+          "primary_accuracy": 0.6666666666666666,
+          "secondary_accuracy": 0.6666666666666666,
+          "upgrades": 0,
+          "downgrades": 0
+        },
+        "full_kv_reference": {
+          "primary_correct": 35,
+          "secondary_correct": 36,
+          "case_count": 48,
+          "primary_accuracy": 0.7291666666666666,
+          "secondary_accuracy": 0.75,
+          "upgrades": 1,
+          "downgrades": 0
+        },
+        "raw_alpha_exact_topk": {
+          "primary_correct": 32,
+          "secondary_correct": 33,
+          "case_count": 48,
+          "primary_accuracy": 0.6666666666666666,
+          "secondary_accuracy": 0.6875,
+          "upgrades": 1,
+          "downgrades": 0
+        },
+        "scattered_cf": {
+          "primary_correct": 27,
+          "secondary_correct": 28,
+          "case_count": 48,
+          "primary_accuracy": 0.5625,
+          "secondary_accuracy": 0.5833333333333334,
+          "upgrades": 1,
+          "downgrades": 0
+        }
+      },
+      "by_stage_dataset": {
+        "16k/longeval_lines": {
+          "contiguous_cf": {
+            "secondary_correct": 8,
+            "case_count": 12
+          },
+          "contiguous_sparse_only": {
+            "secondary_correct": 5,
+            "case_count": 12
+          },
+          "full_kv_reference": {
+            "secondary_correct": 6,
+            "case_count": 12
+          },
+          "raw_alpha_exact_topk": {
+            "secondary_correct": 6,
+            "case_count": 12
+          },
+          "scattered_cf": {
+            "secondary_correct": 4,
+            "case_count": 12
+          }
+        },
+        "16k/needle": {
+          "contiguous_cf": {
+            "secondary_correct": 10,
+            "case_count": 12
+          },
+          "contiguous_sparse_only": {
+            "secondary_correct": 10,
+            "case_count": 12
+          },
+          "full_kv_reference": {
+            "secondary_correct": 10,
+            "case_count": 12
+          },
+          "raw_alpha_exact_topk": {
+            "secondary_correct": 10,
+            "case_count": 12
+          },
+          "scattered_cf": {
+            "secondary_correct": 10,
+            "case_count": 12
+          }
+        },
+        "8k/longeval_lines": {
+          "contiguous_cf": {
+            "secondary_correct": 5,
+            "case_count": 12
+          },
+          "contiguous_sparse_only": {
+            "secondary_correct": 6,
+            "case_count": 12
+          },
+          "full_kv_reference": {
+            "secondary_correct": 9,
+            "case_count": 12
+          },
+          "raw_alpha_exact_topk": {
+            "secondary_correct": 6,
+            "case_count": 12
+          },
+          "scattered_cf": {
+            "secondary_correct": 3,
+            "case_count": 12
+          }
+        },
+        "8k/needle": {
+          "contiguous_cf": {
+            "secondary_correct": 11,
+            "case_count": 12
+          },
+          "contiguous_sparse_only": {
+            "secondary_correct": 11,
+            "case_count": 12
+          },
+          "full_kv_reference": {
+            "secondary_correct": 11,
+            "case_count": 12
+          },
+          "raw_alpha_exact_topk": {
+            "secondary_correct": 11,
+            "case_count": 12
+          },
+          "scattered_cf": {
+            "secondary_correct": 11,
+            "case_count": 12
+          }
+        }
+      },
+      "secondary_comparisons": {
+        "contiguous_cf_vs_scattered_cf": {
+          "left": "contiguous_cf",
+          "right": "scattered_cf",
+          "case_count": 48,
+          "left_accuracy": 0.7083333333333334,
+          "right_accuracy": 0.5833333333333334,
+          "mean_delta": 0.125,
+          "wins": 6,
+          "ties": 42,
+          "losses": 0
+        },
+        "contiguous_cf_vs_raw_alpha_exact_topk": {
+          "left": "contiguous_cf",
+          "right": "raw_alpha_exact_topk",
+          "case_count": 48,
+          "left_accuracy": 0.7083333333333334,
+          "right_accuracy": 0.6875,
+          "mean_delta": 0.020833333333333332,
+          "wins": 2,
+          "ties": 45,
+          "losses": 1
+        },
+        "contiguous_cf_vs_contiguous_sparse_only": {
+          "left": "contiguous_cf",
+          "right": "contiguous_sparse_only",
+          "case_count": 48,
+          "left_accuracy": 0.7083333333333334,
+          "right_accuracy": 0.6666666666666666,
+          "mean_delta": 0.041666666666666664,
+          "wins": 6,
+          "ties": 38,
+          "losses": 4
+        },
+        "contiguous_cf_vs_full_kv_reference": {
+          "left": "contiguous_cf",
+          "right": "full_kv_reference",
+          "case_count": 48,
+          "left_accuracy": 0.7083333333333334,
+          "right_accuracy": 0.75,
+          "mean_delta": -0.041666666666666664,
+          "wins": 2,
+          "ties": 42,
+          "losses": 4
+        }
+      },
+      "changed_cases": [
+        {
+          "sample_id": "contiguous_cf_confirm_8k_s20261005_needle_0008",
+          "dataset": "needle",
+          "answer": "403 o'clock",
+          "upgraded_systems": [
+            "full_kv_reference",
+            "raw_alpha_exact_topk",
+            "scattered_cf"
+          ],
+          "generated_text": {
+            "full_kv_reference": "4:03 PM",
+            "raw_alpha_exact_topk": "4:03 PM",
+            "scattered_cf": "4:03 PM"
+          }
+        }
+      ]
+    },
+    {
+      "label": "qwen35_9b",
+      "source": "/mnt/nvme0/hmo/runs/contiguous_cf_scale9b_formal_c202236_20260904/scale_transfer_results.jsonl",
+      "source_sha256": "1430bec767f9a182198d85aedfbe3c75e59d5323f2690a94651e02ed28d737e0",
+      "case_count": 24,
+      "systems": {
+        "contiguous_cf": {
+          "primary_correct": 23,
+          "secondary_correct": 24,
+          "case_count": 24,
+          "primary_accuracy": 0.9583333333333334,
+          "secondary_accuracy": 1.0,
+          "upgrades": 1,
+          "downgrades": 0
+        },
+        "contiguous_sparse_only": {
+          "primary_correct": 23,
+          "secondary_correct": 23,
+          "case_count": 24,
+          "primary_accuracy": 0.9583333333333334,
+          "secondary_accuracy": 0.9583333333333334,
+          "upgrades": 0,
+          "downgrades": 0
+        },
+        "full_kv_reference": {
+          "primary_correct": 23,
+          "secondary_correct": 24,
+          "case_count": 24,
+          "primary_accuracy": 0.9583333333333334,
+          "secondary_accuracy": 1.0,
+          "upgrades": 1,
+          "downgrades": 0
+        },
+        "raw_alpha_exact_slack": {
+          "primary_correct": 23,
+          "secondary_correct": 24,
+          "case_count": 24,
+          "primary_accuracy": 0.9583333333333334,
+          "secondary_accuracy": 1.0,
+          "upgrades": 1,
+          "downgrades": 0
+        },
+        "raw_alpha_exact_topk": {
+          "primary_correct": 24,
+          "secondary_correct": 24,
+          "case_count": 24,
+          "primary_accuracy": 1.0,
+          "secondary_accuracy": 1.0,
+          "upgrades": 0,
+          "downgrades": 0
+        },
+        "scattered_cf": {
+          "primary_correct": 19,
+          "secondary_correct": 20,
+          "case_count": 24,
+          "primary_accuracy": 0.7916666666666666,
+          "secondary_accuracy": 0.8333333333333334,
+          "upgrades": 1,
+          "downgrades": 0
+        }
+      },
+      "by_stage_dataset": {
+        "16k/longeval_lines": {
+          "contiguous_cf": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "contiguous_sparse_only": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "full_kv_reference": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "raw_alpha_exact_slack": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "raw_alpha_exact_topk": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "scattered_cf": {
+            "secondary_correct": 4,
+            "case_count": 6
+          }
+        },
+        "16k/needle": {
+          "contiguous_cf": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "contiguous_sparse_only": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "full_kv_reference": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "raw_alpha_exact_slack": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "raw_alpha_exact_topk": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "scattered_cf": {
+            "secondary_correct": 6,
+            "case_count": 6
+          }
+        },
+        "8k/longeval_lines": {
+          "contiguous_cf": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "contiguous_sparse_only": {
+            "secondary_correct": 5,
+            "case_count": 6
+          },
+          "full_kv_reference": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "raw_alpha_exact_slack": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "raw_alpha_exact_topk": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "scattered_cf": {
+            "secondary_correct": 4,
+            "case_count": 6
+          }
+        },
+        "8k/needle": {
+          "contiguous_cf": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "contiguous_sparse_only": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "full_kv_reference": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "raw_alpha_exact_slack": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "raw_alpha_exact_topk": {
+            "secondary_correct": 6,
+            "case_count": 6
+          },
+          "scattered_cf": {
+            "secondary_correct": 6,
+            "case_count": 6
+          }
+        }
+      },
+      "secondary_comparisons": {
+        "contiguous_cf_vs_scattered_cf": {
+          "left": "contiguous_cf",
+          "right": "scattered_cf",
+          "case_count": 24,
+          "left_accuracy": 1.0,
+          "right_accuracy": 0.8333333333333334,
+          "mean_delta": 0.16666666666666666,
+          "wins": 4,
+          "ties": 20,
+          "losses": 0
+        },
+        "contiguous_cf_vs_raw_alpha_exact_slack": {
+          "left": "contiguous_cf",
+          "right": "raw_alpha_exact_slack",
+          "case_count": 24,
+          "left_accuracy": 1.0,
+          "right_accuracy": 1.0,
+          "mean_delta": 0.0,
+          "wins": 0,
+          "ties": 24,
+          "losses": 0
+        },
+        "contiguous_cf_vs_raw_alpha_exact_topk": {
+          "left": "contiguous_cf",
+          "right": "raw_alpha_exact_topk",
+          "case_count": 24,
+          "left_accuracy": 1.0,
+          "right_accuracy": 1.0,
+          "mean_delta": 0.0,
+          "wins": 0,
+          "ties": 24,
+          "losses": 0
+        },
+        "contiguous_cf_vs_contiguous_sparse_only": {
+          "left": "contiguous_cf",
+          "right": "contiguous_sparse_only",
+          "case_count": 24,
+          "left_accuracy": 1.0,
+          "right_accuracy": 0.9583333333333334,
+          "mean_delta": 0.041666666666666664,
+          "wins": 1,
+          "ties": 23,
+          "losses": 0
+        },
+        "contiguous_cf_vs_full_kv_reference": {
+          "left": "contiguous_cf",
+          "right": "full_kv_reference",
+          "case_count": 24,
+          "left_accuracy": 1.0,
+          "right_accuracy": 1.0,
+          "mean_delta": 0.0,
+          "wins": 0,
+          "ties": 24,
+          "losses": 0
+        }
+      },
+      "changed_cases": [
+        {
+          "sample_id": "scale9b_16k_s20261013_needle_0004",
+          "dataset": "needle",
+          "answer": "838 o'clock",
+          "upgraded_systems": [
+            "contiguous_cf",
+            "full_kv_reference",
+            "raw_alpha_exact_slack",
+            "scattered_cf"
+          ],
+          "generated_text": {
+            "contiguous_cf": "8:38",
+            "full_kv_reference": "8:38",
+            "raw_alpha_exact_slack": "8:38",
+            "scattered_cf": "8:38"
+          }
+        }
+      ]
+    }
+  ]
+}

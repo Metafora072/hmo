@@ -26,20 +26,23 @@
 - Expose the scattered-importance failure mode.
 - Present HMO as query-guided contiguous coverage plus optional Exact fidelity.
 - Preview consistent 14.58/16.67 pp equal-byte gains across 0.8B/9B and near-Full quality at 13.38% footprint.
-- End with four contribution bullets aligned with the matrix.
+- End with three contribution bullets aligned with the matrix.
 
 ### Section 2: Background And Related Work, 0.75 page
 
 - Hybrid/linear attention and recurrent state.
 - KV eviction, heavy hitters, query-aware compression, and budget allocation.
-- Local windows, chunks, and span-structured evidence.
-- Position HMO as query-guided local overlay rather than recent-only window or
-  singleton token ranking.
+- Local windows, chunks, sentence/semantic units, and span-structured evidence.
+- Treat ChunkKV as the closest method: do not claim locality or chunks as new.
+- Position HMO through Hybrid residual-memory roles, coverage-first
+  macro-segments, and query-guided free-start micro-windows.
 
 ### Section 3: Hybrid Memory Overlay, 1.85 pages
 
 - Formal system model and measured resident-byte objective.
-- Define `HMO family = mandatory coverage + optional fidelity`, allowing `m=0`.
+- Define `HMO family = locality-preserving coverage actions + optional
+  fidelity`, allowing `m=0`; mandatory means covered segments use contiguous
+  structure, not that every segment is covered under every budget.
 - Protected anchors and segment catalog.
 - Query-guided contiguous coverage.
 - Optional Exact fidelity upgrade.
@@ -52,7 +55,8 @@
 - Proposition on complete `ell`-span coverage.
 - Main proof sketch via consecutive-run decomposition and merging.
 - Corollary for max-attention-mass placement within the locality class.
-- Retention coefficient `w/L + m(L-w)/T`.
+- General retention coefficient `(cw + m(L-w) + s)/T`, with `w/L` only as
+  the full-coverage approximation.
 - Move full boundary cases and weighted-span extensions to appendix.
 
 ### Section 5: Experiments, 2.80 pages
@@ -63,6 +67,8 @@
 - 5%/10%/20% quality-memory Pareto with Raw Exact+Slack.
 - 32K HotpotQA transfer and official F1, subject to Full-KV solvability.
 - Qwen3.5-9B frozen transfer with Raw Exact+Slack and peak-memory reporting.
+- Global Fixed-Chunk Top-K under the same query probe and exact target bytes,
+  separating generic chunking from stratified coverage/free-start placement.
 - Latency and peak-memory table.
 
 ### Section 6: Discussion And Conclusion, 0.65 page
@@ -81,8 +87,8 @@ revision headroom.
 
 | ID | Type | Content | Data source | Priority |
 |---|---|---|---|---|
-| Figure 1 | Hero architecture | Hybrid recurrent global state + residual KV overlay; equal-byte scattered versus contiguous evidence | Manual, current method | Highest |
-| Figure 2 | Quality-memory Pareto | HMO, Raw Exact+Slack, Scattered, Full at 5%/10%/20% | Planned Pareto run | Highest |
+| Figure 1 | Hero architecture | Hybrid memory anatomy; equal-byte retention geometry; cross-scale result | `docs/paper/HMO_FIGURE1_STORYBOARD_ZH.md` | Highest |
+| Figure 2 | Quality-memory Pareto | HMO, Global Fixed-Chunk, Raw Exact+Slack, Scattered, Full at 5%/10%/20% | Planned Pareto run | Highest |
 | Figure A1 | Appendix mechanism plot | Answer-span survival and per-case win/tie/loss across 8K/16K | Fresh confirmation JSON | Appendix |
 | Table 1 | Main results | Quality, token F1, resident bytes, footprint, task/length groups | 0.8B fresh confirmation + 9B transfer | Highest |
 | Table A1 | Appendix ablation | Contiguous, Scattered, Sparse-only, optional Exact, anchors | Fresh confirmation and limited additions | Appendix |
@@ -110,8 +116,10 @@ All formal metadata and BibTeX must be verified before use.
 
 - Introduction: Hybrid-Attention motivation, Qwen3.5 technical report,
   DeltaNet/Gated DeltaNet, and representative KV cache compression surveys.
-- Related Work: StreamingLLM, H2O, SnapKV, PyramidKV, Quest, SAGE-KV,
-  DuoAttention, chunk retrieval, and local attention. `[VERIFY]`
+- Related Work: H2O, SnapKV, PyramidKV, Quest, ChunkKV, SentenceKV, ProtoKV,
+  Kara, Zoology, and Hypic. Initial metadata and method properties are verified
+  in `docs/design/HMO_METHOD_AND_NOVELTY_DOSSIER_ZH.md`; BibTeX remains to be
+  generated from primary records.
 - Method: official Qwen3.5 architecture and cache semantics. `[VERIFY]`
 - Theory: prior span-level or structured-pruning analyses if a direct match
   exists; do not manufacture a related theorem. `[VERIFY]`
@@ -143,9 +151,11 @@ All formal metadata and BibTeX must be verified before use.
 ## Next Steps
 
 - [x] Freeze the paper story, claim ladder, theoretical core, and abstract V1.
-- [ ] Cross-review this outline and apply only the minimum coherence fixes.
+- [x] Audit closest work and freeze the revised contribution/method boundary.
+- [x] Specify Figure 1 and add the post-hoc format-robust secondary analysis.
 - [x] Implement Raw Exact+Slack and complete the frozen 10% Qwen3.5-9B transfer.
-- [ ] Run the 5%/10%/20% Pareto package after PZ approval.
+- [ ] Add Global Fixed-Chunk Top-K, then run the 5%/10%/20% Pareto package
+  after PZ approval.
 - [ ] Add 32K HotpotQA transfer after PZ approval.
 - [ ] Generate Figure 1 and the current-results plots.
 - [ ] Verify citations and construct the bibliography.
