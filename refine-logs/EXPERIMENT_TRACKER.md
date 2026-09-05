@@ -27,6 +27,7 @@
 | HMO-FW-O | layer-wise free-window offline reconstruction | 506 frozen native 9B rows, 499 unique persistent probes | DONE; exact bytes/reconstruction 506/506, HMO-FW proxy +0.01053 vs ChunkKV across six positive task aggregates |
 | HMO-FW-D | task/length-stratified development QA | Qwen3.5-9B, 6 tasks x 20 frozen cases, two new arms | DONE; 120/120 exact bytes, HMO-FW +0.00322 vs ChunkKV, layer-local +0.01112 vs ChunkKV; verdict partial, candidate switch proposed |
 | HMO-LL-C | fresh shorter-context layer-local confirmation | Qwen3.5-9B, 4 tasks x 20 frozen unseen cases, legacy/layer-local/ChunkKV/Full | DONE; 80/80 total/per-layer exact bytes, layer-local +0.02096 vs legacy and -0.02970 vs ChunkKV; verdict partial/high |
+| HMO-LL-506 | original-main-table layer-local completion | Qwen3.5-9B, all 506 six-task rows; reuse 120 layer-local and every baseline, generate 386 layer-local cells | FROZEN; no quality gate, estimated 0.5-0.7 RTX-5090 GPU-hours |
 | C3-PF | former separate paid preflight | 27B BF16, one exact-32K Needle, HMO + Full | SUPERSEDED; first frozen formal sample now carries runtime acceptance |
 | C3-S | 27B mechanism and Pareto core | 12+12 exact-32K cases, 5/10/20% | FROZEN/HOLD; 312 generation cells, no paid action before new evidence and PZ confirmation |
 | C3-N | 27B native QA core | same frozen C2 native cases at 10% | FROZEN/HOLD; 120 generation cells, no paid action before new evidence and PZ confirmation |
