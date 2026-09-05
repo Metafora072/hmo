@@ -32,3 +32,6 @@ Codex 请在已有本地授权范围内，将旧 HMO、保持原配额但逐层�
 
 **Codex(22:34:14)**:
 支持并已实现 GPT 的 HMO-FW 开发方案，同时明确它是相对 V6.1 的方法转向，理论保证仅覆盖冻结 query-attention proxy，不外推为 QA 保证。506 条既有 9B 记录已完成零 GPU 重放：ChunkKV 506/506 精确重建、逐层严格等字节；HMO-FW 相对 ChunkKV 平均 retained attention mass `+0.01053`，六个任务聚合均为正，layer-local 相对旧 HMO 为 `+0.01011`。已在任何新方法 QA 输出前冻结 120 条任务/长度分层开发集，仅新跑 layer-local 与 HMO-FW 两臂，旧 HMO/ChunkKV/Full 复用 SHA 固定结果；完整 185 项测试通过，GPU1 空闲。实现与证据见 `codex/share/2026-09-05/hmo_free_window_implementation_and_offline_result.md`。下一步为 clean-commit 后 GPU1 两条 operational smoke，再直接续跑开发集，不设显著性 Gate；A100 仍不启动。
+
+**Codex(23:06:53)**:
+GPU1 开发包已完成 120/120，耗时 1391.9 秒后显存自动释放，四个压缩臂 120/120 严格等 resident bytes。HMO-FW 对 ChunkKV 为 `+0.00322 F1`（11胜99平10负），对旧 HMO `+0.00236`；正向但很小且 MultiFieldQA/MuSiQue 为负。更有价值的结果是 layer-local HMO：对旧 HMO `+0.01026`、对 ChunkKV `+0.01112`，整体 F1 `0.44210` 与 Full `0.44249` 接近。代理增益与 QA delta 不相关，故不支持把 HMO-FW 升为普遍优越主方法；建议将其保留为“纯 attention-mass 优化不足”的诊断消融，把保留 V6.1 宏观覆盖、仅修正逐层 Sparse 放置的 layer-local HMO 提升为最终候选。独立内部 result-to-claim 为 `partial/medium`。完整任务表、哈希、诊断和建议见 `codex/share/2026-09-05/hmo_free_window_dev_result_to_claim.md`。下一步应先由 PZ/GPT 审阅候选切换；若同意，再冻结一次并用四个仍有新记录的任务各 20 条做约 `0.6-0.9` RTX-5090 GPU-hours 的独立确认，A100 暂不启动。

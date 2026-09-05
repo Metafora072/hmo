@@ -25,7 +25,7 @@
 | C2-N6-9B | six-task native LongBench main table | Qwen3.5-9B, 506 native <=16K QA records at 10% | DONE; 506/506, exact equal bytes; HMO 0.4642 vs ChunkKV 0.4793, verdict partial |
 | C2-MC-9B | frozen mechanism comparison with ChunkKV | Qwen3.5-9B, 24 8K/16K Needle+LongEval cases at 10% | DONE; 24/24, HMO and ChunkKV tie every metric at exact equal bytes; HMO>ChunkKV claim not supported |
 | HMO-FW-O | layer-wise free-window offline reconstruction | 506 frozen native 9B rows, 499 unique persistent probes | DONE; exact bytes/reconstruction 506/506, HMO-FW proxy +0.01053 vs ChunkKV across six positive task aggregates |
-| HMO-FW-D | task/length-stratified development QA | Qwen3.5-9B, 6 tasks x 20 frozen cases, two new arms | FROZEN/READY; old HMO, ChunkKV, and Full outputs SHA-pinned and reused; GPU1 smoke then resumable development run |
+| HMO-FW-D | task/length-stratified development QA | Qwen3.5-9B, 6 tasks x 20 frozen cases, two new arms | DONE; 120/120 exact bytes, HMO-FW +0.00322 vs ChunkKV, layer-local +0.01112 vs ChunkKV; verdict partial, candidate switch proposed |
 | C3-PF | former separate paid preflight | 27B BF16, one exact-32K Needle, HMO + Full | SUPERSEDED; first frozen formal sample now carries runtime acceptance |
 | C3-S | 27B mechanism and Pareto core | 12+12 exact-32K cases, 5/10/20% | FROZEN/HOLD; 312 generation cells, no paid action before new evidence and PZ confirmation |
 | C3-N | 27B native QA core | same frozen C2 native cases at 10% | FROZEN/HOLD; 120 generation cells, no paid action before new evidence and PZ confirmation |
