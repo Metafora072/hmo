@@ -303,3 +303,29 @@
   budget sweep only if that identifies a credible operating regime.
 - Full report:
   `experiments/results/NATIVE_LONGBENCH_SIX_TASK_9B_20260905.md`.
+
+## 2026-09-05: Frozen 9B ChunkKV Mechanism Comparison
+
+- Independent result-to-claim verdict for the intended HMO-over-ChunkKV
+  mechanism claim: `no`.
+- Evidence: the same 24 frozen 8K/16K Needle and LongEval-Lines cases as the
+  historical 9B scale transfer, central 10% budget, 72 completed generation
+  cells, and no outcome-dependent continuation gate.
+- HMO and ChunkKV both obtain 23/24 answer containment, 22/24 exact match and
+  0.972222 token F1. Every metric comparison is 0 wins, 24 ties and 0 losses.
+- Their generated token IDs match in 23/24 cases; the sole difference is final
+  punctuation and has no score effect.
+- HMO and ChunkKV use exactly equal resident KV bytes in 24/24 cases, averaging
+  51,757,056 bytes or 13.3849% of Full on the mean per-case ratio. Full obtains
+  the same 23/24 answer containment.
+- New HMO and Full outputs reproduce the historical frozen run at token level
+  in 24/24 cases each, ruling out run drift as an explanation for the tie.
+- Supported: controlled central-budget behavioral equivalence to ChunkKV and
+  near-Full quality at an 86.615% residual-KV reduction. Unsupported: HMO has
+  an incremental mechanism advantage over public contiguous structured
+  retention.
+- Stop condition: do not use 5%/20% or A100 scale-up to rescue this superiority
+  claim. A budget sweep is only justified as a predeclared equivalence curve;
+  any new policy must use a newly frozen confirmation set.
+- Full report:
+  `experiments/results/CHUNKKV_MECHANISM_TRANSFER_9B_20260905.md`.

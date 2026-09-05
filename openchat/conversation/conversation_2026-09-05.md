@@ -21,3 +21,6 @@ PZ 确认后的 pre-A100 合并包已实现。理论 tie/复杂度已修正；�
 
 **Codex(19:46:31)**:
 9B 六任务正式主表已完成 506/506，GPU1 自动释放。HMO / ChunkKV / Global Fixed / Raw+Slack / Full QA-F1 为 0.4642 / 0.4793 / 0.4766 / 0.4800 / 0.4815；四个压缩系统 506/506 严格等字节，逐样本 Full residual-KV ratio 平均为 14.465%。独立内部 result-to-claim 与本地诊断均判为 `partial`：高压缩 near-Full、Hybrid residual-memory formulation 和既有 locality/regime 机制证据可保留，但 broad native superiority 不成立。HMO 以更低 attention mass 换更广 macro coverage，当前原生 QA 平均偏好集中保留；`>14K` 后验正向 slice 受任务混杂，不能升级为定律。建议暂不花 A100 验证 superiority，先在冻结 9B mechanism suite 加入 ChunkKV。详见 `codex/share/2026-09-05/hmo_9b_six_task_result_to_claim.md`。
+
+**Codex(20:44:43)**:
+冻结 9B ChunkKV 机制补充已完成 24/24，耗时 418 秒，GPU1 自动释放。HMO 与 ChunkKV 在 answer containment、exact match、token F1 上均为 0W/24T/0L，24/24 严格等 resident bytes，平均仅为 Full residual-KV 的 13.3849%；两者生成 token 23/24 相同，唯一差异是末尾句号。新 HMO/Full 输出还分别 24/24 复现历史冻结结果。独立内部 result-to-claim 判定 HMO-over-ChunkKV 机制命题为 `no`：可保留 near-Full 高压缩、Hybrid residual-KV formulation 与相对 scattered singleton 的 locality 证据，但不能声称相对公开 structured baseline 的增量。不建议为挽救 superiority 盲跑 5%/20% 或直接上 A100；下一步转向零 GPU geometry/failure 分析与真实效率口径。详见 `codex/share/2026-09-05/hmo_9b_chunkkv_mechanism_result.md`。

@@ -23,6 +23,7 @@
 | C2-S | final scale transfer | 9B, 24 frozen mechanism cases at 10% | DONE; 24/24, HMO 23 vs Scattered 19, exact bytes |
 | C2-N | native LongBench external validity | 12 HotpotQA + 12 NarrativeQA at 10% | DONE; 24/24, HMO competitive overall and best on NarrativeQA slice |
 | C2-N6-9B | six-task native LongBench main table | Qwen3.5-9B, 506 native <=16K QA records at 10% | DONE; 506/506, exact equal bytes; HMO 0.4642 vs ChunkKV 0.4793, verdict partial |
+| C2-MC-9B | frozen mechanism comparison with ChunkKV | Qwen3.5-9B, 24 8K/16K Needle+LongEval cases at 10% | DONE; 24/24, HMO and ChunkKV tie every metric at exact equal bytes; HMO>ChunkKV claim not supported |
 | C3-PF | former separate paid preflight | 27B BF16, one exact-32K Needle, HMO + Full | SUPERSEDED; first frozen formal sample now carries runtime acceptance |
 | C3-S | 27B mechanism and Pareto core | 12+12 exact-32K cases, 5/10/20% | FROZEN/HOLD; 312 generation cells, no paid action before new evidence and PZ confirmation |
 | C3-N | 27B native QA core | same frozen C2 native cases at 10% | FROZEN/HOLD; 120 generation cells, no paid action before new evidence and PZ confirmation |

@@ -224,6 +224,14 @@ ties、0 losses；平均逐样本 footprint 为 13.38%，与 Full KV 的主指�
 Raw 输出 `8:38 o'clock`，而 Contiguous、Raw+Slack 与 Full 均输出
 语义相同但字符串规则未命中的 `8:38`。
 
+在同一批冻结 24 样本、中央 10% 预算上补入公开 structured baseline
+ChunkKV 后，HMO 与 ChunkKV 的 answer containment、exact match 和 token F1
+均逐例打平（0 wins、24 ties、0 losses），两者 resident bytes 在 24/24 例
+完全相等。生成 token 在 23/24 例相同，唯一差异只是末尾句号。因此这组实验
+支持 HMO 与 ChunkKV 的受控等价和 near-Full 高压缩，不支持 HMO 相对
+ChunkKV 的额外机制优势。完整报告见
+`experiments/results/CHUNKKV_MECHANISM_TRANSFER_9B_20260905.md`。
+
 统一的 post-hoc format-robust secondary analysis 保持主指标与原始结果不变，
 只对 Needle clock answer 增加确定性格式 alias。0.8B 上 Contiguous 为 34/48、
 Scattered 为 28/48，差值 `+12.50 pp`、6 wins/0 losses；9B 上分别为 24/24
@@ -244,6 +252,8 @@ singleton importance 进行离散保留。Query-guided contiguous retention 在
 singleton retention；其相对 fixed chunk 的收益是预算与长度相关的，而非
 无条件成立。在 16K/10% 的固定 stratified allocation 下，free-start 相对
 aligned placement 取得小幅正向收益，并集中于 structured retrieval。
+连续结构本身不是 HMO 相对 ChunkKV 的独有增量：冻结 9B 中央预算比较显示
+两者逐例等价。
 
 ### 系统主张
 
@@ -388,11 +398,12 @@ Raw+Slack 为 0.4800。Raw 系列保留为强公平基线，正文不能暗示 H
 
 1. C2 与 9B 六任务原生主表均已完成；不对 observed native labels 做直接
    调参。
-2. 最小补充证据是在现有冻结 9B Needle/LongEval 8K/16K 机制集上加入
-   ChunkKV，先检验 HMO 相对公开 structured baseline 的工作区间。
-3. 只有机制比较保留可信正向 slice 时，才补一个预声明的小型 native
-   5%/20% budget sweep；新设计必须另用未按结果选择的记录确认。
-4. C3 代码与协议继续冻结。27B 权重下载、A100 租用和付费执行仍需 PZ 单独
+2. 冻结 9B 机制集的 ChunkKV 补充已完成；HMO 与 ChunkKV 在中央 10% 下
+   三项指标逐例打平，因此 HMO-over-ChunkKV 机制主张关闭。
+3. 不为挽救 superiority 盲目补 5%/20% sweep。下一步优先做零 GPU 的
+   failure/geometry 分析和真实效率口径梳理；任何新 policy 都必须另用未按
+   observed outcomes 选择的记录确认。
+4. C3 代码与协议继续冻结/暂缓。27B 权重下载、A100 租用和付费执行仍需 PZ 单独
    确认；当前不把直接放大作为证明算法优越性的下一步。
 
 ### C3 已冻结执行包（尚无 27B 结果）
