@@ -329,3 +329,36 @@
   any new policy must use a newly frozen confirmation set.
 - Full report:
   `experiments/results/CHUNKKV_MECHANISM_TRANSFER_9B_20260905.md`.
+
+## 2026-09-06: Layer-local HMO Fresh Confirmation
+
+- Independent result-to-claim verdict: `partial`, high confidence.
+- Evidence: 80 frozen unseen LongBench records on Qwen3.5-9B, 20 each from
+  Qasper, MultiFieldQA-en, HotpotQA, and 2WikiMQA, selected in four context
+  length strata without QA outcomes or probe scores. The set is systematically
+  shorter than the previous longest-first 506 rows and spans about 1.1K--9.3K
+  context tokens.
+- Legacy HMO / layer-local HMO / ChunkKV / Full official QA-F1 is
+  `0.56956 / 0.59052 / 0.62022 / 0.65280`.
+- Layer-local versus legacy is `+0.02096` F1 (`9W/65T/6L`), with descriptive
+  paired bootstrap interval `[-0.03375,+0.07605]`. The two separately selected
+  development and confirmation packages therefore both have positive overall
+  point estimates for the layer-local correction, but the confirmation alone
+  does not establish a reliable universal gain.
+- Layer-local versus ChunkKV is `-0.02970` (`4W/62T/14L`), interval
+  `[-0.06998,+0.00523]`. The positive development point estimate did not
+  replicate, so ChunkKV superiority is not supported.
+- The three compressed arms match exact total and per-Full-layer post-query
+  resident bytes in `80/80` cases; all systems have zero generation-cap hits.
+  Mean compressed residual-KV residency is `20.837%` of Full.
+- Under fixed global HMO actions/counts, layer-local retained query-attention
+  mass is above the legacy shared-window value in `636/640` Full-layer/case
+  pairs and tied in four, with no negative pair. This supports the bounded
+  proxy theorem but not a QA monotonicity claim.
+- Route: replace legacy shared placement with layer-local HMO v1 as a method
+  correction, keep HMO-FW as a diagnostic ablation, and frame ChunkKV as a
+  strong baseline under which HMO is competitive rather than superior. Do not
+  buy A100 time for a ChunkKV-superiority claim. A scale/32K transfer run is a
+  separate story decision requiring an updated C3 protocol and PZ approval.
+- Full report:
+  `openchat/codex/share/2026-09-06/hmo_layer_local_confirmation_result_to_claim.md`.
