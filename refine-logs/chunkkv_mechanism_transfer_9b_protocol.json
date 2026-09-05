@@ -1,0 +1,104 @@
+{
+  "schema_version": "hmo.contiguous_cf.chunkkv_scale_transfer_protocol.v1",
+  "status": "frozen_before_outcomes",
+  "frozen_at": "2026-09-05T20:00:00+08:00",
+  "development_basis": "experiments/results/NATIVE_LONGBENCH_SIX_TASK_9B_20260905.md",
+  "parent_protocol": "refine-logs/contiguous_cf_scale_transfer_9b_protocol.json",
+  "parent_protocol_sha256": "b58a69a6acc192f218c24e410ff188d9f1ab8eec7f0b04f7df5c366b3f1e09f8",
+  "model_id": "Qwen/Qwen3.5-9B",
+  "model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "systems": [
+    "contiguous_cf",
+    "chunkkv",
+    "full_kv_reference"
+  ],
+  "equal_byte_systems": [
+    "contiguous_cf",
+    "chunkkv"
+  ],
+  "primary_comparisons": [
+    ["contiguous_cf", "chunkkv"]
+  ],
+  "primary_metric": "normalized_answer_contains",
+  "secondary_metrics": [
+    "normalized_exact_match",
+    "token_f1"
+  ],
+  "budget_fractions": [0.1],
+  "max_new_tokens": 32,
+  "inference_seed": 20261010,
+  "method": {
+    "allocator": "attention_led",
+    "sparse_selector": "max_mass_window",
+    "sparse_width": 16,
+    "chunkkv_chunk_size": 10,
+    "chunkkv_observation": "query_suffix_attention",
+    "chunkkv_layer_policy": "independent_per_full_layer_shared_across_kv_heads",
+    "chunkkv_partial_chunk": "fixed_prefix_of_next_ranked_chunk",
+    "raw_slack_selector": "global_top_tokens_slack",
+    "global_fixed_chunk_width": 16,
+    "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1
+  },
+  "stage_sets": {
+    "formal": {
+      "stages": ["8k", "16k"],
+      "budget_fractions": [0.1],
+      "manifest_group": "formal",
+      "manifest_budget_fractions": [0.1]
+    }
+  },
+  "stages": {
+    "8k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 6,
+      "context_length": 8192,
+      "segment_length": 256,
+      "seed": 20261012,
+      "sample_id_prefix": "scale9b_8k_s20261012_",
+      "budget_fractions": [0.1],
+      "systems": [
+        "contiguous_cf",
+        "chunkkv",
+        "full_kv_reference"
+      ]
+    },
+    "16k": {
+      "datasets": "needle,longeval_lines",
+      "samples_per_dataset": 6,
+      "context_length": 16384,
+      "segment_length": 256,
+      "seed": 20261013,
+      "sample_id_prefix": "scale9b_16k_s20261013_",
+      "budget_fractions": [0.1],
+      "systems": [
+        "contiguous_cf",
+        "chunkkv",
+        "full_kv_reference"
+      ]
+    }
+  },
+  "execution": {
+    "formal_sample_cases": 24,
+    "formal_budget_cases": 24,
+    "expected_generation_cells": 72,
+    "continuation_gate": false,
+    "resume_after_interruption": true
+  },
+  "claims": [
+    "same-sample 9B HMO-versus-ChunkKV mechanism transfer at exact equal resident bytes",
+    "controlled 8K/16K and Needle/LongEval regime comparison"
+  ],
+  "excluded_claims": [
+    "broad native-QA superiority",
+    "cross-architecture generalization",
+    "statistical significance as a continuation gate"
+  ],
+  "immutability": {
+    "parent_sample_identity_unchanged": true,
+    "method_or_budget_changes_after_launch": false,
+    "case_filtering_after_outcomes": false,
+    "outcome_gate": false
+  }
+}

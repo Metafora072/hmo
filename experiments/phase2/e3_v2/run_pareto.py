@@ -82,6 +82,9 @@ from experiments.utils.run_manifest import collect_environment, ensure_run_manif
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 PROTOCOL_SCHEMA = "hmo.contiguous_cf.pareto_protocol.v1"
+CHUNKKV_SCALE_PROTOCOL_SCHEMA = (
+    "hmo.contiguous_cf.chunkkv_scale_transfer_protocol.v1"
+)
 RESULT_SCHEMA = "hmo.contiguous_cf.pareto_result.v1"
 RESULTS_FILENAME = "pareto_results.jsonl"
 SUMMARY_FILENAME = "pareto_summary.json"
@@ -105,12 +108,121 @@ def _budget_key(fraction: float) -> str:
     return f"{int(round(fraction * 100)):02d}pct"
 
 
+def _validate_chunkkv_scale_protocol(payload: Mapping) -> None:
+    parent_path = PROJECT_ROOT / str(payload.get("parent_protocol", ""))
+    try:
+        parent_sha = hashlib.sha256(parent_path.read_bytes()).hexdigest()
+    except OSError as exc:
+        raise OracleContractError(
+            "ChunkKV scale protocol cannot read its parent"
+        ) from exc
+    method = payload.get("method", {})
+    stages = payload.get("stages", {})
+    shapes = {
+        name: (
+            stage.get("datasets"),
+            int(stage.get("samples_per_dataset", 0)),
+            int(stage.get("context_length", 0)),
+            int(stage.get("segment_length", 0)),
+            int(stage.get("seed", 0)),
+            stage.get("sample_id_prefix"),
+        )
+        for name, stage in stages.items()
+    }
+    expected_systems = (
+        "contiguous_cf",
+        "chunkkv",
+        "full_kv_reference",
+    )
+    expected_stage_set = {
+        "formal": {
+            "stages": ["8k", "16k"],
+            "budget_fractions": [0.1],
+            "manifest_group": "formal",
+            "manifest_budget_fractions": [0.1],
+        }
+    }
+    if (
+        payload.get("status") != "frozen_before_outcomes"
+        or payload.get("parent_protocol_sha256") != parent_sha
+        or tuple(payload.get("systems", ())) != expected_systems
+        or tuple(payload.get("equal_byte_systems", ()))
+        != expected_systems[:-1]
+        or payload.get("primary_comparisons")
+        != [["contiguous_cf", "chunkkv"]]
+        or payload.get("primary_metric") != "normalized_answer_contains"
+        or tuple(payload.get("budget_fractions", ())) != (0.1,)
+        or payload.get("model_id") != "Qwen/Qwen3.5-9B"
+        or payload.get("model_revision")
+        != "c202236235762e1c871ad0ccb60c8ee5ba337b9a"
+        or int(payload.get("max_new_tokens", 0)) != 32
+        or int(payload.get("inference_seed", 0)) != 20261010
+        or method
+        != {
+            "allocator": "attention_led",
+            "sparse_selector": "max_mass_window",
+            "sparse_width": 16,
+            "chunkkv_chunk_size": 10,
+            "chunkkv_observation": "query_suffix_attention",
+            "chunkkv_layer_policy": (
+                "independent_per_full_layer_shared_across_kv_heads"
+            ),
+            "chunkkv_partial_chunk": "fixed_prefix_of_next_ranked_chunk",
+            "raw_slack_selector": "global_top_tokens_slack",
+            "global_fixed_chunk_width": 16,
+            "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
+            "protected_prefix_segments": 1,
+            "protected_suffix_segments": 1,
+        }
+        or payload.get("stage_sets") != expected_stage_set
+        or set(stages) != {"8k", "16k"}
+        or shapes.get("8k")
+        != (
+            "needle,longeval_lines",
+            6,
+            8192,
+            256,
+            20261012,
+            "scale9b_8k_s20261012_",
+        )
+        or shapes.get("16k")
+        != (
+            "needle,longeval_lines",
+            6,
+            16384,
+            256,
+            20261013,
+            "scale9b_16k_s20261013_",
+        )
+        or payload.get("execution")
+        != {
+            "formal_sample_cases": 24,
+            "formal_budget_cases": 24,
+            "expected_generation_cells": 72,
+            "continuation_gate": False,
+            "resume_after_interruption": True,
+        }
+        or payload.get("immutability")
+        != {
+            "parent_sample_identity_unchanged": True,
+            "method_or_budget_changes_after_launch": False,
+            "case_filtering_after_outcomes": False,
+            "outcome_gate": False,
+        }
+    ):
+        raise OracleContractError("ChunkKV scale-transfer protocol mismatch")
+
+
 def load_pareto_protocol(path: Path) -> tuple[dict, str]:
     try:
         encoded = path.read_bytes()
         payload = json.loads(encoded)
     except (OSError, json.JSONDecodeError) as exc:
         raise OracleContractError(f"cannot read Pareto protocol: {path}") from exc
+
+    if payload.get("schema_version") == CHUNKKV_SCALE_PROTOCOL_SCHEMA:
+        _validate_chunkkv_scale_protocol(payload)
+        return payload, hashlib.sha256(encoded).hexdigest()
 
     if payload.get("schema_version") == C3_SCHEMA:
         try:
