@@ -1,0 +1,1282 @@
+{
+  "case_count": 120,
+  "cases": [
+    {
+      "context_tokens": 9171,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 0,
+      "probe_id": "9b042a5d17f30dc6753f385bc4f83eb997f65d0b0ecee1e86938ae67c645debc",
+      "query_tokens": 56,
+      "record_index": 3,
+      "record_sha256": "dc128d53cb6667eff803990b249a82a844a774579e3500e1cb9cd8fbda52d9a9",
+      "sample_id": "longbench_narrativeqa_0003"
+    },
+    {
+      "context_tokens": 9171,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 0,
+      "probe_id": "2acdce716b02c6b29c070d02720ae2b9063122867c6780931366bf1f76a935c6",
+      "query_tokens": 55,
+      "record_index": 19,
+      "record_sha256": "e6df144b25c10b7156312140f025dd7366ac43e11ec767c39554b12aa234a902",
+      "sample_id": "longbench_narrativeqa_0019"
+    },
+    {
+      "context_tokens": 9171,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 0,
+      "probe_id": "9fbfa79bc2c35173f6dd651f6d602e906f49e4778d8db386d4525e715da1528e",
+      "query_tokens": 57,
+      "record_index": 23,
+      "record_sha256": "f4f584f0a38988b0e26e16c896294991a994e01bed12686f72f102bab3b5c113",
+      "sample_id": "longbench_narrativeqa_0023"
+    },
+    {
+      "context_tokens": 8683,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 0,
+      "probe_id": "60feda380d1378935669049928ff5c9e4890a9409942b5fcefa58615f146bded",
+      "query_tokens": 52,
+      "record_index": 156,
+      "record_sha256": "c449018aa3c8159491f74b93d2ed21421c85507e1889a1394624e5ccc48441f6",
+      "sample_id": "longbench_narrativeqa_0156"
+    },
+    {
+      "context_tokens": 8683,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 0,
+      "probe_id": "9ca2ee09ec50b3e63dd0b72485be364bc4cfa937b35e6db0a1d5a77988968881",
+      "query_tokens": 56,
+      "record_index": 170,
+      "record_sha256": "65dc3b97cb514abb9f24063b3e7922e1e837b21986422bcce6315b7712511501",
+      "sample_id": "longbench_narrativeqa_0170"
+    },
+    {
+      "context_tokens": 11383,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 1,
+      "probe_id": "2ff4011d5743c2bb905010274118f80047200bcf16a4ec7501a63ed8ef94bb88",
+      "query_tokens": 62,
+      "record_index": 12,
+      "record_sha256": "87caddb5c708d07dc060ba8b3ae6df33d14f2a4e0b207233e0bd0dd85911691c",
+      "sample_id": "longbench_narrativeqa_0012"
+    },
+    {
+      "context_tokens": 11383,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 1,
+      "probe_id": "57c7a822cf156a00ee62e271521d71d8be68d6e097a38c4c0e16226997821dc2",
+      "query_tokens": 52,
+      "record_index": 61,
+      "record_sha256": "a964113da45edb2484dd26db6a4cf5896834b980c34729be32f1a2683db71325",
+      "sample_id": "longbench_narrativeqa_0061"
+    },
+    {
+      "context_tokens": 11383,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 1,
+      "probe_id": "d0066e5bd31916d0af12c754b22f4b708c621099a4840a397e37ba7d74ae2b5c",
+      "query_tokens": 60,
+      "record_index": 94,
+      "record_sha256": "83d1be2d056436c296b5f816dfc91b74d24e6689692d49f293652ac136bc1495",
+      "sample_id": "longbench_narrativeqa_0094"
+    },
+    {
+      "context_tokens": 11383,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 1,
+      "probe_id": "76780a8a07eb56d98fc9f53d997778fd19bc1ef81c8e287ae539d812f6c2a33b",
+      "query_tokens": 58,
+      "record_index": 153,
+      "record_sha256": "ba2ff3cde867d58750e141750908aa0308da4a5880aa2176af0a6642a2d2ea2a",
+      "sample_id": "longbench_narrativeqa_0153"
+    },
+    {
+      "context_tokens": 11383,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 1,
+      "probe_id": "44a614ac1b2ea1b61b049ff354ec6a4fbfafc14af57aa9887f0176afb30fcdff",
+      "query_tokens": 67,
+      "record_index": 183,
+      "record_sha256": "79c6968ee5ab483fac814724755a41364c52fc80984e57c2bc91a599c8ba7c87",
+      "sample_id": "longbench_narrativeqa_0183"
+    },
+    {
+      "context_tokens": 11547,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 2,
+      "probe_id": "c059cc8dc3af1a82f6bf5b6f293071a8d7084352ba6c5088e13e90d339b0528a",
+      "query_tokens": 57,
+      "record_index": 14,
+      "record_sha256": "2970cd2cdcfc88bb93d58d5fea8a03dd60d0fe8b690aea061b0332e047bd4fb6",
+      "sample_id": "longbench_narrativeqa_0014"
+    },
+    {
+      "context_tokens": 11547,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 2,
+      "probe_id": "2c12fe080531f458462f94cce8894250942d13c8fd763fef1d8dc5169b385daf",
+      "query_tokens": 53,
+      "record_index": 97,
+      "record_sha256": "0c6ddb7c64c37dd83ac61ff4069f4311e8178f413f5fee676ed0044b9c7a0bb0",
+      "sample_id": "longbench_narrativeqa_0097"
+    },
+    {
+      "context_tokens": 11547,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 2,
+      "probe_id": "a72c7c7ee0d2fb9a9226eb737013238880cd5e8e0c1989b3749db2d66d6aa8e9",
+      "query_tokens": 61,
+      "record_index": 145,
+      "record_sha256": "cf4096202100aca7fa65585e1ec3cbd099eba618fde909fe500b2a14a4004d29",
+      "sample_id": "longbench_narrativeqa_0145"
+    },
+    {
+      "context_tokens": 11547,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 2,
+      "probe_id": "950108d9c972f4c87a5a0cc5e88efb585860f9e7d255986a6f3c3e064164ce55",
+      "query_tokens": 63,
+      "record_index": 162,
+      "record_sha256": "fe39e14686e5cc7d18f40fcd79d02cde7f00c6dc3b8224de4f0285a00d75455c",
+      "sample_id": "longbench_narrativeqa_0162"
+    },
+    {
+      "context_tokens": 11547,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 2,
+      "probe_id": "8463dd155be4d9c16bba7f33060fd56ad533ded26673d99547acfed8695ae114",
+      "query_tokens": 58,
+      "record_index": 171,
+      "record_sha256": "61957e98ce69a48e40700ccbb50b4bf16b036b9fe93e5d3b4b79b0fa02b1d03b",
+      "sample_id": "longbench_narrativeqa_0171"
+    },
+    {
+      "context_tokens": 13701,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 3,
+      "probe_id": "18dfbb57efe26ff580515551fa30108cd99acdfef52fecc10e875cb34db6c32a",
+      "query_tokens": 60,
+      "record_index": 76,
+      "record_sha256": "1cf61348551975b3cf7c6ec99759b375cea50a9a531240cea702c83445fc5801",
+      "sample_id": "longbench_narrativeqa_0076"
+    },
+    {
+      "context_tokens": 13701,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 3,
+      "probe_id": "4e105f20ccc23f27c4fa475a42a703d80d05c5e89a3946832671654206955901",
+      "query_tokens": 60,
+      "record_index": 84,
+      "record_sha256": "a1863ea1f9d0e70f1bd01fb16f0fd0f6e87b069473f31255d341b39f1b26f4c2",
+      "sample_id": "longbench_narrativeqa_0084"
+    },
+    {
+      "context_tokens": 12191,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 3,
+      "probe_id": "7b4f949044398005e620c64512529ac73a2b876af24d0e63b5f745596345d030",
+      "query_tokens": 55,
+      "record_index": 95,
+      "record_sha256": "31cf0efce2a226664b16611c636412061e8eba33d45449c5287911ec3a69ea5b",
+      "sample_id": "longbench_narrativeqa_0095"
+    },
+    {
+      "context_tokens": 12191,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 3,
+      "probe_id": "0f718b28d55f6f7aaea9475c81d33e53d80aae6bff85386bccd1e7851eede673",
+      "query_tokens": 57,
+      "record_index": 135,
+      "record_sha256": "77541d39b9e7f9cdbd4090510de1f04ae2f9165df0d937c692b9aedb6dab75e5",
+      "sample_id": "longbench_narrativeqa_0135"
+    },
+    {
+      "context_tokens": 13701,
+      "dataset": "longbench_narrativeqa",
+      "length_stratum": 3,
+      "probe_id": "06cfd0af2b25b47a6ed715d397645ae271318a371e1e0b36d347144e84b48bf1",
+      "query_tokens": 54,
+      "record_index": 196,
+      "record_sha256": "dd6be91ff148695756b615d013e800108a5ef5d271751c536cff8cedbf26716a",
+      "sample_id": "longbench_narrativeqa_0196"
+    },
+    {
+      "context_tokens": 4780,
+      "dataset": "longbench_qasper",
+      "length_stratum": 0,
+      "probe_id": "319536d46aef12069f1988e1e1a0426029a3d0224a2cb6be7abeb197528ec885",
+      "query_tokens": 97,
+      "record_index": 14,
+      "record_sha256": "3eea88668e0bbe8d7d82c16ba5e6136ae3e34fbaf50d4761c39e684c82ba1d11",
+      "sample_id": "longbench_qasper_0014"
+    },
+    {
+      "context_tokens": 4684,
+      "dataset": "longbench_qasper",
+      "length_stratum": 0,
+      "probe_id": "a4a911a124ee71021356fc7ce17c9b8ab8c1f638db4aa0b724a4ea0229b81991",
+      "query_tokens": 98,
+      "record_index": 31,
+      "record_sha256": "0e6a618812f910f94c75a965b73ede093efe96957a86165be69de44c4c7ce79f",
+      "sample_id": "longbench_qasper_0031"
+    },
+    {
+      "context_tokens": 5180,
+      "dataset": "longbench_qasper",
+      "length_stratum": 0,
+      "probe_id": "4a0977e40032089761edc5e9ef8668d7241ae14da779785f679e1c9d1dae0c7e",
+      "query_tokens": 97,
+      "record_index": 111,
+      "record_sha256": "9130db3fd548ab8b5a80c6e20d1167efc0efb8b69c6cf69f10d22a021c913b9c",
+      "sample_id": "longbench_qasper_0111"
+    },
+    {
+      "context_tokens": 4834,
+      "dataset": "longbench_qasper",
+      "length_stratum": 0,
+      "probe_id": "71aa42abbe1a7ca6b10ac33a020a3e0a0c56406975f744ce07024918476c1e8e",
+      "query_tokens": 101,
+      "record_index": 135,
+      "record_sha256": "5f44c9ec741d45a622ebfdc2c24c2dd303ccb1e591b809fe418be31d2225af2b",
+      "sample_id": "longbench_qasper_0135"
+    },
+    {
+      "context_tokens": 5127,
+      "dataset": "longbench_qasper",
+      "length_stratum": 0,
+      "probe_id": "74ec8e33ac6a28164044971aaa0b54c69e6e29f3e9a21cd2073b6228017a6683",
+      "query_tokens": 100,
+      "record_index": 182,
+      "record_sha256": "a35d1470c962e346521cacf62c9cc95bc5eae65b6ca5d9c9355cf320979d1cf0",
+      "sample_id": "longbench_qasper_0182"
+    },
+    {
+      "context_tokens": 5369,
+      "dataset": "longbench_qasper",
+      "length_stratum": 1,
+      "probe_id": "5386003338a64587a79840fb852d92e5d72522a262b2bdc0a211b37d6c833ca4",
+      "query_tokens": 97,
+      "record_index": 29,
+      "record_sha256": "f93cd46697254ee64fe5165331fd4c5448c5ead2eb3aee01a19378c62489cbb9",
+      "sample_id": "longbench_qasper_0029"
+    },
+    {
+      "context_tokens": 5711,
+      "dataset": "longbench_qasper",
+      "length_stratum": 1,
+      "probe_id": "c667854ca75a58d954972e2a5cc3ceb80b5eaccff934a2ffdec74eeb54c7a7ee",
+      "query_tokens": 108,
+      "record_index": 142,
+      "record_sha256": "b3315d3f15726fe4fd9f70076e334b7f76d7de1476c319df226aa351fa8733c3",
+      "sample_id": "longbench_qasper_0142"
+    },
+    {
+      "context_tokens": 5699,
+      "dataset": "longbench_qasper",
+      "length_stratum": 1,
+      "probe_id": "4620a5d53bbd70059bf0b42fecac123138894724abd3eabe69b5ac73de9703d8",
+      "query_tokens": 95,
+      "record_index": 151,
+      "record_sha256": "dbcaf597be5b71b0b7ca03ae00d27bd5df5db782a1594d71c5ca577d5a93ea8c",
+      "sample_id": "longbench_qasper_0151"
+    },
+    {
+      "context_tokens": 5787,
+      "dataset": "longbench_qasper",
+      "length_stratum": 1,
+      "probe_id": "137ae3a14669df3a0e5847699f6d058a524fba752f00ed8edc26322a19cb51a7",
+      "query_tokens": 98,
+      "record_index": 157,
+      "record_sha256": "b13600fec620c89e00431ed9935db6f83e5e4ddf4368af9a4dd7f62514b91d3d",
+      "sample_id": "longbench_qasper_0157"
+    },
+    {
+      "context_tokens": 5506,
+      "dataset": "longbench_qasper",
+      "length_stratum": 1,
+      "probe_id": "4cdfd555b669c54cefdbd714241e2c6cf6711c56405ebdeea1bff1cb21f7acd8",
+      "query_tokens": 103,
+      "record_index": 194,
+      "record_sha256": "3238b2d8ffe59ee165992c357db34f11570ea2e14e843e19f15e49d95c693719",
+      "sample_id": "longbench_qasper_0194"
+    },
+    {
+      "context_tokens": 5805,
+      "dataset": "longbench_qasper",
+      "length_stratum": 2,
+      "probe_id": "35d46e86a0bdf5c07ae90710ee7b647c7bf411681b9e1bd86d0597e26b2701a6",
+      "query_tokens": 98,
+      "record_index": 74,
+      "record_sha256": "9ffa72f96c4c44b5e65d43f28f1fd69b71f339add1182bbb37c7930cdf5f373c",
+      "sample_id": "longbench_qasper_0074"
+    },
+    {
+      "context_tokens": 6203,
+      "dataset": "longbench_qasper",
+      "length_stratum": 2,
+      "probe_id": "49a824b84e99c8062e73cb5300fcb3605f378487d28a930e1f11717b684f6d03",
+      "query_tokens": 95,
+      "record_index": 91,
+      "record_sha256": "15856ce6a1b503e19d9c166da84a35d7ec5d7065c9097b8d763910310ee3deef",
+      "sample_id": "longbench_qasper_0091"
+    },
+    {
+      "context_tokens": 6318,
+      "dataset": "longbench_qasper",
+      "length_stratum": 2,
+      "probe_id": "0429ae7e318e9b4e9057c126102cdcaa067becaa36cedf57a6b9370c2dc8adfe",
+      "query_tokens": 96,
+      "record_index": 136,
+      "record_sha256": "42febc9de636ba24917aded0c5e364a0bb9e5ac8c675ce1b73a6acde568f116a",
+      "sample_id": "longbench_qasper_0136"
+    },
+    {
+      "context_tokens": 6633,
+      "dataset": "longbench_qasper",
+      "length_stratum": 2,
+      "probe_id": "385255d909b9d9df1ed7d226281d2c519ba34bcf33606c4d60aafd7bbdd20127",
+      "query_tokens": 97,
+      "record_index": 184,
+      "record_sha256": "feb83e08a18ff8135d4f36f5797bfcfc682ac6e3537c14525a6489dec3ea6508",
+      "sample_id": "longbench_qasper_0184"
+    },
+    {
+      "context_tokens": 5865,
+      "dataset": "longbench_qasper",
+      "length_stratum": 2,
+      "probe_id": "118af07a8ba9e82f538a9b17685521770e00673db7c7eb7d2d806a03889f8071",
+      "query_tokens": 96,
+      "record_index": 197,
+      "record_sha256": "0ec4c31f05180816e2651ff3d4c90329594ad6df8f52473157fdbdf19db5c478",
+      "sample_id": "longbench_qasper_0197"
+    },
+    {
+      "context_tokens": 8734,
+      "dataset": "longbench_qasper",
+      "length_stratum": 3,
+      "probe_id": "08d82212cf5a38643ce7b2bd45af2523c89c40b9a9354261844a0c52305c0b86",
+      "query_tokens": 97,
+      "record_index": 13,
+      "record_sha256": "4638363bdb46cfda22ddadbc13d2a58f4bc5b82c4a67cb559b490ce6a94dfb54",
+      "sample_id": "longbench_qasper_0013"
+    },
+    {
+      "context_tokens": 7903,
+      "dataset": "longbench_qasper",
+      "length_stratum": 3,
+      "probe_id": "cb9ed241797b9b926342d41d8a5d31ddee586c26735e556a68083b6033bff7ac",
+      "query_tokens": 101,
+      "record_index": 21,
+      "record_sha256": "340f71f72a28b1bb5e1867095ede014c96018cfad35d647b0fc0bd26030b1750",
+      "sample_id": "longbench_qasper_0021"
+    },
+    {
+      "context_tokens": 7531,
+      "dataset": "longbench_qasper",
+      "length_stratum": 3,
+      "probe_id": "8a9cc3888409438a4b7f55c6cbc6affe12d247087104e07a8b46d5eeda918f1b",
+      "query_tokens": 97,
+      "record_index": 24,
+      "record_sha256": "0a3edf52fc7c5878d817fbcce364a175c12cb71267557936f5cb8646d86cf1a4",
+      "sample_id": "longbench_qasper_0024"
+    },
+    {
+      "context_tokens": 7040,
+      "dataset": "longbench_qasper",
+      "length_stratum": 3,
+      "probe_id": "fbe860e37348009468a589314122606f5ca24af336f7cbf4ebb2882008de5926",
+      "query_tokens": 97,
+      "record_index": 40,
+      "record_sha256": "03a1c2b768ba66fc4c7482a5c7616cc8409c11474723f515d79dd80405ed340a",
+      "sample_id": "longbench_qasper_0040"
+    },
+    {
+      "context_tokens": 6814,
+      "dataset": "longbench_qasper",
+      "length_stratum": 3,
+      "probe_id": "82093f5afb386598bed4c84a03a2cf9ef2f839b97e8ccbecc775d71cc8a4ae97",
+      "query_tokens": 98,
+      "record_index": 128,
+      "record_sha256": "c840cde030efe6a38b58971fa00ef2afcb5c64c8a77a0237ee237a1028e0d1f3",
+      "sample_id": "longbench_qasper_0128"
+    },
+    {
+      "context_tokens": 5709,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 0,
+      "probe_id": "b8c719c9a4ced938bfce8853db111a7918c9bf207b3cb7baed20d2d0020114b9",
+      "query_tokens": 54,
+      "record_index": 22,
+      "record_sha256": "ba761e38a6424f43378255fa41c06def8d5e41c9a77282b759e2415c7cec514a",
+      "sample_id": "longbench_multifieldqa_en_0022"
+    },
+    {
+      "context_tokens": 6087,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 0,
+      "probe_id": "b46eb8957d40bc8b738e82b8f09f514903302c58630373f76a3b3df94237c76f",
+      "query_tokens": 53,
+      "record_index": 38,
+      "record_sha256": "205a547c0eeba7f6b95ddba642af33155577644aee10e270e9a1a0bcb5509ced",
+      "sample_id": "longbench_multifieldqa_en_0038"
+    },
+    {
+      "context_tokens": 6428,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 0,
+      "probe_id": "1ac5a6ec59770539277da5ef1217fefa4a3e3179b704f66dd222279827c10141",
+      "query_tokens": 53,
+      "record_index": 46,
+      "record_sha256": "72e4bf1932f609f8b103dc72572e5b7e59905bd3a63e972c7110e5ca0ee9fcaf",
+      "sample_id": "longbench_multifieldqa_en_0046"
+    },
+    {
+      "context_tokens": 5557,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 0,
+      "probe_id": "450c158a20f858ddb10d2b3ad9bc9284bc0c8920491f9182cb6c5cf58c0a179b",
+      "query_tokens": 55,
+      "record_index": 69,
+      "record_sha256": "f2ddb722d465cdf64fe170692e815849c8cf093e7f8974be90990c46cb66c3a4",
+      "sample_id": "longbench_multifieldqa_en_0069"
+    },
+    {
+      "context_tokens": 5876,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 0,
+      "probe_id": "9a7eab8e5e78653b128e91acc19f049312f459822a00b43f49e158a9defa663d",
+      "query_tokens": 59,
+      "record_index": 95,
+      "record_sha256": "eddfcbd0f7c4ac31ddaf1793377887d85990a4e076a1d14f4fa5524142f7d5ac",
+      "sample_id": "longbench_multifieldqa_en_0095"
+    },
+    {
+      "context_tokens": 8246,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 1,
+      "probe_id": "ba5155f0f9c522ec074285cb25560bb0aa1451ed6c0777f7e26220e0687ff704",
+      "query_tokens": 49,
+      "record_index": 6,
+      "record_sha256": "63566a3f037bbedd9a619d2c860a7cc3ed2a5f218650d689cad58a88a26b01f1",
+      "sample_id": "longbench_multifieldqa_en_0006"
+    },
+    {
+      "context_tokens": 8418,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 1,
+      "probe_id": "fb72d5f0f33a5e4582602bdde9563e74a6dfd41ff5992d0cf5bead8877969d35",
+      "query_tokens": 55,
+      "record_index": 44,
+      "record_sha256": "847a7f82ba723f57fe9a040777e332c93a368b92f9e50033d9f85197a387207a",
+      "sample_id": "longbench_multifieldqa_en_0044"
+    },
+    {
+      "context_tokens": 8654,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 1,
+      "probe_id": "039cc9fd4507a68ee5b6e5d48a8efda2810beb233aea3f59d2c7cdbc9329ab03",
+      "query_tokens": 61,
+      "record_index": 52,
+      "record_sha256": "ca1613f99ec98c97b407b83f8e5ba2f0f8c187c847e5f4364c47bb52c0fb9d7f",
+      "sample_id": "longbench_multifieldqa_en_0052"
+    },
+    {
+      "context_tokens": 8230,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 1,
+      "probe_id": "bdf4db515624ffbac10538741a7a4980dcdc2495622be0ffcd5a43a7d10cc1c0",
+      "query_tokens": 61,
+      "record_index": 112,
+      "record_sha256": "b3295f0d4212cfcef3f655b5603178050354139653cb58e010413c571df14592",
+      "sample_id": "longbench_multifieldqa_en_0112"
+    },
+    {
+      "context_tokens": 8469,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 1,
+      "probe_id": "320dc1defc956bdab276d9a852a9a333512fee45cc2458e1dfb8229e7b66c8ba",
+      "query_tokens": 52,
+      "record_index": 147,
+      "record_sha256": "9ab110bba9d55dda78807717458441b3420973278dfc02180592d3e0f90166d1",
+      "sample_id": "longbench_multifieldqa_en_0147"
+    },
+    {
+      "context_tokens": 9446,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 2,
+      "probe_id": "625b0211227350e27747df4c8e97ff575577b3d48d87a9e7f6d6f1d55308188b",
+      "query_tokens": 55,
+      "record_index": 26,
+      "record_sha256": "42551b7f6e74205896bc1cdd7e4d2de5f79e828ea6c332efad0c3c502f9d7c67",
+      "sample_id": "longbench_multifieldqa_en_0026"
+    },
+    {
+      "context_tokens": 9918,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 2,
+      "probe_id": "ea6b4a1386417fb391786de4aa2aad2e1b66e74db9db37df9bae84c4fa4acd2f",
+      "query_tokens": 49,
+      "record_index": 43,
+      "record_sha256": "f660a114f86fbe0bac1e46c4a33e0f0b62d92dc2d68676f0a171d342098e8f5c",
+      "sample_id": "longbench_multifieldqa_en_0043"
+    },
+    {
+      "context_tokens": 9637,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 2,
+      "probe_id": "66ab367e6c972aa88298651eeed49dd2332cc5c1b8d011c25df79996030c596a",
+      "query_tokens": 59,
+      "record_index": 45,
+      "record_sha256": "f953de1c229f8019e3bfd60747023b5f1e09528c5aa92a558dc9eddce45c6ebb",
+      "sample_id": "longbench_multifieldqa_en_0045"
+    },
+    {
+      "context_tokens": 9965,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 2,
+      "probe_id": "2358b89f14f128b49a87ae922f30bfc754068cc57b67c84de20a37f86995cacc",
+      "query_tokens": 51,
+      "record_index": 114,
+      "record_sha256": "226b369a43a1df182318aa4ed449e511289216ea01c6bfb73657292a384b69be",
+      "sample_id": "longbench_multifieldqa_en_0114"
+    },
+    {
+      "context_tokens": 9492,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 2,
+      "probe_id": "8a4856a4a61c10a1723b81b09982dffae141ffe02be56ede7eb67b62e645d372",
+      "query_tokens": 65,
+      "record_index": 125,
+      "record_sha256": "3fd14b4a1b2a5fee120ed4b315b4836f8aaeaa6eb6b1f8aa0c1484302d341aed",
+      "sample_id": "longbench_multifieldqa_en_0125"
+    },
+    {
+      "context_tokens": 11401,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 3,
+      "probe_id": "803bd20e40fe1410398bddda8132af8a444ace5a04a4746814271b8a8f1649de",
+      "query_tokens": 51,
+      "record_index": 1,
+      "record_sha256": "1d49c265ea039773d9119639b825dab016f3654e82f8538f62d5aa661b3e7575",
+      "sample_id": "longbench_multifieldqa_en_0001"
+    },
+    {
+      "context_tokens": 13651,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 3,
+      "probe_id": "f63f952791d6f81dd8d95b8e7303bc6d9066d996a0ae082323f21f5301eeb2d7",
+      "query_tokens": 53,
+      "record_index": 74,
+      "record_sha256": "6705a78d4aa5dc792d27bcd3937d92294455fe8d5ee646c35fccc17c4b75a312",
+      "sample_id": "longbench_multifieldqa_en_0074"
+    },
+    {
+      "context_tokens": 12816,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 3,
+      "probe_id": "03475f9f7b0fa2c20c7954ca08bf00d44431faff261559d4dc135fa0cae40e50",
+      "query_tokens": 55,
+      "record_index": 85,
+      "record_sha256": "21b6d5d76b8a29e15444d4278b15878a323ce97831d761edc7f866142ede052e",
+      "sample_id": "longbench_multifieldqa_en_0085"
+    },
+    {
+      "context_tokens": 14859,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 3,
+      "probe_id": "91fa5e3734496dc666e77a6f6f60dd9f72edff39c0bd97953cd7e766239b4aa4",
+      "query_tokens": 50,
+      "record_index": 90,
+      "record_sha256": "3fea1f0a54bf06c1c59ff81ca4b16528191393adc430be2f7738037bb80c2938",
+      "sample_id": "longbench_multifieldqa_en_0090"
+    },
+    {
+      "context_tokens": 13420,
+      "dataset": "longbench_multifieldqa_en",
+      "length_stratum": 3,
+      "probe_id": "5332b0c9d93324e4708c5709a321e110e58d0d41bfbae5fed2a8468dd9b52e49",
+      "query_tokens": 57,
+      "record_index": 116,
+      "record_sha256": "5b9abef41505b5dd36e9faf07ad04ce8f8dd31eb76ce1ef04662c775f37420e8",
+      "sample_id": "longbench_multifieldqa_en_0116"
+    },
+    {
+      "context_tokens": 11512,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 0,
+      "probe_id": "c8c93b3cf1557257e8510c2a34502459f895c531426b690a0f7415bc1e2652cc",
+      "query_tokens": 59,
+      "record_index": 20,
+      "record_sha256": "90a200e07f9b27b74a5ca2cb12e57bf41269420fdd317144243efcfd11baab67",
+      "sample_id": "longbench_hotpotqa_0020"
+    },
+    {
+      "context_tokens": 11687,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 0,
+      "probe_id": "b49efb7b81b97a250c84db73c83864f7ef7e8cc3bbad6ac58c3918575b8547ee",
+      "query_tokens": 51,
+      "record_index": 94,
+      "record_sha256": "3802d77b93ac63d257cbf78a9148a50c46af258f93945508b03099bc251de551",
+      "sample_id": "longbench_hotpotqa_0094"
+    },
+    {
+      "context_tokens": 12035,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 0,
+      "probe_id": "bd1f64bcea490db589f669c086e0011c1dc7cfd9999dbdc53fa30f58977e4f25",
+      "query_tokens": 49,
+      "record_index": 109,
+      "record_sha256": "37094bec2a451d0fdb7ab78fc3708672af8cee562714429cbde84c5ef25eebca",
+      "sample_id": "longbench_hotpotqa_0109"
+    },
+    {
+      "context_tokens": 11767,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 0,
+      "probe_id": "c74c8dc14c3ba07b336e68b2331fa90dc99f4da1ff42eb8bb777b49be26445a7",
+      "query_tokens": 61,
+      "record_index": 160,
+      "record_sha256": "d2c2e403308cdf2efc28ab876f366484308d3a453430dbd97da0122b5b10bd0b",
+      "sample_id": "longbench_hotpotqa_0160"
+    },
+    {
+      "context_tokens": 11261,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 0,
+      "probe_id": "73ecbb7073506a6325292e1a46e4a0d03397b2b7b84f9103fb22cbaff3e4ab4f",
+      "query_tokens": 50,
+      "record_index": 192,
+      "record_sha256": "516dfb0241480085c53ed5252a805749a1305467221bff6540b357b7a2f78c2d",
+      "sample_id": "longbench_hotpotqa_0192"
+    },
+    {
+      "context_tokens": 13008,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 1,
+      "probe_id": "b7d26637c81a5629b2a89c8e9102faa53c45eec2e938d2811b96afcbf72d7829",
+      "query_tokens": 56,
+      "record_index": 15,
+      "record_sha256": "7f24dfe27d3101ad1f293b4fb2a58c3f9d928b897f0216b3d6d07aac66bd530d",
+      "sample_id": "longbench_hotpotqa_0015"
+    },
+    {
+      "context_tokens": 13955,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 1,
+      "probe_id": "3b697c1bf03e41f5dcb38fa367830ba0aede1f309a18a5940d81a9c58f877e7d",
+      "query_tokens": 62,
+      "record_index": 37,
+      "record_sha256": "5ab68d5e09e88d8e9ef0775b7d14a8cf3bfc8caf97fcf633ece2ba057d777433",
+      "sample_id": "longbench_hotpotqa_0037"
+    },
+    {
+      "context_tokens": 14158,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 1,
+      "probe_id": "a83769c8b3ac2c002542761c36846d59441e54da3e7e59e485f224fb3ead1668",
+      "query_tokens": 46,
+      "record_index": 63,
+      "record_sha256": "bc50424e868f372b0422319312e2f1ac96ec774eac410aed2fecfb263d2e6fbf",
+      "sample_id": "longbench_hotpotqa_0063"
+    },
+    {
+      "context_tokens": 12060,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 1,
+      "probe_id": "455b3ddcf2820f313b7210a68cdfab30e6d0f7bdfb1ccd6d1ca02c76edcd1a05",
+      "query_tokens": 53,
+      "record_index": 74,
+      "record_sha256": "fc7076a4f95a5144a856c67259722b3270c41a7dcf18e446cf6456b87198111d",
+      "sample_id": "longbench_hotpotqa_0074"
+    },
+    {
+      "context_tokens": 12740,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 1,
+      "probe_id": "d3297e388582e49e1c6581ce65fa15224dd6422c96cca8a5d561e557bb078bd0",
+      "query_tokens": 73,
+      "record_index": 153,
+      "record_sha256": "e53e43920ce3df7175abf979fdd5716027167b2af0cc7b7ca99f13da12fa5e39",
+      "sample_id": "longbench_hotpotqa_0153"
+    },
+    {
+      "context_tokens": 14612,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 2,
+      "probe_id": "03d87b1528d0ca86d8e0c9a10dd29616514f5c55c1063dd5538a4d9e914a7278",
+      "query_tokens": 56,
+      "record_index": 116,
+      "record_sha256": "8cccb474aa45ea9ea619b5a077d0a8447bbd01f25543d3b0d7796ad6453546ff",
+      "sample_id": "longbench_hotpotqa_0116"
+    },
+    {
+      "context_tokens": 14410,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 2,
+      "probe_id": "23af77dfd30ac7d86fb232b6a68b216a585c87614357dc01e72687584900ca9c",
+      "query_tokens": 61,
+      "record_index": 132,
+      "record_sha256": "900ccb5aa80cd4333cdec842faa6724ef093c3146cfc5095a5c353806ef48fda",
+      "sample_id": "longbench_hotpotqa_0132"
+    },
+    {
+      "context_tokens": 15092,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 2,
+      "probe_id": "40783c85e3f77f601f1f5f75828f3e6d7747057cfdb3b42d076fd024b891eec1",
+      "query_tokens": 61,
+      "record_index": 169,
+      "record_sha256": "ee0c45f8f7326ae2593197b684d82dab94142d74d802955702bc1809f78391d0",
+      "sample_id": "longbench_hotpotqa_0169"
+    },
+    {
+      "context_tokens": 14600,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 2,
+      "probe_id": "b479cc3e6e4798e451fc3a7b3f6f17303f53aa4ad4ca7adec137bf4048f596ee",
+      "query_tokens": 65,
+      "record_index": 174,
+      "record_sha256": "d85520c9ecd3c96996df966c436523756f96f1aa7e9ab2faf550f58a9b53f3b3",
+      "sample_id": "longbench_hotpotqa_0174"
+    },
+    {
+      "context_tokens": 14837,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 2,
+      "probe_id": "f65966c8de869a86fcabb73af2b0407d2f664f149b83d11522ed8b55f894cd6c",
+      "query_tokens": 62,
+      "record_index": 196,
+      "record_sha256": "d8625b1f4d6609991ce94a195d02e5e39b72380f06ada3427c58855848ec85d6",
+      "sample_id": "longbench_hotpotqa_0196"
+    },
+    {
+      "context_tokens": 15921,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 3,
+      "probe_id": "4f9352c37076769068137c8ef23d5d9f0658a4706f8ef1138935c6a645690121",
+      "query_tokens": 52,
+      "record_index": 77,
+      "record_sha256": "02af9ae6aa5f0179c202d64d61b6c7a655708fc9e2e9c7a0a90ceba0405cdbe8",
+      "sample_id": "longbench_hotpotqa_0077"
+    },
+    {
+      "context_tokens": 15942,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 3,
+      "probe_id": "13cfc0cc5082ca7ec88b59fc205d68dfdfac079d8115193f3c7e85119831ea78",
+      "query_tokens": 49,
+      "record_index": 105,
+      "record_sha256": "b91e2d67a24a5e3d57b0584ba82f6cc6b5cfe689b0a82c8dc38fe7d2c54a19e1",
+      "sample_id": "longbench_hotpotqa_0105"
+    },
+    {
+      "context_tokens": 15866,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 3,
+      "probe_id": "f8d0f3fb29c1418a1b38e9c79db540ddfcd39cd611cc06b591846bbe2d64fdd8",
+      "query_tokens": 55,
+      "record_index": 124,
+      "record_sha256": "bdca11635590e3d41a67470a8faf65271b1a47ba817d0fb0e8cb04fc4d67d003",
+      "sample_id": "longbench_hotpotqa_0124"
+    },
+    {
+      "context_tokens": 16062,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 3,
+      "probe_id": "2778c18ff8a51afedbf714f2211978ae5667d44611451648b48c596cd862b413",
+      "query_tokens": 54,
+      "record_index": 170,
+      "record_sha256": "3be21462f31c222df749278f33f95d68eb4ec5dc11492071e497313e4cc47a0a",
+      "sample_id": "longbench_hotpotqa_0170"
+    },
+    {
+      "context_tokens": 15940,
+      "dataset": "longbench_hotpotqa",
+      "length_stratum": 3,
+      "probe_id": "57e920bf29a79f0d9cbcea0594ed7303fb869639de7b5dd34ac36ca661b399a5",
+      "query_tokens": 53,
+      "record_index": 189,
+      "record_sha256": "f658334e059dba33f59d0910604a7fcc815a5f428ec026bdef3778dc8893d732",
+      "sample_id": "longbench_hotpotqa_0189"
+    },
+    {
+      "context_tokens": 6982,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 0,
+      "probe_id": "d6eac19a2b73d4188484d06f275e65064710529fdb267575ee7ce32ba0cbf1f7",
+      "query_tokens": 57,
+      "record_index": 72,
+      "record_sha256": "d53d5af37f3ae95c42fccb003029ee3ac3a607c0fe3b6298aac8988924929343",
+      "sample_id": "longbench_2wikimqa_0072"
+    },
+    {
+      "context_tokens": 7055,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 0,
+      "probe_id": "0f029be8a51c1d580de91a0fc1a049e1f71287573fa7437c568fc606c63a23fd",
+      "query_tokens": 54,
+      "record_index": 82,
+      "record_sha256": "05cbff75b98991789511af77b9205c06c5d3bc9d75ac9faf640971bb6a26752b",
+      "sample_id": "longbench_2wikimqa_0082"
+    },
+    {
+      "context_tokens": 6935,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 0,
+      "probe_id": "c3c6e24be6f7f63b54facb34d4a1e5f2270d79a382b8ba8a66f587c9f83d6df2",
+      "query_tokens": 55,
+      "record_index": 103,
+      "record_sha256": "2c0d6e1d97b202322bb60f47ca8eaf5af63e46e9c0da4199ad59df2882fa2b14",
+      "sample_id": "longbench_2wikimqa_0103"
+    },
+    {
+      "context_tokens": 6552,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 0,
+      "probe_id": "84f2de814b4100e6e658d4450ab2ffc791110f299aee8843e47ed54324a3b4c5",
+      "query_tokens": 55,
+      "record_index": 110,
+      "record_sha256": "e295160e742b3d1839a460d08a797e9d82145b552901daa978f7737aee8b7ad2",
+      "sample_id": "longbench_2wikimqa_0110"
+    },
+    {
+      "context_tokens": 6855,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 0,
+      "probe_id": "92bae87a349be74b092b76127565f0468827faf3a51a25c83e455afd81dfbe60",
+      "query_tokens": 51,
+      "record_index": 195,
+      "record_sha256": "cc37147f2c4ceb172be92f3a69c570d16339e36c05bb1550c60fe61e3f9a8205",
+      "sample_id": "longbench_2wikimqa_0195"
+    },
+    {
+      "context_tokens": 7525,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 1,
+      "probe_id": "b7cc7c4f0297baee266ab506b696779cdd7f91a6f450c2cd1bf5fe4cd71c97b6",
+      "query_tokens": 52,
+      "record_index": 29,
+      "record_sha256": "62e1731b4a0699c610c3af877bdeab837f1ee5dd6b55a9cd5eda26033eecf206",
+      "sample_id": "longbench_2wikimqa_0029"
+    },
+    {
+      "context_tokens": 8052,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 1,
+      "probe_id": "a8a6d7131d43d4e1101f49e81b4bd5c97cf9aa69a9291d27a69eeedd5f2bf474",
+      "query_tokens": 56,
+      "record_index": 95,
+      "record_sha256": "3dc83ae322a565f6e1dd0d924c7daa4c6c4d54ea57b78b06f487d51af38965ca",
+      "sample_id": "longbench_2wikimqa_0095"
+    },
+    {
+      "context_tokens": 7845,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 1,
+      "probe_id": "5c135f3c69dc008f4d158f9e44151304f6bb5a26bd2ca1a591656508d9ad14d2",
+      "query_tokens": 51,
+      "record_index": 117,
+      "record_sha256": "e935c6ecca66a326bf70dc491865f5d5348bbaf8abcdc208e596f33d18b2558f",
+      "sample_id": "longbench_2wikimqa_0117"
+    },
+    {
+      "context_tokens": 7914,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 1,
+      "probe_id": "801a0179ed1e3574106a8ffadff596d724755c18233e52f9407249fa1d14bd8f",
+      "query_tokens": 59,
+      "record_index": 125,
+      "record_sha256": "e2153fcb1214c19352028ac0d65a55cb8d51730eb47eae0aa76cfe17495a469b",
+      "sample_id": "longbench_2wikimqa_0125"
+    },
+    {
+      "context_tokens": 8020,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 1,
+      "probe_id": "0a242e3247bdcc198666eaf023650c2564d502c98ade38e051457094433f8489",
+      "query_tokens": 53,
+      "record_index": 171,
+      "record_sha256": "0002b12cb481ba7b6ec3e466350afa0b26d6c3c36a61a1b8fa8fc5b427af612a",
+      "sample_id": "longbench_2wikimqa_0171"
+    },
+    {
+      "context_tokens": 11300,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 2,
+      "probe_id": "7975f206979b92fed7dff52ee497b539ddfaa80b4e75ae23c061cb167e4aae20",
+      "query_tokens": 48,
+      "record_index": 7,
+      "record_sha256": "85caad220a10f05361b1d1155266e5c0e3fdd920295225a301f855de1e041fac",
+      "sample_id": "longbench_2wikimqa_0007"
+    },
+    {
+      "context_tokens": 9003,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 2,
+      "probe_id": "19896a3856bfd631c90551de80eed1d23a1cac0658e489760f83c953219b9fd7",
+      "query_tokens": 54,
+      "record_index": 23,
+      "record_sha256": "1c020ef677b85145f4414e32de7083ede8f0ea3a6468977a5f48fc72d84b6830",
+      "sample_id": "longbench_2wikimqa_0023"
+    },
+    {
+      "context_tokens": 8503,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 2,
+      "probe_id": "c11cf37870e31054a4415a93c4d75c20d3bb204a5250e3b008e3de31bce5ddf4",
+      "query_tokens": 56,
+      "record_index": 43,
+      "record_sha256": "72add9060e013c4b146ae118cde5a34bd88113559a18b87762088ee35dea308d",
+      "sample_id": "longbench_2wikimqa_0043"
+    },
+    {
+      "context_tokens": 8740,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 2,
+      "probe_id": "5f2c6ca1eea6ec4e637a51cc57a04bfb55bdb2789dc39a530a5e8560eb72fe1d",
+      "query_tokens": 55,
+      "record_index": 87,
+      "record_sha256": "1d4911d841922ec7554b63b052635343636d1c544442e0ff6f570688f006ac30",
+      "sample_id": "longbench_2wikimqa_0087"
+    },
+    {
+      "context_tokens": 11437,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 2,
+      "probe_id": "64c21f0600c0226d77e57bd4dbd22cdd0483078a49e90ff65039a6b65766cbd0",
+      "query_tokens": 50,
+      "record_index": 177,
+      "record_sha256": "cddce17772da68bff9f3d2d3c0dc81fe66bcc89a99ff752a44cda9a941ad8ae6",
+      "sample_id": "longbench_2wikimqa_0177"
+    },
+    {
+      "context_tokens": 15701,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 3,
+      "probe_id": "492b35ad72d2b42806782330bd5c32b98fda9f0bde70518bc860c7f450b499f5",
+      "query_tokens": 59,
+      "record_index": 10,
+      "record_sha256": "c1a26fac2ba4032391ba7eedab21ec4e270e0989e829bac2ba54d36c8ffa08d3",
+      "sample_id": "longbench_2wikimqa_0010"
+    },
+    {
+      "context_tokens": 15007,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 3,
+      "probe_id": "23dbf8a2995aa87bc31de9e0cf088a81f9f012a5f55588371d909096c182b94a",
+      "query_tokens": 50,
+      "record_index": 15,
+      "record_sha256": "3cfa20550235cf5426d0f85522228ac3a19b209ed6a15c21c547b888ed85f450",
+      "sample_id": "longbench_2wikimqa_0015"
+    },
+    {
+      "context_tokens": 13086,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 3,
+      "probe_id": "54a04bdd29a81390f0e30a8e1d6b87ddf699d388163ce8e0eb925365286ca626",
+      "query_tokens": 57,
+      "record_index": 22,
+      "record_sha256": "10355e13ff7a6623113d1ca3a72e445292cdea05d45fed592894bb225dc19a35",
+      "sample_id": "longbench_2wikimqa_0022"
+    },
+    {
+      "context_tokens": 14993,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 3,
+      "probe_id": "8e7418ebb46c8726a9f076c19ff21b15b6662419443e03df0a31e80155daff00",
+      "query_tokens": 51,
+      "record_index": 50,
+      "record_sha256": "16833f6623360babe53230f3f59437d1c6b2f3680ca2a3170b17b0297f2b8e9d",
+      "sample_id": "longbench_2wikimqa_0050"
+    },
+    {
+      "context_tokens": 14792,
+      "dataset": "longbench_2wikimqa",
+      "length_stratum": 3,
+      "probe_id": "41dd2fcde00bac60d048dcdf309b63983227a3ef25f834df5a9f55e3db2ca225",
+      "query_tokens": 51,
+      "record_index": 160,
+      "record_sha256": "5d24e43f07960f0f8593a1d24c9688af8914fd70950bb15791d17df5beeb7e2a",
+      "sample_id": "longbench_2wikimqa_0160"
+    },
+    {
+      "context_tokens": 11078,
+      "dataset": "longbench_musique",
+      "length_stratum": 0,
+      "probe_id": "8f021f1499ec0fcd3df440e5600db197511ed5ba57e6c1d558d818aba7d4cad5",
+      "query_tokens": 59,
+      "record_index": 30,
+      "record_sha256": "329b4f123d8369659135ad5e326c7e33d1a497a717e3fe4567dbcd724e79e072",
+      "sample_id": "longbench_musique_0030"
+    },
+    {
+      "context_tokens": 6830,
+      "dataset": "longbench_musique",
+      "length_stratum": 0,
+      "probe_id": "37df208229689a0d16ea8daf695915006526da1231d37fe7b4a47f2556b7c2a4",
+      "query_tokens": 52,
+      "record_index": 68,
+      "record_sha256": "6e44464d84705a69b7c9390450940a3f209ea37f81e31aad7e272c38e0dd28b3",
+      "sample_id": "longbench_musique_0068"
+    },
+    {
+      "context_tokens": 9480,
+      "dataset": "longbench_musique",
+      "length_stratum": 0,
+      "probe_id": "d3b548a5f165adc561066e88c8095b0241a8845c4278a28f34a727370587ba0d",
+      "query_tokens": 56,
+      "record_index": 108,
+      "record_sha256": "d6abc37b658e436db2898cfa1cdfa6d351cfc037f9ad464b2b9386d2f4f93da2",
+      "sample_id": "longbench_musique_0108"
+    },
+    {
+      "context_tokens": 13057,
+      "dataset": "longbench_musique",
+      "length_stratum": 0,
+      "probe_id": "67498f479341d6246b71d085fcaebaeac5aeb4eac0d09a90f9973fb2050a068e",
+      "query_tokens": 58,
+      "record_index": 120,
+      "record_sha256": "688407e56b16d03a84fdac35bb1602784ad55d4b80e634cdeef13c44d443931d",
+      "sample_id": "longbench_musique_0120"
+    },
+    {
+      "context_tokens": 7835,
+      "dataset": "longbench_musique",
+      "length_stratum": 0,
+      "probe_id": "24101eb5ac6199d65f8679af92a22fdc87c6351a47e1de6e8d515a9a0defec9c",
+      "query_tokens": 50,
+      "record_index": 135,
+      "record_sha256": "c1b2d442281ae2321d0ca4889cbb6be2a31add336310d5684e3d37cf6663d2ce",
+      "sample_id": "longbench_musique_0135"
+    },
+    {
+      "context_tokens": 15231,
+      "dataset": "longbench_musique",
+      "length_stratum": 1,
+      "probe_id": "4117138d741167ad641a132bc0a3ba864ab90d806bdc59e24c11ed802ee8cb71",
+      "query_tokens": 59,
+      "record_index": 42,
+      "record_sha256": "c090cf17c117d3f504137fafdd17600003251ab7d3292bc6d75c3055e08b0195",
+      "sample_id": "longbench_musique_0042"
+    },
+    {
+      "context_tokens": 15484,
+      "dataset": "longbench_musique",
+      "length_stratum": 1,
+      "probe_id": "9128d1caa6963957e8f4f9d25527a68ef2970ee697a6cce9fe97704ebabe867d",
+      "query_tokens": 51,
+      "record_index": 55,
+      "record_sha256": "2cf1c70c4b9388eba781d2ae65725658d02ddb558a12b1095c652270e14f07ef",
+      "sample_id": "longbench_musique_0055"
+    },
+    {
+      "context_tokens": 14664,
+      "dataset": "longbench_musique",
+      "length_stratum": 1,
+      "probe_id": "d5f0ba52c5fe1d906bcc4406f5f90fafe11b3f129ffc1ad596fb856cb3656a13",
+      "query_tokens": 52,
+      "record_index": 56,
+      "record_sha256": "e34c6457ae63bef79cf7a165a95beaf37a5c628fb36198fd3729ee0dcec8b161",
+      "sample_id": "longbench_musique_0056"
+    },
+    {
+      "context_tokens": 14469,
+      "dataset": "longbench_musique",
+      "length_stratum": 1,
+      "probe_id": "6f79cefd06ef6f678efc6499480c6b386ad3a9db902f41ee5116f2720d48d978",
+      "query_tokens": 55,
+      "record_index": 76,
+      "record_sha256": "7a99950dbae8d80e360390bd990f637950d37c8ada19476eb63e271caf31ab91",
+      "sample_id": "longbench_musique_0076"
+    },
+    {
+      "context_tokens": 15068,
+      "dataset": "longbench_musique",
+      "length_stratum": 1,
+      "probe_id": "370bc180ec54fbf5a9b26e746bcf05ba450ee513eda9c0e06c1343cafb14a7d1",
+      "query_tokens": 58,
+      "record_index": 91,
+      "record_sha256": "e3324882cec7f821f0c9f0d2466e824c514bde6345c83a0cda55b4186f641e26",
+      "sample_id": "longbench_musique_0091"
+    },
+    {
+      "context_tokens": 15899,
+      "dataset": "longbench_musique",
+      "length_stratum": 2,
+      "probe_id": "4a4b6d64fea3bda320fd8f90f476447572480463a15cebde3e6b01b5d34b271b",
+      "query_tokens": 54,
+      "record_index": 90,
+      "record_sha256": "e68f6bac65aaa414673e86b310415d8cc0b8a41022c6e78e8fa94ead3cda3aa2",
+      "sample_id": "longbench_musique_0090"
+    },
+    {
+      "context_tokens": 15805,
+      "dataset": "longbench_musique",
+      "length_stratum": 2,
+      "probe_id": "6f74bd6d6cabc7e3cf6e46ad1993ea6332b5dd7695afca3f221cbfb1e539fa82",
+      "query_tokens": 47,
+      "record_index": 138,
+      "record_sha256": "ce9adfb49fd41f89b81f314c47416df877730cab6f5892d10279d9896e68dfcf",
+      "sample_id": "longbench_musique_0138"
+    },
+    {
+      "context_tokens": 15872,
+      "dataset": "longbench_musique",
+      "length_stratum": 2,
+      "probe_id": "ec6b09d983b1c8d1523aafe820e1bb2a4fd84c8599cb0ebcd1991da153fe81b0",
+      "query_tokens": 54,
+      "record_index": 167,
+      "record_sha256": "e27bb7b7ab2bcc91fd269b4afcda25a4cc8da68860cf07f6477fb171977e70e1",
+      "sample_id": "longbench_musique_0167"
+    },
+    {
+      "context_tokens": 15798,
+      "dataset": "longbench_musique",
+      "length_stratum": 2,
+      "probe_id": "5ef247e585f27ebe7f3aaf72c6509d395a5bbadbda72996e6490c9548e7fa090",
+      "query_tokens": 61,
+      "record_index": 172,
+      "record_sha256": "e005130c47b2fe18561d4508dba7d51946825bf01c555cda96b9504a3b0ad508",
+      "sample_id": "longbench_musique_0172"
+    },
+    {
+      "context_tokens": 15742,
+      "dataset": "longbench_musique",
+      "length_stratum": 2,
+      "probe_id": "076ec2afc4988ff051a6786bb2e339204cce436df24b0cb5ccd3ab05866925a7",
+      "query_tokens": 62,
+      "record_index": 193,
+      "record_sha256": "4899dc1239e2dd4032d1ca0a39986f1c5ca57866af25cacf2de436c2a2f61b45",
+      "sample_id": "longbench_musique_0193"
+    },
+    {
+      "context_tokens": 16128,
+      "dataset": "longbench_musique",
+      "length_stratum": 3,
+      "probe_id": "bb5c39585ca041fff51f4b2ae0780c8c0605f8848b59f6ca131435ce92ac5cba",
+      "query_tokens": 49,
+      "record_index": 29,
+      "record_sha256": "fdcf9ef9f07152d5532e20e355e0e518b790776659e63527e2a3265959d1d2f1",
+      "sample_id": "longbench_musique_0029"
+    },
+    {
+      "context_tokens": 16338,
+      "dataset": "longbench_musique",
+      "length_stratum": 3,
+      "probe_id": "d766a870f8092a2dcedcc99bcd8f12b790fd7c9d602e0af77a0348d08f9f8191",
+      "query_tokens": 52,
+      "record_index": 86,
+      "record_sha256": "52d063d33ddc67936dd9dd13b4d0402ce1418b1c242ce0a35d748f959e109afa",
+      "sample_id": "longbench_musique_0086"
+    },
+    {
+      "context_tokens": 16103,
+      "dataset": "longbench_musique",
+      "length_stratum": 3,
+      "probe_id": "18b4f783611af108fda7909884d67272765f7c04103086b18d1bddd657e4f861",
+      "query_tokens": 57,
+      "record_index": 118,
+      "record_sha256": "925c3a254bc977e7b0015b1c53d1b3b30f9df9fc1a2fc993a7a7e71c3b2412e5",
+      "sample_id": "longbench_musique_0118"
+    },
+    {
+      "context_tokens": 16049,
+      "dataset": "longbench_musique",
+      "length_stratum": 3,
+      "probe_id": "de2651b06d6475aa67ba1cc79d1ec77dcb532f71bc8feeb3925c579183f9db25",
+      "query_tokens": 50,
+      "record_index": 155,
+      "record_sha256": "13c5a8506e0d2dcd1e5ef86505ea4c4567f3102116a8a273419b6c309d9fd728",
+      "sample_id": "longbench_musique_0155"
+    },
+    {
+      "context_tokens": 16319,
+      "dataset": "longbench_musique",
+      "length_stratum": 3,
+      "probe_id": "dcc17a845cea3e5618b45f0233c2fed280600ed267adb9dd5ec96f62ce50e0d3",
+      "query_tokens": 52,
+      "record_index": 195,
+      "record_sha256": "d21a08f3223d3cd980403706afd8f207aa9dae6d506597f6b0f2510f8e16c7a8",
+      "sample_id": "longbench_musique_0195"
+    }
+  ],
+  "generated_systems": [
+    "hmo_layer_local",
+    "hmo_free_window"
+  ],
+  "method": {
+    "byte_target": "exactly_the_reconstructed_chunkkv_context_resident_bytes",
+    "free_window_boundary_policy": "arbitrary_eligible_token_start",
+    "free_window_selector": "exact_cardinality_constrained_weighted_interval_dp",
+    "free_window_width": 10,
+    "layer_local_control": "legacy_hmo_actions_and_counts_with_per_layer_sparse_placement",
+    "layer_policy": "independent_per_full_attention_layer_shared_across_kv_heads",
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1,
+    "recurrent_state_policy": "unchanged",
+    "segment_length": 256
+  },
+  "middle_kv_fraction": 0.1,
+  "model_id": "Qwen/Qwen3.5-9B",
+  "model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "native_protocol": {
+    "path_hint": "/home/pz/hmo/refine-logs/native_longbench_six_task_9b_protocol.json",
+    "sha256": "2b6c90154e42a543e1bc3ea534e5c81d84c4e7524a82192d8d59bbe29585464e"
+  },
+  "primary_comparisons": [
+    [
+      "hmo_free_window",
+      "chunkkv"
+    ],
+    [
+      "hmo_free_window",
+      "hmo_legacy"
+    ],
+    [
+      "hmo_layer_local",
+      "hmo_legacy"
+    ]
+  ],
+  "primary_metric": "official_qa_f1",
+  "purpose": "development_only_task_and_context_length_stratified_validation",
+  "reused_systems": [
+    "hmo_legacy",
+    "chunkkv",
+    "full_kv_reference"
+  ],
+  "schema_version": "hmo.free_window_dev_protocol.v1",
+  "selection": {
+    "dataset_order": [
+      "longbench_narrativeqa",
+      "longbench_qasper",
+      "longbench_multifieldqa_en",
+      "longbench_hotpotqa",
+      "longbench_2wikimqa",
+      "longbench_musique"
+    ],
+    "development_only": true,
+    "final_confirmation_requires_unseen_source_record_ids": true,
+    "length_strata": 4,
+    "per_dataset": 20,
+    "per_stratum": 5,
+    "rule": "deduplicate_exact_probe_identity_then_equal_rank_length_strata_then_seeded_hash",
+    "seed": 20260905,
+    "uses_proxy_outcomes": false,
+    "uses_qa_outcomes": false
+  },
+  "source_results": {
+    "case_count": 506,
+    "path_hint": "/mnt/nvme0/hmo/runs/native_six_task_9b_5348b87/formal/native_longbench_results.jsonl",
+    "sha256": "a84577f55911af85a8bb76b9049ce76da9482ef04edf6af314786889b94074ae"
+  },
+  "status": "frozen_before_new_method_qa_outcomes",
+  "systems": [
+    "hmo_legacy",
+    "hmo_layer_local",
+    "chunkkv",
+    "hmo_free_window",
+    "full_kv_reference"
+  ]
+}
