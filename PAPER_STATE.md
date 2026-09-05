@@ -8,11 +8,14 @@ attention-only FP32 query probe v2 已在 5090 上证明与旧 hybrid probe bitw
 验证，并替换 Scattered 进入新的正式系统表。旧 probe 与 Scattered 协议作为
 legacy artifact 保留。
 
-9B 六任务 LongBench 主表已按官方 prompt、QA-F1 和生成上限冻结：不截断的
-`<=16K` 原生样本共 506 条，预定先跑 295 条 prefix50，再无结果 Gate 地补到
-prefix100。C3 已升级为无独立 preflight 的 v2，固定顺序为 synthetic 10% ->
-native 10% -> synthetic 5%/20%，总量仍为 432 cells。当前首要任务是执行 9B
-prefix50 并形成新 HMO-vs-ChunkKV 主表与分阶段真实耗时。
+9B 六任务 LongBench 主表已经完成：不截断的 `<=16K` 原生样本共 506 条，
+prefix50 与无结果 Gate 的 prefix100 均正常结束。HMO / ChunkKV / Global Fixed /
+Raw+Slack / Full 的官方 QA-F1 为 0.4642 / 0.4793 / 0.4766 / 0.4800 /
+0.4815；四个压缩系统 506/506 逐样本严格等字节，相对 Full KV 的逐样本
+比例再平均为 14.465%。因此 broad native-QA superiority 不成立，但
+residual-KV 高压缩下接近 Full 的系统主张得到支持。C3 v2 仍保持 432 cells
+冻结，但在新的
+result-to-claim 路由下暂不作为算法优越性验证直接付费执行。
 
 目标会议暂按 ICLR 规划，正文页数按 9 页控制。工作标题为：
 
@@ -244,16 +247,18 @@ aligned placement 取得小幅正向收益，并集中于 structured retrieval�
 
 ### 系统主张
 
-HMO 将 Full-Attention KV footprint 降至平均约 13.38%。在 0.8B 上质量
-接近 Full KV；在 9B transfer 上 Contiguous 与 Full KV 均达到 23/24，
-且二者的主指标逐例一致。
+HMO 在 9B 六任务 native QA 上将 residual Full-Attention KV 的逐样本比例
+平均降至 14.465%，同时保留 Full QA-F1 的 96.41%。这是 near-Full quality
+的高压缩证据，不是 HMO 独有优势：ChunkKV、Global Fixed 与 Raw+Slack 在
+相同 resident bytes 下点估计均更高。0.8B/9B synthetic transfer 继续承担
+locality 相对 scattered singleton 的受控机制证据。
 
 ### 方向性主张
 
-Raw Exact 不是当前贡献需要击败的主线：0.8B 上 Contiguous 相对 Raw
-Exact 有 +4.17 pp 点估计但字节略多；9B 上 Contiguous 与严格等字节
-Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多记一次
-命中。Raw 系列保留为强公平基线，不包装为 HMO 的稳定优势。
+Raw Exact 不是 HMO 已经击败的对象：早期 synthetic transfer 中 HMO 与严格
+等字节 Raw Exact+Slack 持平，但新的六任务 native 主表上 HMO 为 0.4642，
+Raw+Slack 为 0.4800。Raw 系列保留为强公平基线，正文不能暗示 HMO 对其有
+稳定优势。
 
 ### 当前不需要承担的主张
 
@@ -359,27 +364,50 @@ Raw Exact+Slack 完全持平，而 Raw Exact 在一个格式敏感样本上多�
 - 四个压缩臂 24/24 逐样本等字节，平均为 Full KV 的 12.80%；无生成触及
   token 上限。完整报告：`experiments/results/NATIVE_LONGBENCH_C2_20260904.md`。
 
+### 9B 六任务原生 LongBench 主表
+
+- 506 条 native、未增广、未裁剪的 `<=16K` LongBench QA 样本已经完成，覆盖
+  NarrativeQA、Qasper、MultiFieldQA-en、HotpotQA、2WikiMultihopQA 与
+  MuSiQue；全部 sample ID 唯一、分数有限。
+- HMO / ChunkKV / Global Fixed / Raw+Slack / Full 官方 QA-F1 为
+  `0.4642 / 0.4793 / 0.4766 / 0.4800 / 0.4815`。HMO 对 ChunkKV 为
+  62 wins、372 ties、72 losses，均值差 `-0.0151`，配对 case-bootstrap
+  95% 区间 `[-0.0351,+0.0042]`。
+- 四个压缩方法平均 resident KV 均为 47,098,560 bytes，逐样本相对 Full 的
+  ratio 再平均为 14.465%；HMO 保留 Full QA-F1 的 96.41%。这是 residual
+  Full-Attention KV 口径，不是总进程 VRAM 等比例下降。
+- HMO 平均触达 38.62 个中间 macro-regions 并保留 70.90% observation
+  attention mass；逐层 ChunkKV 平均触达 27.41 个并保留 79.02%。这把原生
+  QA 的负点估计定位为 coverage 与 concentration 的真实取舍，而不是实现或
+  字节核算失败。
+- 结论为 `partial`：保留 hybrid residual-memory formulation、严格等字节
+  高压缩和受控 locality/regime 证据；删除 broad native superiority 表述。
+  完整报告：`experiments/results/NATIVE_LONGBENCH_SIX_TASK_9B_20260905.md`。
+
 ### 下一阶段
 
-1. C2 已完成，不再追加 5090 方法搜索。
-2. 整理 C3 大卡 preflight 与一次性运行矩阵；租卡、模型下载与付费执行仍需
-   PZ 单独确认。
-3. 原生任务 external result-to-claim 复核可由 GPT/Opus 基于 OpenChat 报告
-   完成，但不作为继续整理 C3 runbook 的严格 Gate。
+1. C2 与 9B 六任务原生主表均已完成；不对 observed native labels 做直接
+   调参。
+2. 最小补充证据是在现有冻结 9B Needle/LongEval 8K/16K 机制集上加入
+   ChunkKV，先检验 HMO 相对公开 structured baseline 的工作区间。
+3. 只有机制比较保留可信正向 slice 时，才补一个预声明的小型 native
+   5%/20% budget sweep；新设计必须另用未按结果选择的记录确认。
+4. C3 代码与协议继续冻结。27B 权重下载、A100 租用和付费执行仍需 PZ 单独
+   确认；当前不把直接放大作为证明算法优越性的下一步。
 
 ### C3 已冻结执行包（尚无 27B 结果）
 
 - 目标模型为 Qwen3.5-27B BF16，固定 revision
   `fc05daec18b0a78c049392ed2e771dde82bdf654`，单张 80GB GPU。
-- 先跑一条 exact-32K Needle 的 HMO+Full 两-cell preflight，只测可运行性、
-  显存与耗时，不按答案质量设 Gate。
+- 不设独立付费 preflight；首个 exact-32K Needle 正式样本同时承担运行、显存
+  与耗时验收，并计入冻结结果。
 - 必跑核心缩为 432 generation cells：24 条 exact-32K Needle/LongEval 在
   5%/10%/20% 下的 312 cells，以及同一批 C2 原生 QA 的 120 cells。
 - 原 GPT 方案约 1,080 cells 的规模降为可选扩展，不占用首次付费预算。
 - 冻结协议：`refine-logs/c3_27b_protocol.json`；当前 runbook：
   `experiments/C3_27B_ONE_SHOT_RUNBOOK.md`。
-- 当前只完成零 GPU 实现和协议校验。27B 权重下载、租卡与 GPU 执行均未启动，
-  需要 PZ 在 preflight 前确认资源，并在实测费用投影后确认核心运行。
+- 当前只完成零 GPU 实现和协议校验。27B 权重下载、租卡与 GPU 执行均未启动；
+  新的六任务结果使该包暂缓，任何付费动作仍需 PZ 单独确认。
 
 
 ## 执行原则

@@ -276,3 +276,30 @@
 - Supported: native-task competitive efficiency and a task-conditioned benefit.
   Unsupported: universal native-QA superiority or full-split LongBench claims.
 - Full report: experiments/results/NATIVE_LONGBENCH_C2_20260904.md
+
+## 2026-09-05: Qwen3.5-9B Six-Task Native LongBench
+
+- Result-to-claim verdict: `partial`, medium confidence. The original broad
+  native-QA superiority claim is not supported; the scoped residual-KV
+  efficiency claim is supported.
+- Evidence: 506 unique, native, unaugmented and untruncated LongBench QA
+  records across six tasks. The protocol was frozen before outcomes and all
+  506 records completed with finite scores.
+- HMO / ChunkKV / Global Fixed / Raw+Slack / Full official QA-F1 is
+  `0.4642 / 0.4793 / 0.4766 / 0.4800 / 0.4815`.
+- HMO versus ChunkKV is `62W/372T/72L`, mean delta `-0.0151` with paired
+  case-bootstrap 95% interval `[-0.0351,+0.0042]`. The point estimate is not a
+  win, while the interval does not establish reliable inferiority.
+- All four compressed systems use exactly equal measured resident KV in
+  506/506 cases. Their mean is 47,098,560 bytes and the mean per-case fraction
+  is 14.465% of Full KV. HMO keeps 96.41% of Full's QA-F1 while reducing
+  residual Full-Attention KV by 85.535% on that per-case ratio.
+- Probe diagnosis: HMO keeps 70.90% layer-averaged attention mass and touches
+  38.62 middle macro-regions; ChunkKV keeps 79.02% and touches 27.41. Broad
+  native QA favors concentration on average, while the earlier controlled
+  locality-versus-scattered mechanism result remains valid.
+- Route: do not run the frozen A100 package as proof of HMO superiority. First
+  add ChunkKV to the low-cost frozen 9B mechanism suite; use a small native
+  budget sweep only if that identifies a credible operating regime.
+- Full report:
+  `experiments/results/NATIVE_LONGBENCH_SIX_TASK_9B_20260905.md`.

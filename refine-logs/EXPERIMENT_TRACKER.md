@@ -22,6 +22,7 @@
 | C2-P | final persistent-probe Pareto rerun | 0.8B, 48 cases x 3 budgets | DONE; 144/144 budget rows, exact-byte contract passed |
 | C2-S | final scale transfer | 9B, 24 frozen mechanism cases at 10% | DONE; 24/24, HMO 23 vs Scattered 19, exact bytes |
 | C2-N | native LongBench external validity | 12 HotpotQA + 12 NarrativeQA at 10% | DONE; 24/24, HMO competitive overall and best on NarrativeQA slice |
-| C3-PF | paid-run fit and cost calibration | 27B BF16, one exact-32K Needle, HMO + Full | READY; 2 generation cells, awaits PZ rental/download confirmation |
-| C3-S | 27B mechanism and Pareto core | 12+12 exact-32K cases, 5/10/20% | FROZEN; 312 generation cells, run after preflight cost confirmation |
-| C3-N | 27B native QA core | same frozen C2 native cases at 10% | FROZEN; 120 generation cells, run after C3-S without result gate |
+| C2-N6-9B | six-task native LongBench main table | Qwen3.5-9B, 506 native <=16K QA records at 10% | DONE; 506/506, exact equal bytes; HMO 0.4642 vs ChunkKV 0.4793, verdict partial |
+| C3-PF | former separate paid preflight | 27B BF16, one exact-32K Needle, HMO + Full | SUPERSEDED; first frozen formal sample now carries runtime acceptance |
+| C3-S | 27B mechanism and Pareto core | 12+12 exact-32K cases, 5/10/20% | FROZEN/HOLD; 312 generation cells, no paid action before new evidence and PZ confirmation |
+| C3-N | 27B native QA core | same frozen C2 native cases at 10% | FROZEN/HOLD; 120 generation cells, no paid action before new evidence and PZ confirmation |
