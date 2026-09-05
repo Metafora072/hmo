@@ -33,7 +33,7 @@ require_runtime() {
 run_stage() {
   local stage="$1"
   mkdir -p "${RESULTS_ROOT}" "${PROBE_ROOT}"
-  "${PYTHON}" experiments/phase2/e3_v2/run_native_tasks.py \
+  "${PYTHON}" -m experiments.phase2.e3_v2.run_native_tasks \
     --model-path "${MODEL_PATH}" \
     --model-id Qwen/Qwen3.5-9B \
     --model-revision c202236235762e1c871ad0ccb60c8ee5ba337b9a \

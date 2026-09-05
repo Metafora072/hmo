@@ -47,7 +47,7 @@ run_synthetic() {
   local stage_set="$1"
   local run_dir="${RESULTS_ROOT}/synthetic_formal"
   mkdir -p "${run_dir}" "${PROBE_ROOT}"
-  "${PYTHON}" experiments/phase2/e3_v2/run_pareto.py \
+  "${PYTHON}" -m experiments.phase2.e3_v2.run_pareto \
     --model-path "${MODEL_PATH}" \
     --model-id "${MODEL_ID}" \
     --model-revision "${MODEL_REVISION}" \
@@ -65,7 +65,7 @@ run_native() {
     exit 2
   fi
   mkdir -p "${run_dir}" "${PROBE_ROOT}"
-  "${PYTHON}" experiments/phase2/e3_v2/run_native_tasks.py \
+  "${PYTHON}" -m experiments.phase2.e3_v2.run_native_tasks \
     --model-path "${MODEL_PATH}" \
     --model-id "${MODEL_ID}" \
     --model-revision "${MODEL_REVISION}" \
