@@ -78,6 +78,36 @@ class LayerLocalCompletionTests(unittest.TestCase):
             0.05,
         )
 
+    def test_summary_accepts_smoke_subset(self):
+        systems = {}
+        for system, score in (
+            ("hmo_legacy", 0.2),
+            ("hmo_layer_local", 0.3),
+            ("chunkkv", 0.3),
+            ("full_kv_reference", 0.4),
+        ):
+            systems[system] = {
+                "official_qa_f1": score,
+                "normalized_answer_contains": 0.0,
+                "normalized_exact_match": 0.0,
+                "post_query_resident_kv_bytes": 500 if system == "full_kv_reference" else 100,
+                "generated_token_ids": [1, 2],
+            }
+        result = summarize(
+            [
+                {
+                    "dataset": DATASET_ORDER[0],
+                    "length_stratum": 2,
+                    "context_tokens": 1000,
+                    "max_new_tokens": 8,
+                    "systems": systems,
+                }
+            ]
+        )
+        self.assertEqual(set(result["by_dataset"]), {DATASET_ORDER[0]})
+        self.assertEqual(set(result["by_length_stratum"]), {"2"})
+        self.assertEqual(result["overall"]["case_count"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

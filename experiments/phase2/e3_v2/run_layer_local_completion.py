@@ -202,6 +202,7 @@ def summarize(rows: Sequence[Mapping]) -> dict:
         "by_dataset": {
             dataset: _summary_group(by_dataset[dataset])
             for dataset in DATASET_ORDER
+            if by_dataset[dataset]
         },
         "by_length_stratum": {
             str(stratum): {
@@ -211,6 +212,7 @@ def summarize(rows: Sequence[Mapping]) -> dict:
                 ),
             }
             for stratum in range(4)
+            if by_stratum[stratum]
         },
     }
 
