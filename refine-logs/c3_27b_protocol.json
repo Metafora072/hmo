@@ -1,5 +1,5 @@
 {
-  "schema_version": "hmo.c3.large_model_protocol.v1",
+  "schema_version": "hmo.c3.large_model_protocol.v2",
   "status": "frozen_before_27b_outcomes",
   "frozen_at": "2026-09-05T00:00:00+08:00",
   "development_basis": "openchat/gpt/share/2026-09-04/hmo_pre_a100_convergence_and_one_shot_run_plan.md",
@@ -16,25 +16,29 @@
   },
   "systems": [
     "contiguous_cf",
+    "chunkkv",
     "global_fixed_chunk_topk",
     "raw_alpha_exact_slack",
-    "scattered_cf",
     "full_kv_reference"
   ],
   "equal_byte_systems": [
     "contiguous_cf",
+    "chunkkv",
     "global_fixed_chunk_topk",
-    "raw_alpha_exact_slack",
-    "scattered_cf"
+    "raw_alpha_exact_slack"
   ],
   "primary_comparisons": [
-    ["contiguous_cf", "global_fixed_chunk_topk"],
-    ["contiguous_cf", "scattered_cf"]
+    ["contiguous_cf", "chunkkv"],
+    ["contiguous_cf", "global_fixed_chunk_topk"]
   ],
   "method": {
     "allocator": "attention_led",
     "sparse_selector": "max_mass_window",
     "sparse_width": 16,
+    "chunkkv_chunk_size": 10,
+    "chunkkv_observation": "query_suffix_attention",
+    "chunkkv_layer_policy": "independent_per_full_layer_shared_across_kv_heads",
+    "chunkkv_partial_chunk": "fixed_prefix_of_next_ranked_chunk",
     "raw_slack_selector": "global_top_tokens_slack",
     "global_fixed_chunk_width": 16,
     "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
@@ -47,34 +51,33 @@
     "max_new_tokens": 32,
     "inference_seed": 20261017,
     "stage_sets": {
-      "preflight": ["preflight_32k"],
-      "core": ["core_32k"]
+      "central": {
+        "stages": ["formal_32k"],
+        "budget_fractions": [0.1],
+        "manifest_group": "formal",
+        "manifest_budget_fractions": [0.05, 0.1, 0.2]
+      },
+      "side": {
+        "stages": ["formal_32k"],
+        "budget_fractions": [0.05, 0.2],
+        "manifest_group": "formal",
+        "manifest_budget_fractions": [0.05, 0.1, 0.2]
+      }
     },
     "stages": {
-      "preflight_32k": {
-        "datasets": "needle",
-        "samples_per_dataset": 1,
-        "context_length": 32768,
-        "segment_length": 256,
-        "seed": 20261015,
-        "sample_id_prefix": "c3_27b_preflight_32k_s20261015_",
-        "budget_fractions": [0.1],
-        "systems": ["contiguous_cf", "full_kv_reference"],
-        "expected_generation_cells": 2
-      },
-      "core_32k": {
+      "formal_32k": {
         "datasets": "needle,longeval_lines",
         "samples_per_dataset": 12,
         "context_length": 32768,
         "segment_length": 256,
         "seed": 20261016,
-        "sample_id_prefix": "c3_27b_core_32k_s20261016_",
+        "sample_id_prefix": "c3_27b_formal_32k_s20261016_",
         "budget_fractions": [0.05, 0.1, 0.2],
         "systems": [
           "contiguous_cf",
+          "chunkkv",
           "global_fixed_chunk_topk",
           "raw_alpha_exact_slack",
-          "scattered_cf",
           "full_kv_reference"
         ],
         "expected_generation_cells": 312
@@ -83,7 +86,7 @@
   },
   "native": {
     "parent_protocol": "refine-logs/native_longbench_protocol.json",
-    "parent_protocol_sha256": "86ebfa5cfdff0613e559780811887b7537d0485cbd00534193c0aac433b49e2a",
+    "parent_protocol_sha256": "8d49708feb49f20413a3376c42b51b5bf1d5a6e02452bd87f15206bd6ed95b02",
     "stage_set": "formal",
     "datasets": ["hotpotqa", "narrativeqa"],
     "cases_per_dataset": 12,
@@ -110,7 +113,8 @@
   "immutability": {
     "method_or_budget_changes_after_launch": false,
     "case_filtering_after_outcomes": false,
-    "preflight_is_a_result_gate": false,
+    "first_27b_sample_is_formal_result": true,
+    "formal_execution_order": ["synthetic_10pct", "native_10pct", "synthetic_5_20pct"],
     "extension_requires_new_decision": true
   }
 }

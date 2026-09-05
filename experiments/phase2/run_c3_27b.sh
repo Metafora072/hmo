@@ -45,7 +45,7 @@ require_model() {
 
 run_synthetic() {
   local stage_set="$1"
-  local run_dir="${RESULTS_ROOT}/synthetic_${stage_set}"
+  local run_dir="${RESULTS_ROOT}/synthetic_formal"
   mkdir -p "${run_dir}" "${PROBE_ROOT}"
   "${PYTHON}" experiments/phase2/e3_v2/run_pareto.py \
     --model-path "${MODEL_PATH}" \
@@ -81,33 +81,42 @@ case "${TARGET}" in
   validate)
     validate_protocol
     ;;
-  preflight)
+  central)
     validate_protocol
     require_clean_commit
     require_single_gpu
     require_model
-    run_synthetic preflight
+    run_synthetic central
     ;;
-  core-synthetic)
+  side)
     validate_protocol
     require_clean_commit
     require_single_gpu
     require_model
-    run_synthetic core
+    run_synthetic side
     ;;
-  core-native)
+  native)
     validate_protocol
     require_clean_commit
     require_single_gpu
     require_model
     run_native
     ;;
+  formal)
+    validate_protocol
+    require_clean_commit
+    require_single_gpu
+    require_model
+    run_synthetic central
+    run_native
+    run_synthetic side
+    ;;
   status)
     find "${RESULTS_ROOT}" -maxdepth 2 -type f \
       \( -name '*.jsonl' -o -name '*summary.json' \) -print 2>/dev/null || true
     ;;
   *)
-    echo "Usage: $0 {validate|preflight|core-synthetic|core-native|status}" >&2
+    echo "Usage: $0 {validate|formal|central|native|side|status}" >&2
     exit 2
     ;;
 esac

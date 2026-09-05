@@ -86,6 +86,35 @@ class CoverageFidelityAllocatorTests(unittest.TestCase):
         )
         self.assertNotEqual(cf_tokens, no_access_tokens)
 
+    def test_disabled_accessibility_accepts_none_and_matches_legacy_call(self):
+        attention, accessibility = _signals()
+        kwargs = dict(
+            segments=_segments(),
+            middle_kv_fraction=0.4,
+            sparse_width=2,
+            use_accessibility=False,
+        )
+        legacy = allocate_coverage_fidelity(attention, accessibility, **kwargs)
+        omitted = allocate_coverage_fidelity(attention, None, **kwargs)
+        self.assertEqual(
+            [item.retained_tokens for item in legacy.allocations],
+            [item.retained_tokens for item in omitted.allocations],
+        )
+        self.assertTrue(
+            all(item.accessibility_rank == 0.0 for item in omitted.allocations)
+        )
+
+    def test_enabled_accessibility_rejects_none(self):
+        attention, _ = _signals()
+        with self.assertRaisesRegex(CoverageFidelityError, "is required"):
+            allocate_coverage_fidelity(
+                attention,
+                None,
+                _segments(),
+                middle_kv_fraction=0.4,
+                sparse_width=2,
+            )
+
     def test_ties_are_broken_by_segment_id(self):
         plan = allocate_coverage_fidelity(
             {1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0},

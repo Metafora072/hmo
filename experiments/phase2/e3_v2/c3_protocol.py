@@ -9,22 +9,20 @@ from pathlib import Path
 from typing import Mapping
 
 
-C3_SCHEMA = "hmo.c3.large_model_protocol.v1"
+C3_SCHEMA = "hmo.c3.large_model_protocol.v2"
 C3_STATUS = "frozen_before_27b_outcomes"
 C3_MODEL_ID = "Qwen/Qwen3.5-27B"
 C3_MODEL_REVISION = "fc05daec18b0a78c049392ed2e771dde82bdf654"
 C3_SYSTEMS = (
     "contiguous_cf",
+    "chunkkv",
     "global_fixed_chunk_topk",
     "raw_alpha_exact_slack",
-    "scattered_cf",
     "full_kv_reference",
 )
 C3_EQUAL_BYTE_SYSTEMS = C3_SYSTEMS[:-1]
 C3_BUDGETS = (0.05, 0.1, 0.2)
-C3_NATIVE_PARENT_SHA256 = (
-    "86ebfa5cfdff0613e559780811887b7537d0485cbd00534193c0aac433b49e2a"
-)
+C3_NATIVE_PARENT_SHA256 = "8d49708feb49f20413a3376c42b51b5bf1d5a6e02452bd87f15206bd6ed95b02"
 
 
 class C3ProtocolError(ValueError):
@@ -67,6 +65,10 @@ def load_c3_protocol(path: Path, project_root: Path) -> tuple[dict, str, dict]:
         "allocator": "attention_led",
         "sparse_selector": "max_mass_window",
         "sparse_width": 16,
+        "chunkkv_chunk_size": 10,
+        "chunkkv_observation": "query_suffix_attention",
+        "chunkkv_layer_policy": "independent_per_full_layer_shared_across_kv_heads",
+        "chunkkv_partial_chunk": "fixed_prefix_of_next_ranked_chunk",
         "raw_slack_selector": "global_top_tokens_slack",
         "global_fixed_chunk_width": 16,
         "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
@@ -94,47 +96,44 @@ def load_c3_protocol(path: Path, project_root: Path) -> tuple[dict, str, dict]:
         or tuple(payload.get("equal_byte_systems", ())) != C3_EQUAL_BYTE_SYSTEMS
         or payload.get("primary_comparisons")
         != [
+            ["contiguous_cf", "chunkkv"],
             ["contiguous_cf", "global_fixed_chunk_topk"],
-            ["contiguous_cf", "scattered_cf"],
         ]
         or method != expected_method
         or tuple(synthetic.get("budget_fractions", ())) != C3_BUDGETS
         or synthetic.get("max_new_tokens") != 32
         or int(synthetic.get("inference_seed", 0)) <= 0
         or synthetic.get("stage_sets")
-        != {"preflight": ["preflight_32k"], "core": ["core_32k"]}
-        or set(stages) != {"preflight_32k", "core_32k"}
+        != {
+            "central": {
+                "stages": ["formal_32k"],
+                "budget_fractions": [0.1],
+                "manifest_group": "formal",
+                "manifest_budget_fractions": [0.05, 0.1, 0.2],
+            },
+            "side": {
+                "stages": ["formal_32k"],
+                "budget_fractions": [0.05, 0.2],
+                "manifest_group": "formal",
+                "manifest_budget_fractions": [0.05, 0.1, 0.2],
+            },
+        }
+        or set(stages) != {"formal_32k"}
     ):
         raise C3ProtocolError("C3 top-level contract mismatch")
 
-    preflight = stages["preflight_32k"]
-    core = stages["core_32k"]
-    if (
-        preflight
-        != {
-            "datasets": "needle",
-            "samples_per_dataset": 1,
-            "context_length": 32768,
-            "segment_length": 256,
-            "seed": 20261015,
-            "sample_id_prefix": "c3_27b_preflight_32k_s20261015_",
-            "budget_fractions": [0.1],
-            "systems": ["contiguous_cf", "full_kv_reference"],
-            "expected_generation_cells": 2,
-        }
-        or core
-        != {
+    formal = stages["formal_32k"]
+    if formal != {
             "datasets": "needle,longeval_lines",
             "samples_per_dataset": 12,
             "context_length": 32768,
             "segment_length": 256,
             "seed": 20261016,
-            "sample_id_prefix": "c3_27b_core_32k_s20261016_",
+            "sample_id_prefix": "c3_27b_formal_32k_s20261016_",
             "budget_fractions": [0.05, 0.1, 0.2],
             "systems": list(C3_SYSTEMS),
             "expected_generation_cells": 312,
-        }
-    ):
+        }:
         raise C3ProtocolError("C3 synthetic stage mismatch")
     for stage in stages.values():
         if _synthetic_cells(stage, C3_SYSTEMS) != stage["expected_generation_cells"]:
@@ -186,7 +185,8 @@ def load_c3_protocol(path: Path, project_root: Path) -> tuple[dict, str, dict]:
         != {
             "method_or_budget_changes_after_launch": False,
             "case_filtering_after_outcomes": False,
-            "preflight_is_a_result_gate": False,
+            "first_27b_sample_is_formal_result": True,
+            "formal_execution_order": ["synthetic_10pct", "native_10pct", "synthetic_5_20pct"],
             "extension_requires_new_decision": True,
         }
         or len(payload.get("claims", ())) != 2
@@ -243,9 +243,7 @@ def main() -> int:
                 "status": "valid",
                 "protocol_sha256": digest,
                 "model": payload["model"],
-                "preflight_generation_cells": payload["synthetic"]["stages"][
-                    "preflight_32k"
-                ]["expected_generation_cells"],
+                "first_formal_stage_generation_cells": 120,
                 "mandatory_core": payload["mandatory_core"],
                 "native_case_count": sum(
                     len(spec["cases"]) for spec in parent["datasets"].values()

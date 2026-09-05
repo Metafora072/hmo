@@ -241,6 +241,7 @@ def _generate_system(
     max_new_tokens: int,
 ) -> dict:
     started = time.perf_counter()
+    prompt_started = started
     state = run_post_intervention_prompt(
         model,
         prompt,
@@ -248,15 +249,20 @@ def _generate_system(
         recurrent_layer_indices=recurrent_layers,
         intervention=intervention,
     )
+    prompt_seconds = time.perf_counter() - prompt_started
     resident_bytes = get_active_kv_bytes(state.cache, list(attention_layers))
+    decode_started = time.perf_counter()
     answer = generate_greedy(
         model, tokenizer, state, max_new_tokens=max_new_tokens
     )
+    decode_seconds = time.perf_counter() - decode_started
     payload = {
         **_score_text(answer.text, sample),
         "generated_text": answer.text,
         "generated_token_ids": [int(value) for value in answer.token_ids[0].tolist()],
         "post_query_resident_kv_bytes": int(resident_bytes),
+        "prompt_intervention_seconds": prompt_seconds,
+        "decode_seconds": decode_seconds,
         "system_elapsed_seconds": time.perf_counter() - started,
     }
     del state
@@ -303,17 +309,23 @@ def _pair_summary(rows: Sequence[Mapping], left: str, right: str) -> dict:
     return output
 
 
-def summarize_results(rows: Sequence[Mapping]) -> dict:
+def summarize_results(
+    rows: Sequence[Mapping],
+    systems: Sequence[str] = SYSTEMS,
+    equal_byte_systems: Sequence[str] = EQUAL_BYTE_SYSTEMS,
+) -> dict:
     if not rows:
         raise OracleContractError("Hotpot paired summary requires results")
-    systems = {
+    system_names = tuple(systems)
+    equal_byte_names = tuple(equal_byte_systems)
+    system_metrics = {
         system: {
             metric: float(
                 np.mean([float(row["systems"][system][metric]) for row in rows])
             )
             for metric in METRICS
         }
-        for system in SYSTEMS
+        for system in system_names
     }
     mean_resident = {
         system: float(
@@ -321,16 +333,16 @@ def summarize_results(rows: Sequence[Mapping]) -> dict:
                 [row["systems"][system]["post_query_resident_kv_bytes"] for row in rows]
             )
         )
-        for system in SYSTEMS
+        for system in system_names
     }
     return {
         "case_count": len(rows),
-        "systems": systems,
+        "systems": system_metrics,
         "comparisons": {
             f"contiguous_cf_vs_{system}": _pair_summary(
                 rows, "contiguous_cf", system
             )
-            for system in SYSTEMS
+            for system in system_names
             if system != "contiguous_cf"
         },
         "mean_post_query_resident_kv_bytes": mean_resident,
@@ -346,13 +358,13 @@ def summarize_results(rows: Sequence[Mapping]) -> dict:
                     ]
                 )
             )
-            for system in SYSTEMS
+            for system in system_names
         },
         "equal_resident_byte_cases": sum(
             len(
                 {
                     row["systems"][system]["post_query_resident_kv_bytes"]
-                    for system in EQUAL_BYTE_SYSTEMS
+                    for system in equal_byte_names
                 }
             )
             == 1

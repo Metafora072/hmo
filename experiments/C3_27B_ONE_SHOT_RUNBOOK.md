@@ -12,12 +12,12 @@
 - GPU：单张 A100 80GB 或 H100 80GB；进程只暴露一张卡
 - 持久盘：至少 120 GiB 空闲，建议 150 GiB
 - 协议：`refine-logs/c3_27b_protocol.json`
-- 协议 SHA256：`a5121b8d820ae49f8e584659894fee374244ce43d555a38b4f86fa13fa2097d4`
-- 必跑核心：preflight 后 432 generation cells
+- 协议 SHA256：`4baab152a7c9461322d9bfd551860006193c357c30faaeeac816d85512652126`
+- 必跑核心：432 个正式 generation cells；不另设 preflight
 
 本机已经验证过的参考软件栈是 Python 3.11.15、PyTorch 2.7.0+cu128、
 Transformers 5.5.4、NumPy 2.2.6。租用机可以使用等价 CUDA 构建，但必须先
-通过 CPU tests 和两-cell preflight；不要在付费核心阶段升级依赖。
+通过 CPU tests；不要在付费实验阶段升级依赖。
 
 ## 2. 数据盘布局
 
@@ -90,57 +90,52 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 核对 `df -h /data/hmo`、`nvidia-smi`、模型 `config.json` 和 archive SHA 后再跑。
 
-## 6. 两-cell Preflight
+## 6. 正式执行顺序
 
 按仓库约定使用 detached `screen`，日志放外部结果目录：
 
 ```bash
 mkdir -p "$HMO_C3_RESULTS_ROOT/logs"
-screen -dmS hmo_c3_preflight bash -lc \
-  'set -o pipefail; cd "$HMO_PROJECT_ROOT"; bash experiments/phase2/run_c3_27b.sh preflight 2>&1 | tee "$HMO_C3_RESULTS_ROOT/logs/preflight.log"'
+screen -dmS hmo_c3_formal bash -lc \
+  'set -o pipefail; cd "$HMO_PROJECT_ROOT"; bash experiments/phase2/run_c3_27b.sh formal 2>&1 | tee "$HMO_C3_RESULTS_ROOT/logs/formal.log"'
 screen -ls
 ```
 
-它只运行一条 exact-32K Needle 的 HMO 10% 与 Full，共 2 次 generation。
-检查：
+`formal` 固定顺序运行：32K 合成 central 10%，原生 QA 10%，最后补 32K
+合成 5%/20%。第一条 27B 样本即计入正式结果，不存在按答案好坏决定是否继续的
+preflight Gate。运行中检查：
 
 ```bash
 bash experiments/phase2/run_c3_27b.sh status
-tail -100 "$HMO_C3_RESULTS_ROOT/logs/preflight.log"
+tail -100 "$HMO_C3_RESULTS_ROOT/logs/formal.log"
 ```
 
-`synthetic_preflight/pareto_summary.json` 应为 complete，只有 1 个 budget row；
-HMO/Full 都有生成文本和 resident bytes，runtime 中含 peak allocated/reserved、
-model load，row 中含 sample preparation 与逐系统耗时。
+OOM 或基础设施故障时保留日志并用同一目标恢复，不能现场改方法、样本与预算。
+`central`、`native`、`side` 也是可单独恢复的 launcher 目标；central 与 side 共用
+`synthetic_formal` 目录、manifest 和 Full 生成。
 
-preflight 不以答案对错决定是否继续。它只回答：是否真实跑通、80GB 是否有余量、
-恢复路径是否正确、核心预计需要多少时间和费用。OOM 时保留日志，换 H100 80GB
-或修执行基础设施，不能现场改方法与预算。
-
-## 7. 计算费用并确认
+## 7. 运行时预算复核
 
 输入供应商当前单卡时价：
 
 ```bash
 "$HMO_PYTHON" experiments/phase2/estimate_c3_cost.py \
-  "$HMO_C3_RESULTS_ROOT/synthetic_preflight/pareto_summary.json" \
+  "$HMO_C3_RESULTS_ROOT/synthetic_formal/pareto_summary.json" \
   --hourly-rate <PRICE_PER_GPU_HOUR>
 ```
 
-估算覆盖 312 个合成 generation cells 和 120 个原生 QA generation cells，
-并加 25% 余量。把输出的 `projected_gpu_hours`、`projected_cost`、GPU 型号和
-preflight 峰值发给 PZ；收到明确费用确认后才启动核心。这个确认是成本控制，
-不是科学 Gate。
+central 结果产生后可运行该命令复核总预算。估算器分别使用 prompt/intervention
+与 decode 计时，不会因 NarrativeQA 输出上限为 128 就把 prefill 也放大四倍。
+该估算用于监控预先批准的费用上限，不是科学 Gate。
 
-## 8. 核心运行
+## 8. 恢复运行
 
 确认后在一个 detached session 中顺序执行，避免并发争抢显存：
 
 ```bash
-screen -dmS hmo_c3_core bash -lc \
+screen -dmS hmo_c3_resume bash -lc \
   'set -o pipefail; cd "$HMO_PROJECT_ROOT"; \
-   bash experiments/phase2/run_c3_27b.sh core-synthetic 2>&1 | tee "$HMO_C3_RESULTS_ROOT/logs/core_synthetic.log" && \
-   bash experiments/phase2/run_c3_27b.sh core-native 2>&1 | tee "$HMO_C3_RESULTS_ROOT/logs/core_native.log"'
+   bash experiments/phase2/run_c3_27b.sh formal 2>&1 | tee "$HMO_C3_RESULTS_ROOT/logs/formal_resume.log"'
 screen -ls
 ```
 
@@ -152,7 +147,7 @@ screen -ls
 ## 9. 完成核对与释放
 
 ```bash
-wc -l "$HMO_C3_RESULTS_ROOT/synthetic_core/pareto_results.jsonl"
+wc -l "$HMO_C3_RESULTS_ROOT/synthetic_formal/pareto_results.jsonl"
 wc -l "$HMO_C3_RESULTS_ROOT/native_core/native_longbench_results.jsonl"
 sha256sum "$HMO_C3_RESULTS_ROOT"/*/*summary.json
 nvidia-smi

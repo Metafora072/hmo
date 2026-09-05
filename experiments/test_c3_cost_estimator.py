@@ -1,4 +1,4 @@
-"""CPU tests for C3 preflight cost projection."""
+"""CPU tests for staged C3 formal cost projection."""
 from __future__ import annotations
 
 import unittest
@@ -12,12 +12,15 @@ class C3CostEstimatorTests(unittest.TestCase):
             "runtime": {"model_load_seconds": 100},
             "samples": [
                 {
-                    "stage": "preflight_32k",
+                    "stage": "formal_32k",
                     "budget_fraction": 0.1,
                     "sample_prepare_seconds": 10,
                     "systems": {
-                        "contiguous_cf": {"system_elapsed_seconds": 2},
-                        "full_kv_reference": {"system_elapsed_seconds": 3},
+                        "contiguous_cf": {"prompt_intervention_seconds": 2, "decode_seconds": 1},
+                        "chunkkv": {"prompt_intervention_seconds": 2, "decode_seconds": 1},
+                        "global_fixed_chunk_topk": {"prompt_intervention_seconds": 2, "decode_seconds": 1},
+                        "raw_alpha_exact_slack": {"prompt_intervention_seconds": 2, "decode_seconds": 1},
+                        "full_kv_reference": {"prompt_intervention_seconds": 4, "decode_seconds": 2},
                     },
                 }
             ],
@@ -25,15 +28,15 @@ class C3CostEstimatorTests(unittest.TestCase):
         result = estimate(summary, hourly_rate=2.0)
         expected = (
             100
-            + 24 * (10 + 3 + 24)
-            + 12 * (10 + 3 + 8)
-            + 12 * (10 + 12 + 32)
+            + 24 * (10 + 4 + 2 + 12 * 3)
+            + 12 * (5 + 2 + 2 + 4 * (1 + 1))
+            + 12 * (5 + 2 + 8 + 4 * (1 + 4))
         )
         self.assertEqual(result["projected_seconds_before_margin"]["total"], expected)
         self.assertAlmostEqual(result["projected_gpu_hours"], expected * 1.25 / 3600)
         self.assertAlmostEqual(result["projected_cost"], expected * 1.25 / 3600 * 2)
 
-    def test_rejects_non_preflight_summary(self):
+    def test_rejects_summary_without_formal_central_rows(self):
         with self.assertRaises(ValueError):
             estimate({"runtime": {}, "samples": []})
 

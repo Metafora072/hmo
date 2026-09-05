@@ -2,10 +2,17 @@
 
 ## 当前状态
 
-论文处于大卡前的实验收敛阶段。核心方法、理论合同与持久化 FP32 query
-probe 已冻结；5%/10%/20% Pareto、结构化强基线、free-start 机制控制、
-HotpotQA-32K-Aug 路径和跨运行确定性 smoke 均已完成。当前首要任务是在同一
-最终路径上的 C2-0.8B、C2-9B 与原生 LongBench 小包均已完成。
+论文处于大卡前的正式实验收敛阶段。核心方法与修正后的理论合同已冻结；
+attention-only FP32 query probe v2 已在 5090 上证明与旧 hybrid probe bitwise
+等价，逐 Full 层的 ChunkKV hybrid adapter 已通过真实 cache 干预和严格等字节
+验证，并替换 Scattered 进入新的正式系统表。旧 probe 与 Scattered 协议作为
+legacy artifact 保留。
+
+9B 六任务 LongBench 主表已按官方 prompt、QA-F1 和生成上限冻结：不截断的
+`<=16K` 原生样本共 506 条，预定先跑 295 条 prefix50，再无结果 Gate 地补到
+prefix100。C3 已升级为无独立 preflight 的 v2，固定顺序为 synthetic 10% ->
+native 10% -> synthetic 5%/20%，总量仍为 432 cells。当前首要任务是执行 9B
+prefix50 并形成新 HMO-vs-ChunkKV 主表与分阶段真实耗时。
 
 目标会议暂按 ICLR 规划，正文页数按 9 页控制。工作标题为：
 

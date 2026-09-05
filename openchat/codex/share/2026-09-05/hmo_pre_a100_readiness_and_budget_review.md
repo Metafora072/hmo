@@ -5,6 +5,10 @@ Author: Codex
 Decision target: whether HMO is ready to spend one formal A100-80GB window on
 Qwen3.5-27B, without a separate paid preflight.
 
+> Implementation note: this is the review snapshot that preceded the approved
+> changes. The executed state, validation evidence and final protocol hashes are
+> recorded in `hmo_pre_a100_package_implementation_report.md`.
+
 ## 1. Executive verdict
 
 **Current status: conditionally ready, but not yet fully closed for an algorithmic
@@ -59,7 +63,8 @@ The current evidence supports the following bounded story:
    structure and gives a cleaner quality-memory frontier in the tested regime.
 3. The effect transfers without retuning from Qwen3.5-0.8B to 9B and is strongest
    at constrained 5--10% middle-cache budgets.
-4. HMO is a training-free memory-organization algorithm with `O(T)` selection and
+4. HMO is a training-free memory-organization algorithm with
+   `O(T + n log n + N_keep)` selection and
    linear retained KV in context length, but with a substantially smaller
    coefficient than Full KV.
 
@@ -88,7 +93,7 @@ every paper's compute scale.
 | [DuoAttention, ICLR 2025](https://proceedings.iclr.cc/paper_files/paper/2025/file/5c1ddd2e59df46fd2aa85c833b1b36ed-Paper-Conference.pdf) | Llama-2-7B, Llama-3-8B and Mistral-7B main; 70B is auxiliary | Needle, 14/21 LongBench tasks, and short-context quality checks | H2O, TOVA, FastGen, StreamingLLM; matched budgets; A100 memory/latency curves | Multiple 7--8B architectures and quality-preservation checks matter more than making 70B the main table. |
 | [HeadKV, ICLR 2025](https://proceedings.iclr.cc/paper_files/paper/2025/file/f649556471416b35e60ae0de7c1e3619-Paper-Conference.pdf) | Llama-3-8B and Mistral-7B | Six LongBench QA tasks, mostly 200 examples/task, plus four LooGLE tasks | SnapKV, PyramidKV and Ada-SnapKV at equal KV entries; 32K memory/latency averaged over three trials | HMO's 24 native examples are currently too thin; a six-task, 100+ example design is a useful minimum target. |
 | [CAKE, ICLR 2025](https://proceedings.iclr.cc/paper_files/paper/2025/file/dfae940651f3e690a12e19c874edad7c-Paper-Conference.pdf) | Five architectures from 7B to 70B; 7--8B models carry the dense sweeps | All 16 LongBench datasets and three NeedleBench subtasks | StreamingLLM, H2O, TOVA, SnapKV, PyramidKV across 64--2048 entries/layer; A100 efficiency | This is the high-compute end of the spectrum, not HMO's minimum bar, but it shows why public baselines and budget curves are expected. |
-| [SAGE-KV, ICLR 2025](https://arxiv.org/abs/2503.08879) | Three long-context 7--8B models from Llama and Qwen families | LongBench | Static StreamingLLM and dynamic Quest, with memory-efficiency comparison | Cross-family 7--8B evidence is a strong alternative to spending the budget on a single very large model. |
+| [SAGE-KV, ICLR 2025 SLLM workshop](https://iclr.cc/virtual/2025/33493) | Three long-context 7--8B models from Llama and Qwen families | LongBench | Static StreamingLLM and dynamic Quest, with memory-efficiency comparison | Cross-family 7--8B evidence is a useful reference, but this is workshop evidence rather than an ICLR main-conference paper. |
 
 ### Model-selection implication
 

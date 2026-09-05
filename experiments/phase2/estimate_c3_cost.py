@@ -1,55 +1,119 @@
-"""Project the C3 mandatory-core runtime from its two-cell 27B preflight."""
+"""Project the full C3 runtime from its first formal 10% result stage."""
 from __future__ import annotations
 
 import argparse
 import json
+import statistics
 from pathlib import Path
 
 
-def estimate(summary: dict, hourly_rate: float | None = None) -> dict:
-    samples = summary.get("samples", [])
-    if len(samples) != 1:
-        raise ValueError("C3 preflight summary must contain exactly one sample")
-    row = samples[0]
-    if (
-        row.get("stage") != "preflight_32k"
-        or float(row.get("budget_fraction", 0.0)) != 0.1
-        or set(row.get("systems", {}))
-        != {"contiguous_cf", "full_kv_reference"}
-    ):
-        raise ValueError("summary is not the frozen C3 two-cell preflight")
-    runtime = summary.get("runtime", {})
-    model_load = float(runtime["model_load_seconds"])
-    prepare = float(row["sample_prepare_seconds"])
-    hmo = float(row["systems"]["contiguous_cf"]["system_elapsed_seconds"])
-    full = float(row["systems"]["full_kv_reference"]["system_elapsed_seconds"])
-    if min(model_load, prepare, hmo, full) < 0:
-        raise ValueError("preflight timing values must be nonnegative")
+def _mean(values, name: str) -> float:
+    numeric = [float(value) for value in values]
+    if not numeric or min(numeric) < 0:
+        raise ValueError(f"missing or invalid {name} timing values")
+    return float(statistics.fmean(numeric))
 
-    # Each 32K synthetic sample generates Full once and four compressed arms at
-    # three budgets. HMO time is the conservative proxy for the other arms.
-    synthetic = 24 * (prepare + full + 12 * hmo)
-    # Native contexts are no longer than 16.3K. Hotpot permits 32 output tokens;
-    # Narrative permits 128, so its generation allowance is scaled by four.
-    native_hotpot = 12 * (prepare + full + 4 * hmo)
-    native_narrative = 12 * (prepare + 4 * full + 16 * hmo)
-    projected = model_load + synthetic + native_hotpot + native_narrative
-    with_margin = projected * 1.25
+
+def estimate(summary: dict, hourly_rate: float | None = None) -> dict:
+    """Estimate 432 formal cells without scaling prefill by output length."""
+    rows = [
+        row
+        for row in summary.get("samples", [])
+        if row.get("stage") == "formal_32k"
+        and float(row.get("budget_fraction", 0.0)) == 0.1
+    ]
+    if not rows:
+        raise ValueError("summary lacks formal_32k 10% result rows")
+    full_name = "full_kv_reference"
+    if any(full_name not in row.get("systems", {}) for row in rows):
+        raise ValueError("formal timing rows lack Full-KV")
+    compressed_names = tuple(
+        name for name in rows[0]["systems"] if name != full_name
+    )
+    if len(compressed_names) != 4 or any(
+        set(row["systems"]) != set(compressed_names) | {full_name} for row in rows
+    ):
+        raise ValueError("formal timing rows do not contain four compressed systems")
+
+    prepare = _mean((row["sample_prepare_seconds"] for row in rows), "prepare")
+    full_prompt = _mean(
+        (
+            row["systems"][full_name]["prompt_intervention_seconds"]
+            for row in rows
+        ),
+        "Full prompt",
+    )
+    full_decode = _mean(
+        (row["systems"][full_name]["decode_seconds"] for row in rows),
+        "Full decode",
+    )
+    compressed_prompt = _mean(
+        (
+            row["systems"][name]["prompt_intervention_seconds"]
+            for row in rows
+            for name in compressed_names
+        ),
+        "compressed prompt",
+    )
+    compressed_decode = _mean(
+        (
+            row["systems"][name]["decode_seconds"]
+            for row in rows
+            for name in compressed_names
+        ),
+        "compressed decode",
+    )
+    model_load = float(summary.get("runtime", {}).get("model_load_seconds", -1))
+    if model_load < 0:
+        raise ValueError("summary lacks model-load timing")
+
+    synthetic = 24 * (
+        prepare + full_prompt + full_decode + 12 * (compressed_prompt + compressed_decode)
+    )
+    native_context_ratio = 0.5
+    hotpot = 12 * (
+        prepare * native_context_ratio
+        + full_prompt * native_context_ratio
+        + full_decode
+        + 4 * (compressed_prompt * native_context_ratio + compressed_decode)
+    )
+    narrative = 12 * (
+        prepare * native_context_ratio
+        + full_prompt * native_context_ratio
+        + 4 * full_decode
+        + 4 * (compressed_prompt * native_context_ratio + 4 * compressed_decode)
+    )
+    projected = model_load + synthetic + hotpot + narrative
+    margin = 1.25
+    with_margin = projected * margin
     output = {
-        "assumption": "27B_preflight_timing_projection_with_25pct_margin",
-        "measured_seconds": {
+        "assumption": "first_formal_32k_10pct_projection_with_separate_prompt_decode_scaling",
+        "measured_formal_rows": len(rows),
+        "measured_mean_seconds": {
             "model_load": model_load,
             "sample_prepare": prepare,
-            "hmo_generation": hmo,
-            "full_generation": full,
+            "full_prompt_intervention": full_prompt,
+            "full_decode_32_tokens": full_decode,
+            "compressed_prompt_intervention": compressed_prompt,
+            "compressed_decode_32_tokens": compressed_decode,
+        },
+        "projection_assumptions": {
+            "synthetic_samples": 24,
+            "compressed_arms_per_budget": 4,
+            "synthetic_budgets": 3,
+            "native_samples_per_task": 12,
+            "native_context_to_32k_ratio": native_context_ratio,
+            "hotpot_decode_ratio": 1.0,
+            "narrative_decode_ratio": 4.0,
+            "prefill_is_not_scaled_by_decode_ratio": True,
         },
         "projected_seconds_before_margin": {
-            "synthetic_core": synthetic,
-            "native_hotpotqa": native_hotpot,
-            "native_narrativeqa": native_narrative,
+            "synthetic_formal": synthetic,
+            "native_hotpotqa": hotpot,
+            "native_narrativeqa": narrative,
             "total": projected,
         },
-        "margin": 1.25,
+        "margin": margin,
         "projected_gpu_hours": with_margin / 3600,
     }
     if hourly_rate is not None:

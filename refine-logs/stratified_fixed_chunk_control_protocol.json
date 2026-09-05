@@ -4,7 +4,7 @@
   "model_id": "Qwen/Qwen3.5-0.8B",
   "model_revision": "2fc06364715b967f1860aea9cf38778875588b17",
   "parent": {
-    "protocol": "refine-logs/contiguous_cf_pareto_protocol.json",
+    "protocol": "refine-logs/contiguous_cf_pareto_protocol_legacy_v1.json",
     "protocol_sha256": "ff064dded9813acdf82c693442f2989fa6ee1069da4c703a3b89755e6b3a7388",
     "results_sha256": "5757ff898b921c1b0fcc6ed1e76d195667070999d56bf71189a752e38d49e1ab",
     "source_stage": "16k",

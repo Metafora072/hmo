@@ -213,18 +213,22 @@
   },
   "systems": [
     "contiguous_cf",
+    "chunkkv",
     "global_fixed_chunk_topk",
     "raw_alpha_exact_slack",
-    "scattered_cf",
     "full_kv_reference"
   ],
   "equal_byte_systems": [
     "contiguous_cf",
+    "chunkkv",
     "global_fixed_chunk_topk",
-    "raw_alpha_exact_slack",
-    "scattered_cf"
+    "raw_alpha_exact_slack"
   ],
   "primary_comparisons": [
+    [
+      "contiguous_cf",
+      "chunkkv"
+    ],
     [
       "contiguous_cf",
       "global_fixed_chunk_topk"
@@ -232,10 +236,6 @@
     [
       "contiguous_cf",
       "raw_alpha_exact_slack"
-    ],
-    [
-      "contiguous_cf",
-      "scattered_cf"
     ],
     [
       "contiguous_cf",
@@ -252,6 +252,10 @@
     "allocator": "attention_led",
     "sparse_selector": "max_mass_window",
     "sparse_width": 16,
+    "chunkkv_chunk_size": 10,
+    "chunkkv_observation": "query_suffix_attention",
+    "chunkkv_layer_policy": "independent_per_full_layer_shared_across_kv_heads",
+    "chunkkv_partial_chunk": "fixed_prefix_of_next_ranked_chunk",
     "raw_slack_selector": "global_top_tokens_slack",
     "global_fixed_chunk_width": 16,
     "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",

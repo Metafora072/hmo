@@ -12,11 +12,24 @@ from typing import Mapping, Sequence
 
 import torch
 
+from experiments.phase2.e3_v2.attention_probe import collect_attention_token_probe
+from experiments.phase2.e3_v2.attention_probe_cache import (
+    ATTENTION_PROBE_AGGREGATION,
+    ATTENTION_PROBE_CACHE_SCHEMA,
+    get_or_create_attention_probe,
+    retained_positions_sha256,
+)
 from experiments.phase2.e3_v2.c3_protocol import (
     C3_MODEL_ID,
     C3_SCHEMA,
     load_c3_protocol,
     native_protocol_view,
+)
+from experiments.phase2.e3_v2.chunkkv_adapter import (
+    CHUNKKV_ADAPTER_SCHEMA,
+    CHUNKKV_CHUNK_SIZE,
+    build_chunkkv_plan,
+    make_chunkkv_intervention,
 )
 from experiments.phase2.e3_v2.context_query import (
     full_kv_intervention,
@@ -34,13 +47,6 @@ from experiments.phase2.e3_v2.oracle import (
     OracleContractError,
     build_segment_catalog,
 )
-from experiments.phase2.e3_v2.query_accessibility import collect_hybrid_query_token_probe
-from experiments.phase2.e3_v2.query_probe_cache import (
-    QUERY_PROBE_AGGREGATION,
-    QUERY_PROBE_CACHE_SCHEMA,
-    get_or_create_query_probe,
-    retained_positions_sha256,
-)
 from experiments.phase2.e3_v2.real_model_preflight import (
     REFERENCE_BACKEND,
     _force_torch_reference_backend,
@@ -52,13 +58,10 @@ from experiments.phase2.e3_v2.run_coverage_fidelity import (
     _atomic_json,
     _cleanup_cuda,
     _eligible_action_counts,
-    restrict_eligible_signals,
 )
 from experiments.phase2.e3_v2.run_end_task import select_equal_byte_segments
 from experiments.phase2.e3_v2.run_hotpot_paired import (
-    EQUAL_BYTE_SYSTEMS,
     METRICS,
-    SYSTEMS,
     _generate_system,
     _load_completed,
     summarize_results,
@@ -76,11 +79,30 @@ from experiments.vendor.longbench_metrics import LONG_BENCH_REVISION
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 PROTOCOL_SCHEMA = "hmo.native_longbench_qa_protocol.v1"
+SIX_TASK_PROTOCOL_SCHEMA = "hmo.native_longbench_six_task_protocol.v1"
 RESULT_SCHEMA = "hmo.native_longbench_qa_result.v1"
 RESULTS_FILENAME = "native_longbench_results.jsonl"
 SUMMARY_FILENAME = "native_longbench_summary.json"
+SYSTEMS = (
+    "contiguous_cf",
+    "chunkkv",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "full_kv_reference",
+)
+EQUAL_BYTE_SYSTEMS = SYSTEMS[:-1]
 DATASET_ORDER = ("hotpotqa", "narrativeqa")
 STAGE_CASE_COUNTS = {"smoke": 2, "formal": 24}
+SIX_TASK_MODEL_ID = "Qwen/Qwen3.5-9B"
+SIX_TASK_MODEL_REVISION = "c202236235762e1c871ad0ccb60c8ee5ba337b9a"
+SIX_TASK_ORDER = (
+    "narrativeqa",
+    "qasper",
+    "multifieldqa_en",
+    "hotpotqa",
+    "2wikimqa",
+    "musique",
+)
 
 
 def _sha256_bytes(value: bytes) -> str:
@@ -95,6 +117,7 @@ def load_native_protocol(path: Path) -> tuple[dict, str]:
         raise OracleContractError(f"cannot read native LongBench protocol: {path}") from exc
 
     is_c3 = payload.get("schema_version") == C3_SCHEMA
+    is_six_task = payload.get("schema_version") == SIX_TASK_PROTOCOL_SCHEMA
     if is_c3:
         try:
             c3_payload, protocol_sha, parent = load_c3_protocol(path, PROJECT_ROOT)
@@ -110,15 +133,19 @@ def load_native_protocol(path: Path) -> tuple[dict, str]:
     datasets = payload.get("datasets", {})
     generation = payload.get("generation", {})
     expected_comparisons = [
+        ["contiguous_cf", "chunkkv"],
         ["contiguous_cf", "global_fixed_chunk_topk"],
         ["contiguous_cf", "raw_alpha_exact_slack"],
-        ["contiguous_cf", "scattered_cf"],
         ["contiguous_cf", "full_kv_reference"],
     ]
     expected_method = {
         "allocator": "attention_led",
         "sparse_selector": "max_mass_window",
         "sparse_width": 16,
+        "chunkkv_chunk_size": 10,
+        "chunkkv_observation": "query_suffix_attention",
+        "chunkkv_layer_policy": "independent_per_full_layer_shared_across_kv_heads",
+        "chunkkv_partial_chunk": "fixed_prefix_of_next_ranked_chunk",
         "raw_slack_selector": "global_top_tokens_slack",
         "global_fixed_chunk_width": 16,
         "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
@@ -126,6 +153,97 @@ def load_native_protocol(path: Path) -> tuple[dict, str]:
         "protected_prefix_segments": 1,
         "protected_suffix_segments": 1,
     }
+    if is_six_task:
+        selection_expected = {
+            "rule": "longest_exact_serialized_memory_context_within_inclusive_token_band_then_record_index",
+            "min_memory_context_tokens": 1,
+            "max_memory_context_tokens": 16384,
+            "maximum_samples_per_dataset": 100,
+            "source_context_unchanged": True,
+            "augmentation": False,
+            "truncation": False,
+            "outcome_conditioned_selection": False,
+            "boundary_alignment": "if_one_token_crosses_the_semantic_context_boundary_move_that_complete_token_into_memory_context",
+            "record_sha256_semantics": "sha256_of_raw_jsonl_record_bytes_without_line_ending",
+        }
+        stage_sets_expected = {
+            "prefix50": {
+                "per_dataset_prefix": 50,
+                "manifest_group": "prefix100",
+                "manifest_per_dataset_prefix": 100,
+            },
+            "prefix100": {
+                "per_dataset_prefix": 100,
+                "manifest_group": "prefix100",
+                "manifest_per_dataset_prefix": 100,
+            },
+        }
+        expected_counts = {
+            "narrativeqa": 61,
+            "qasper": 100,
+            "multifieldqa_en": 100,
+            "hotpotqa": 100,
+            "2wikimqa": 100,
+            "musique": 45,
+        }
+        expected_record_counts = {name: 200 for name in expected_counts}
+        expected_record_counts["multifieldqa_en"] = 150
+        if (
+            payload.get("status") != "frozen_before_outcomes"
+            or payload.get("purpose")
+            != "broad_native_non_augmented_real_task_main_table"
+            or payload.get("model_id") != SIX_TASK_MODEL_ID
+            or payload.get("model_revision") != SIX_TASK_MODEL_REVISION
+            or tuple(payload.get("dataset_order", ())) != SIX_TASK_ORDER
+            or tuple(payload.get("systems", ())) != SYSTEMS
+            or tuple(payload.get("equal_byte_systems", ())) != EQUAL_BYTE_SYSTEMS
+            or payload.get("primary_comparisons") != expected_comparisons
+            or payload.get("primary_metric") != "official_qa_f1"
+            or tuple(payload.get("secondary_metrics", ())) != METRICS[1:]
+            or float(payload.get("middle_kv_fraction", 0.0)) != 0.1
+            or method != expected_method
+            or selection != selection_expected
+            or payload.get("stage_sets") != stage_sets_expected
+            or generation.get("decoding") != "greedy"
+            or int(generation.get("inference_seed", 0)) <= 0
+            or generation.get("max_new_tokens")
+            != {
+                "narrativeqa": 128,
+                "qasper": 128,
+                "multifieldqa_en": 64,
+                "hotpotqa": 32,
+                "2wikimqa": 32,
+                "musique": 32,
+            }
+            or tuple(datasets.get(name, {}) and name for name in SIX_TASK_ORDER)
+            != SIX_TASK_ORDER
+        ):
+            raise OracleContractError("six-task native LongBench protocol mismatch")
+        for name, count in expected_counts.items():
+            spec = datasets[name]
+            cases = spec.get("cases", [])
+            if (
+                spec.get("member") != f"data/{name}.jsonl"
+                or spec.get("record_count") != expected_record_counts[name]
+                or spec.get("official_metric") != "qa_f1_score"
+                or len(cases) != count
+                or len({case.get("index") for case in cases}) != count
+            ):
+                raise OracleContractError(f"six-task dataset mismatch: {name}")
+        execution_expected = {
+            "prefix50_case_count": 295,
+            "prefix100_case_count": 506,
+            "prefix50_generation_cells": 1475,
+            "prefix100_generation_cells": 2530,
+            "continuation_is_precommitted_prefix": True,
+            "continuation_gate": False,
+            "resume_after_interruption": True,
+            "case_filtering_after_outcomes": False,
+        }
+        if payload.get("execution") != execution_expected:
+            raise OracleContractError("six-task execution count mismatch")
+        return payload, protocol_sha
+
     if (
         payload.get("schema_version") != (C3_SCHEMA if is_c3 else PROTOCOL_SCHEMA)
         or payload.get("status")
@@ -208,6 +326,10 @@ def select_longest_candidates(
     return sorted(eligible, key=lambda item: (-int(item["context_tokens"]), int(item["index"])))[:count]
 
 
+def _dataset_order(protocol: Mapping) -> tuple[str, ...]:
+    return tuple(protocol.get("dataset_order", DATASET_ORDER))
+
+
 def _load_datasets(archive: Path, protocol: Mapping) -> dict[str, tuple[list[dict], list[bytes]]]:
     expected_sha = protocol["dataset_source"]["archive_sha256"]
     observed_sha = _sha256_file(archive)
@@ -216,7 +338,7 @@ def _load_datasets(archive: Path, protocol: Mapping) -> dict[str, tuple[list[dic
     output = {}
     try:
         with zipfile.ZipFile(archive) as handle:
-            for name in DATASET_ORDER:
+            for name in _dataset_order(protocol):
                 raw_lines = handle.read(protocol["datasets"][name]["member"]).splitlines()
                 records = [json.loads(line) for line in raw_lines if line.strip()]
                 if len(records) != len(raw_lines):
@@ -271,7 +393,9 @@ def validate_frozen_selection(
         metadata,
         selection["min_memory_context_tokens"],
         selection["max_memory_context_tokens"],
-        selection["samples_per_dataset"],
+        selection.get(
+            "samples_per_dataset", selection.get("maximum_samples_per_dataset", 0)
+        ),
     )
     if expected != spec["cases"]:
         raise OracleContractError(f"frozen {dataset} selection no longer reproduces")
@@ -286,20 +410,37 @@ def validate_frozen_selection(
 
 
 def _selected_cases(protocol: Mapping, stage_set: str) -> list[tuple[str, Mapping]]:
+    order = _dataset_order(protocol)
+    if protocol.get("schema_version") == SIX_TASK_PROTOCOL_SCHEMA:
+        stage = protocol["stage_sets"].get(stage_set)
+        if not isinstance(stage, Mapping):
+            raise OracleContractError(f"unknown six-task stage set: {stage_set}")
+        count = int(stage["per_dataset_prefix"])
+        return [
+            (name, case)
+            for name in order
+            for case in protocol["datasets"][name]["cases"][:count]
+        ]
     if stage_set == "smoke":
-        return [(name, protocol["datasets"][name]["cases"][0]) for name in DATASET_ORDER]
+        return [(name, protocol["datasets"][name]["cases"][0]) for name in order]
     return [
         (name, case)
-        for name in DATASET_ORDER
+        for name in order
         for case in protocol["datasets"][name]["cases"]
     ]
 
 
-def summarize_native_results(rows: Sequence[Mapping]) -> dict:
-    analysis = summarize_results(rows)
+def summarize_native_results(
+    rows: Sequence[Mapping], dataset_order: Sequence[str] = DATASET_ORDER
+) -> dict:
+    analysis = summarize_results(rows, SYSTEMS, EQUAL_BYTE_SYSTEMS)
     analysis["by_dataset"] = {
-        name: summarize_results([row for row in rows if row["dataset"] == f"longbench_{name}"])
-        for name in DATASET_ORDER
+        name: summarize_results(
+            [row for row in rows if row["dataset"] == f"longbench_{name}"],
+            SYSTEMS,
+            EQUAL_BYTE_SYSTEMS,
+        )
+        for name in dataset_order
     }
     return analysis
 
@@ -314,8 +455,22 @@ def run(args: argparse.Namespace) -> dict:
     archive = Path(args.archive).resolve()
     datasets = _load_datasets(archive, protocol)
     selected_cases = _selected_cases(protocol, args.stage_set)
-    if len(selected_cases) != STAGE_CASE_COUNTS[args.stage_set]:
-        raise OracleContractError("native LongBench stage case count changed")
+    dataset_order = _dataset_order(protocol)
+    if protocol.get("schema_version") == SIX_TASK_PROTOCOL_SCHEMA:
+        stage_spec = protocol["stage_sets"][args.stage_set]
+        manifest_stage_set = str(stage_spec["manifest_group"])
+        manifest_cases = [
+            (name, case)
+            for name in dataset_order
+            for case in protocol["datasets"][name]["cases"][
+                : int(stage_spec["manifest_per_dataset_prefix"])
+            ]
+        ]
+    else:
+        if args.stage_set not in STAGE_CASE_COUNTS or len(selected_cases) != STAGE_CASE_COUNTS[args.stage_set]:
+            raise OracleContractError("native LongBench stage case count changed")
+        manifest_stage_set = args.stage_set
+        manifest_cases = selected_cases
     run_dir = Path(args.run_dir).resolve()
     probe_cache_dir = Path(args.probe_cache_dir).resolve()
     model_path = Path(args.model_path).resolve()
@@ -330,7 +485,7 @@ def run(args: argparse.Namespace) -> dict:
             "model_revision": args.model_revision,
             "protocol_sha256": protocol_sha,
             "probe_cache_dir": str(probe_cache_dir),
-            "stage_set": args.stage_set,
+            "stage_set": manifest_stage_set,
             "inference_seed": protocol["generation"]["inference_seed"],
             "recurrent_backend": REFERENCE_BACKEND,
             "visible_cuda_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
@@ -342,11 +497,12 @@ def run(args: argparse.Namespace) -> dict:
             "primary_metric": protocol["primary_metric"],
             "middle_kv_fraction": protocol["middle_kv_fraction"],
             "method": protocol["method"],
-            "cases": [{"dataset": name, **case} for name, case in selected_cases],
+            "cases": [{"dataset": name, **case} for name, case in manifest_cases],
             "candidate_search": False,
             "outcome_conditioned_selection": False,
-            "query_probe_cache_schema": QUERY_PROBE_CACHE_SCHEMA,
-            "query_probe_aggregation": QUERY_PROBE_AGGREGATION,
+            "query_probe_cache_schema": ATTENTION_PROBE_CACHE_SCHEMA,
+            "query_probe_aggregation": ATTENTION_PROBE_AGGREGATION,
+            "chunkkv_adapter_schema": CHUNKKV_ADAPTER_SCHEMA,
         },
         model=model_identity,
         project_root=PROJECT_ROOT,
@@ -376,7 +532,7 @@ def run(args: argparse.Namespace) -> dict:
 
     materialized = {}
     selection_audit = {}
-    for name in DATASET_ORDER:
+    for name in dataset_order:
         records, raw_lines = datasets[name]
         materialized[name], selection_audit[name] = validate_frozen_selection(
             name,
@@ -412,45 +568,46 @@ def run(args: argparse.Namespace) -> dict:
         del context_outputs
         _cleanup_cuda()
 
-        cached_probe = get_or_create_query_probe(
+        cached_probe = get_or_create_attention_probe(
             probe_cache_dir,
             model_identity=model_identity,
             prompt=prompt,
             attention_layer_indices=attention_layers,
-            recurrent_layer_indices=recurrent_layers,
             segments=segments,
             segment_length=method["segment_length"],
-            collector=lambda: collect_hybrid_query_token_probe(
+            collector=lambda: collect_attention_token_probe(
                 model,
                 prompt,
                 attention_layer_indices=attention_layers,
-                recurrent_layer_indices=recurrent_layers,
                 segments=segments,
-                segment_length=method["segment_length"],
             ),
         )
         probe = cached_probe.result
         attention = probe.alpha.as_dict()
-        accessibility = probe.accessibility.field_dict("read_share")
         token_attention_mass = tuple(float(value) for value in probe.token_attention_mass)
-        allocator_attention, allocator_accessibility = restrict_eligible_signals(
-            attention, accessibility, segments
-        )
+        layer_token_attention_mass = probe.layer_scores()
+        allocator_attention = {
+            segment.segment_id: float(attention[segment.segment_id])
+            for segment in segments
+            if segment.eligible
+        }
         del probe
         _cleanup_cuda()
 
         raw_selection = select_equal_byte_segments(
-            attention, accessibility, segments, middle_kv_fraction=fraction
+            attention, None, segments, middle_kv_fraction=fraction
         )
         exact_plan = allocate_coverage_fidelity(
             allocator_attention,
-            allocator_accessibility,
+            None,
             segments,
             middle_kv_fraction=fraction,
             sparse_width=method["sparse_width"],
             use_accessibility=False,
             enable_exact_upgrades=True,
         )
+        eligible = [segment for segment in segments if segment.eligible]
+        token_unit_bytes = eligible[0].kv_bytes // eligible[0].token_count
         position_plans = {
             "contiguous_cf": build_retained_position_plan(
                 exact_plan, segments, token_attention_mass,
@@ -467,19 +624,34 @@ def run(args: argparse.Namespace) -> dict:
                 context_tokens=prompt.context_tokens,
                 target_context_charged_bytes=exact_plan.total_charged_bytes,
             ),
-            "scattered_cf": build_retained_position_plan(
-                exact_plan, segments, token_attention_mass,
-                context_tokens=prompt.context_tokens, sparse_selector="top_tokens"
-            ),
         }
-        if len({plan.context_charged_bytes for plan in position_plans.values()}) != 1:
+        chunkkv_plan = build_chunkkv_plan(
+            segments,
+            layer_token_attention_mass,
+            context_tokens=prompt.context_tokens,
+            target_context_charged_bytes=exact_plan.total_charged_bytes,
+            context_token_kv_bytes=token_unit_bytes,
+            observation_query_tokens=prompt.query_tokens,
+            chunk_size=CHUNKKV_CHUNK_SIZE,
+        )
+        if len({
+            plan.context_charged_bytes
+            for plan in (*position_plans.values(), chunkkv_plan)
+        }) != 1:
             raise OracleContractError("native LongBench compressed plans are not equal-byte")
 
         max_new_tokens = protocol["generation"]["max_new_tokens"][dataset]
+        interventions = {
+            name: make_coverage_fidelity_intervention(
+                position_plans[name], attention_layers, name=name
+            )
+            for name in position_plans
+        }
+        interventions["chunkkv"] = make_chunkkv_intervention(chunkkv_plan)
         generated = {
             name: _generate_system(
                 model, tokenizer, prompt, attention_layers, recurrent_layers,
-                make_coverage_fidelity_intervention(position_plans[name], attention_layers, name=name),
+                interventions[name],
                 sample, max_new_tokens,
             )
             for name in EQUAL_BYTE_SYSTEMS
@@ -489,8 +661,6 @@ def run(args: argparse.Namespace) -> dict:
             full_kv_intervention, sample, max_new_tokens,
         )
 
-        eligible = [segment for segment in segments if segment.eligible]
-        token_unit_bytes = eligible[0].kv_bytes // eligible[0].token_count
         query_kv_bytes = prompt.query_tokens * token_unit_bytes
         protected_bytes = sum(segment.kv_bytes for segment in segments if segment.protected)
         compressed_expected = exact_plan.total_charged_bytes + query_kv_bytes
@@ -548,6 +718,7 @@ def run(args: argparse.Namespace) -> dict:
                     "active_positions_sha256": retained_positions_sha256(position_plans["contiguous_cf"].active_positions),
                     "action_counts": _eligible_action_counts(exact_plan, protected_ids),
                 },
+                "chunkkv": chunkkv_plan.to_dict(),
                 "global_fixed_chunk_topk": {
                     "chunk_width": method["global_fixed_chunk_width"],
                     "boundary_slack_tokens": middle_retained_tokens % method["global_fixed_chunk_width"],
@@ -558,12 +729,6 @@ def run(args: argparse.Namespace) -> dict:
                     "selected_exact_segment_ids": list(raw_selection["raw_alpha_segment_ids"]),
                     "retention": position_plans["raw_alpha_exact_slack"].to_dict(),
                     "active_positions_sha256": retained_positions_sha256(position_plans["raw_alpha_exact_slack"].active_positions),
-                },
-                "scattered_cf": {
-                    "allocation": exact_plan.to_dict(),
-                    "retention": position_plans["scattered_cf"].to_dict(),
-                    "active_positions_sha256": retained_positions_sha256(position_plans["scattered_cf"].active_positions),
-                    "action_counts": _eligible_action_counts(exact_plan, protected_ids),
                 },
             },
             "systems": generated,
@@ -578,16 +743,18 @@ def run(args: argparse.Namespace) -> dict:
         )
 
     expected_ids = {f"longbench_{name}_{case['index']:04d}" for name, case in selected_cases}
-    if {str(row["sample_id"]) for row in rows} != expected_ids:
+    allowed_ids = {f"longbench_{name}_{case['index']:04d}" for name, case in manifest_cases}
+    actual_ids = {str(row["sample_id"]) for row in rows}
+    if not expected_ids <= actual_ids or not actual_ids <= allowed_ids:
         raise OracleContractError("native LongBench run did not complete selected package")
-    rows.sort(key=lambda row: (DATASET_ORDER.index(row["dataset"].removeprefix("longbench_")), row["record_index"]))
+    rows.sort(key=lambda row: (dataset_order.index(row["dataset"].removeprefix("longbench_")), row["record_index"]))
     summary = {
         "schema_version": RESULT_SCHEMA,
-        "status": "complete",
+        "status": "complete" if actual_ids == allowed_ids else "stage_complete",
         "scope": "operational_smoke_excluded_from_claims" if args.stage_set == "smoke" else "native_non_augmented_real_task_external_validity",
         "manifest_id": manifest["manifest_id"],
         "protocol_sha256": protocol_sha,
-        "analysis": summarize_native_results(rows),
+        "analysis": summarize_native_results(rows, dataset_order),
         "selection_audit": selection_audit,
         "runtime": {
             "elapsed_seconds": time.perf_counter() - started,
@@ -611,7 +778,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol", required=True)
     parser.add_argument("--run-dir", required=True)
     parser.add_argument("--probe-cache-dir", required=True)
-    parser.add_argument("--stage-set", choices=tuple(STAGE_CASE_COUNTS), default="formal")
+    parser.add_argument("--stage-set", default="formal")
     parser.add_argument("--resume", action="store_true")
     return parser.parse_args()
 

@@ -107,7 +107,7 @@ def _load_protocol(path: Path) -> tuple[dict, str]:
 
 def select_equal_byte_segments(
     alpha_by_segment: Mapping[int, float],
-    access_by_segment: Mapping[int, float],
+    access_by_segment: Mapping[int, float] | None,
     segments: Sequence[SegmentSpec],
     *,
     middle_kv_fraction: float,
@@ -118,12 +118,12 @@ def select_equal_byte_segments(
     costs = {segment.kv_bytes for segment in eligible}
     if len(costs) != 1 or next(iter(costs)) <= 0:
         raise OracleContractError("eligible segments must have one positive KV cost")
-    if any(
-        segment.segment_id not in alpha_by_segment
-        or segment.segment_id not in access_by_segment
-        for segment in eligible
+    if any(segment.segment_id not in alpha_by_segment for segment in eligible):
+        raise OracleContractError("attention does not cover eligible segments")
+    if access_by_segment is not None and any(
+        segment.segment_id not in access_by_segment for segment in eligible
     ):
-        raise OracleContractError("selection signals do not cover eligible segments")
+        raise OracleContractError("accessibility does not cover eligible segments")
 
     unit_cost = next(iter(costs))
     budget_limit = math.floor(sum(segment.kv_bytes for segment in eligible) * middle_kv_fraction)
@@ -133,16 +133,25 @@ def select_equal_byte_segments(
 
     segment_ids = np.asarray([segment.segment_id for segment in eligible], dtype=np.int64)
     alpha = np.asarray([alpha_by_segment[int(index)] for index in segment_ids], dtype=np.float64)
-    access = np.asarray([access_by_segment[int(index)] for index in segment_ids], dtype=np.float64)
-    if not np.all(np.isfinite(alpha)) or not np.all(np.isfinite(access)):
-        raise OracleContractError("selection signals must be finite")
+    if not np.all(np.isfinite(alpha)):
+        raise OracleContractError("attention must be finite")
     entropy = normalized_entropy(alpha)
-    agreement = spearman_correlation(alpha, access)
-    gate_enabled = (
-        entropy >= ALPHA_ENTROPY_THRESHOLD
-        and agreement < ALPHA_ACCESS_AGREEMENT_THRESHOLD
-    )
-    v2_score = alpha * (1.0 - _rank01(access)) if gate_enabled else alpha
+    if access_by_segment is None:
+        agreement = None
+        gate_enabled = False
+        v2_score = alpha
+    else:
+        access = np.asarray(
+            [access_by_segment[int(index)] for index in segment_ids], dtype=np.float64
+        )
+        if not np.all(np.isfinite(access)):
+            raise OracleContractError("accessibility must be finite")
+        agreement = spearman_correlation(alpha, access)
+        gate_enabled = (
+            entropy >= ALPHA_ENTROPY_THRESHOLD
+            and agreement < ALPHA_ACCESS_AGREEMENT_THRESHOLD
+        )
+        v2_score = alpha * (1.0 - _rank01(access)) if gate_enabled else alpha
     raw_order = np.argsort(-alpha, kind="stable")
     v2_order = np.argsort(-v2_score, kind="stable")
     raw_selected = tuple(sorted(int(value) for value in segment_ids[raw_order[:budget_slots]]))
@@ -153,7 +162,8 @@ def select_equal_byte_segments(
         "budget_slots": int(budget_slots),
         "unit_segment_bytes": int(unit_cost),
         "normalized_alpha_entropy": float(entropy),
-        "alpha_access_spearman": float(agreement),
+        "accessibility_measured": access_by_segment is not None,
+        "alpha_access_spearman": None if agreement is None else float(agreement),
         "gate_enabled": bool(gate_enabled),
         "raw_alpha_segment_ids": raw_selected,
         "frozen_v2_segment_ids": v2_selected,

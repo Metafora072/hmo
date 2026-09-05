@@ -238,16 +238,18 @@ $$
 \max_j p_j\Delta u_j(1),
 $$
 
-则在任意 region 获得第二个 action unit 之前，所有可负担 regions 都先获得
-第一个 unit，即 coverage-first 是该阶段的最优结构。
+则存在一个最优分配，使所有可负担 regions 都在任意 region 获得第二个
+action unit 之前先获得第一个 unit。若 greedy 在相等 marginal gain 时优先
+尚未覆盖的 region，它会构造出这个 coverage-first 最优解。
 
 ### 证明骨架
 
 每个 region 产生一条非增 marginal-gain 序列。任何可行分配都等价于从这些
 序列中选择满足 prefix constraint 的 $Q$ 个 marginals。选取当前最大合法
 marginal 的 greedy 与全局 top-$Q$ marginals 等价；若某解包含更小 marginal
-却遗漏更大合法 marginal，可交换并不降低目标。附加不等式保证所有 first
-marginals 排在所有 second marginals 之前。
+却遗漏更大合法 marginal，可交换并不降低目标。附加不等式保证 first
+marginals 不小于 second marginals；等号时把相等项交换为 first marginal
+不降低目标，指定 coverage-first tie-break 即得到上述构造。
 
 ### Regime 解释
 
@@ -271,6 +273,10 @@ downstream accuracy guarantee。
 - segment/action ordering：$O(n\log n)$；
 - 全部 free-start sliding windows：$O(T)$；
 - retained-position materialization：$O(N_{keep})$。
+
+因此当前排序实现的总选择复杂度写作
+$O(T+n\log n+N_{keep})$，另计模型 query probe 与生成成本。固定 $L$ 时
+$n\approx T/L$，不能把排序项笼统省略后声称整个算法为 $O(T)$。
 
 当前实现先产生 Full-KV prompt cache，再执行压缩，因此实验直接证明的是
 post-query resident KV reduction，而不是同倍 peak-VRAM reduction。最终系统

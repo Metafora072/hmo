@@ -51,11 +51,39 @@ LONG_BENCH_PROMPTS = {
         "Question: {input}\n\n"
         "Answer:"
     ),
+    "multifieldqa_en": (
+        "Read the following text and answer briefly.\n\n"
+        "{context}\n\n"
+        "Now, answer the following question based on the above text, only give me the answer "
+        "and do not output any other words.\n\n"
+        "Question: {input}\n"
+        "Answer:"
+    ),
     "hotpotqa": (
         "Answer the question based on the given passages. Only give me the answer and do not output any other words.\n\n"
         "The following are given passages.\n"
         "{context}\n\n"
         "Answer the question based on the given passages. Only give me the answer and do not output any other words.\n\n"
+        "Question: {input}\n"
+        "Answer:"
+    ),
+    "2wikimqa": (
+        "Answer the question based on the given passages. Only give me the answer and do not "
+        "output any other words.\n\n"
+        "The following are given passages.\n"
+        "{context}\n\n"
+        "Answer the question based on the given passages. Only give me the answer and do not "
+        "output any other words.\n\n"
+        "Question: {input}\n"
+        "Answer:"
+    ),
+    "musique": (
+        "Answer the question based on the given passages. Only give me the answer and do not "
+        "output any other words.\n\n"
+        "The following are given passages.\n"
+        "{context}\n\n"
+        "Answer the question based on the given passages. Only give me the answer and do not "
+        "output any other words.\n\n"
         "Question: {input}\n"
         "Answer:"
     ),
@@ -74,7 +102,10 @@ LONG_BENCH_PROMPTS = {
 LONG_BENCH_MAX_GEN = {
     "narrativeqa": 128,
     "qasper": 128,
+    "multifieldqa_en": 64,
     "hotpotqa": 32,
+    "2wikimqa": 32,
+    "musique": 32,
     "gov_report": 512,
     "lcc": 64,
 }
@@ -132,7 +163,14 @@ class PredictionScores:
 
 def get_primary_metric_name(dataset: str) -> str:
     key = get_benchmark_key(dataset)
-    if key in {"hotpotqa", "narrativeqa", "qasper"}:
+    if key in {
+        "hotpotqa",
+        "narrativeqa",
+        "qasper",
+        "multifieldqa_en",
+        "2wikimqa",
+        "musique",
+    }:
         return "f1"
     if key == "gov_report":
         return "rouge_l"

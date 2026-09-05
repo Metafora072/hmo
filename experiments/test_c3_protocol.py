@@ -15,6 +15,7 @@ from experiments.phase2.e3_v2.c3_protocol import (
 )
 from experiments.phase2.e3_v2.run_native_tasks import load_native_protocol
 from experiments.phase2.e3_v2.run_pareto import (
+    _manifest_stage_spec,
     load_pareto_protocol,
     resolve_pareto_stage_set,
 )
@@ -29,8 +30,8 @@ class C3ProtocolTests(unittest.TestCase):
         payload, digest, parent = load_c3_protocol(PROTOCOL, PROJECT_ROOT)
         self.assertEqual(len(digest), 64)
         self.assertEqual(payload["mandatory_core"]["total_generation_cells"], 432)
-        preflight = payload["synthetic"]["stages"]["preflight_32k"]
-        self.assertEqual(preflight["expected_generation_cells"], 2)
+        formal = payload["synthetic"]["stages"]["formal_32k"]
+        self.assertEqual(formal["expected_generation_cells"], 312)
         native_cases = sum(
             len(spec["cases"]) for spec in parent["datasets"].values()
         )
@@ -41,7 +42,9 @@ class C3ProtocolTests(unittest.TestCase):
         pareto = pareto_protocol_view(payload)
         native = native_protocol_view(payload, parent)
         self.assertEqual(pareto["model_revision"], C3_MODEL_REVISION)
-        self.assertEqual(pareto["stage_sets"]["core"], ["core_32k"])
+        self.assertEqual(
+            pareto["stage_sets"]["central"]["budget_fractions"], [0.1]
+        )
         self.assertEqual(native["model_revision"], C3_MODEL_REVISION)
         self.assertEqual(native["datasets"], parent["datasets"])
 
@@ -51,12 +54,20 @@ class C3ProtocolTests(unittest.TestCase):
         self.assertEqual(pareto_digest, native_digest)
         self.assertEqual(pareto["model_revision"], C3_MODEL_REVISION)
         self.assertEqual(native["model_revision"], C3_MODEL_REVISION)
-        preflight = resolve_pareto_stage_set(pareto, "preflight")
-        core = resolve_pareto_stage_set(pareto, "core")
-        self.assertEqual(preflight[1], ("contiguous_cf", "full_kv_reference"))
-        self.assertEqual(preflight[3], (0.1,))
-        self.assertEqual(len(core[2]), 4)
-        self.assertEqual(core[3], (0.05, 0.1, 0.2))
+        central = resolve_pareto_stage_set(pareto, "central")
+        side = resolve_pareto_stage_set(pareto, "side")
+        self.assertEqual(central[0], ("formal_32k",))
+        self.assertEqual(central[3], (0.1,))
+        self.assertEqual(len(central[2]), 4)
+        self.assertEqual(side[3], (0.05, 0.2))
+        self.assertEqual(
+            _manifest_stage_spec(pareto, "central"),
+            ("formal", (0.05, 0.1, 0.2)),
+        )
+        self.assertEqual(
+            _manifest_stage_spec(pareto, "side"),
+            ("formal", (0.05, 0.1, 0.2)),
+        )
 
     def test_cell_count_tampering_is_rejected(self):
         payload = json.loads(PROTOCOL.read_text(encoding="utf-8"))

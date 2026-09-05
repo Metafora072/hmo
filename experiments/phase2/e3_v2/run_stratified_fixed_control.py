@@ -49,7 +49,6 @@ from experiments.phase2.e3_v2.run_pareto import (
     PROJECT_ROOT,
     _generate_system,
     _load_completed as _load_parent_results,
-    load_pareto_protocol,
 )
 from experiments.utils.model_loader import (
     get_full_attention_indices,
@@ -73,6 +72,21 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _load_legacy_parent_protocol(path: Path) -> tuple[dict, str]:
+    try:
+        encoded = path.read_bytes()
+        payload = json.loads(encoded)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise OracleContractError("cannot read legacy Pareto parent") from exc
+    if (
+        payload.get("schema_version") != "hmo.contiguous_cf.pareto_protocol.v1"
+        or "scattered_cf" not in payload.get("systems", ())
+        or set(payload.get("stages", {})) != {"smoke", "8k", "16k"}
+    ):
+        raise OracleContractError("legacy Pareto parent contract mismatch")
+    return payload, hashlib.sha256(encoded).hexdigest()
 
 
 def load_control_protocol(
@@ -213,7 +227,7 @@ def run(args: argparse.Namespace) -> dict:
 
     parent_protocol_path = Path(args.parent_protocol).resolve()
     parent_results_path = Path(args.parent_results).resolve()
-    parent_protocol, parent_protocol_sha = load_pareto_protocol(
+    parent_protocol, parent_protocol_sha = _load_legacy_parent_protocol(
         parent_protocol_path
     )
     parent_results_sha = _sha256(parent_results_path)

@@ -29,7 +29,7 @@ structured retention”。
 
 ## Closest-work 审计
 
-审计时间为 2026-09-04。表中只写从论文或官方实现能够核对的性质。
+审计时间更新至 2026-09-05。表中只写从论文或官方实现能够核对的性质。
 
 | 工作 | 单位与选择方式 | Query 条件 | Coverage 语义 | Hybrid memory 角色 | 与 HMO 的关键差异 |
 |---|---|---|---|---|---|
@@ -37,7 +37,7 @@ structured retention”。
 | SnapKV, NeurIPS 2024 | per-head token positions，并用 pooling 扩展邻域；保留 observation window | prompt 尾部 observation queries | 无跨区域保证 | 无 | 已具有邻域聚合，不能笼统称为纯 scattered baseline |
 | Quest, ICML 2024 | KV page；用 page 的 min/max key 估算当前 query 重要性 | 强，逐 decode query | 只加载 Top-K pages | 无；完整 KV 仍被存储 | 优化 decode 访存而非 resident KV eviction |
 | PyramidKV, ICLR 2025 submission | token；跨层非均匀预算与 attention selection | observation attention | 无 | 无 | 贡献在 layer budget funneling |
-| ChunkKV, 2025 preprint | 固定边界 chunk；按 observation attention 的 chunk sum 做全局 Top-K | 是 | Top-K chunk，无分层区域覆盖 | 无 | 与 locality 动机最接近；HMO 是 macro-segment 内自由滑窗并 coverage-first |
+| ChunkKV, NeurIPS 2025 | 固定边界 chunk；按 observation attention 的 chunk sum 做全局 Top-K，并支持跨层 index reuse | 是 | Top-K chunk，无分层区域覆盖 | 无 | 与 locality 动机最接近；HMO 是 macro-segment 内自由滑窗并 coverage-first |
 | SentenceKV, COLM 2025 | 句子；GPU 语义向量 + CPU KV，decode 时检索句子 | 是，多 query 聚合 | sentence retrieval | 无 | 语义边界、offload 与动态加载，不是 resident overlay |
 | ProtoKV, ICLR 2026 | key-space semantic prototypes/clusters | pre-query 组织 | semantic clusters | 无 | 更强的语义单元建模；HMO 不做聚类，强调 Hybrid 分工和区域覆盖 |
 | Kara, 2026 preprint | 最近生成窗口中的 token candidates 扩为可变 chunk | 双向窗口 attention | 可在任意位置形成 chunk | 无 | 服务 reasoning decode 与周期压缩；HMO 压缩长 prompt 的 residual KV |
@@ -64,10 +64,12 @@ macro-segments，在可负担时给每个 eligible segment 一个自由起点的
 micro-window，再把剩余预算用于窗口扩展或 Exact upgrade。这个 stratified
 coverage 由 recurrent global base 提供架构动机。
 
-当前 0.8B/9B 结果只直接证明 HMO 的连续实现优于同 allocator、同字节的
-scattered 实现。它尚未证明 HMO 优于 ChunkKV/ProtoKV。因此下一轮最有价值的
-baseline 不是再发明 scorer，而是加入同 probe、同 resident bytes 的 global
-fixed-chunk Top-K；若工程允许，再对接官方 ChunkKV。
+当前 0.8B/9B 历史结果只直接证明 HMO 的连续实现优于同 allocator、同字节的
+scattered 实现，尚未证明 HMO 优于 ChunkKV/ProtoKV。Global Fixed-Chunk
+继续承担同 score 的机制控制，不能改名为官方 ChunkKV。现已实现并在 5090
+实模上验证 ChunkKV hybrid adapter：它保留逐 Full 层 observation-attention
+chunk 排名与层内跨 KV head 共享位置，并在相同真实 resident-byte 预算下执行；
+它已替换 Scattered 进入新的正式系统表，质量比较等待冻结的 9B 六任务结果。
 
 ## 冻结方法定义
 

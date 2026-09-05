@@ -11,6 +11,7 @@ from experiments.phase2.e3_v2.run_native_tasks import (
     EQUAL_BYTE_SYSTEMS,
     PROJECT_ROOT,
     SYSTEMS,
+    _selected_cases,
     load_native_protocol,
     select_longest_candidates,
     summarize_native_results,
@@ -26,6 +27,15 @@ class NativeLongBenchRunnerTest(unittest.TestCase):
         self.assertFalse(payload["selection"]["augmentation"])
         self.assertFalse(payload["selection"]["truncation"])
         self.assertEqual(len(digest), 64)
+
+    def test_six_task_protocol_freezes_precommitted_prefixes(self):
+        payload, digest = load_native_protocol(
+            PROJECT_ROOT / "refine-logs/native_longbench_six_task_9b_protocol.json"
+        )
+        self.assertEqual(len(digest), 64)
+        self.assertEqual(len(_selected_cases(payload, "prefix50")), 295)
+        self.assertEqual(len(_selected_cases(payload, "prefix100")), 506)
+        self.assertFalse(payload["execution"]["continuation_gate"])
 
     def test_protocol_rejects_outcome_filtering(self):
         source = PROJECT_ROOT / "refine-logs/native_longbench_protocol.json"
@@ -49,13 +59,13 @@ class NativeLongBenchRunnerTest(unittest.TestCase):
 
     def test_summary_reports_overall_and_dataset_slices(self):
         rows = []
-        for dataset, hmo, scattered in (
+        for dataset, hmo, baseline in (
             ("longbench_hotpotqa", 1.0, 0.0),
             ("longbench_narrativeqa", 0.5, 0.5),
         ):
             systems = {}
             for name in SYSTEMS:
-                score = hmo if name == "contiguous_cf" else scattered
+                score = hmo if name == "contiguous_cf" else baseline
                 systems[name] = {
                     "official_qa_f1": score,
                     "normalized_answer_contains": float(score > 0),
@@ -67,7 +77,7 @@ class NativeLongBenchRunnerTest(unittest.TestCase):
         self.assertEqual(summary["case_count"], 2)
         self.assertEqual(summary["equal_resident_byte_cases"], 2)
         self.assertEqual(summary["by_dataset"]["hotpotqa"]["case_count"], 1)
-        comparison = summary["comparisons"]["contiguous_cf_vs_scattered_cf"]["official_qa_f1"]
+        comparison = summary["comparisons"]["contiguous_cf_vs_chunkkv"]["official_qa_f1"]
         self.assertEqual((comparison["wins"], comparison["ties"], comparison["losses"]), (1, 1, 0))
 
 

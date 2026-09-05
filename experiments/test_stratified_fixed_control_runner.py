@@ -13,8 +13,8 @@ from experiments.phase2.e3_v2.run_stratified_fixed_control import (
 
 class StratifiedFixedControlRunnerTests(unittest.TestCase):
     def test_frozen_protocol_is_bound_to_package_b(self):
-        parent_protocol = (
-            PROJECT_ROOT / "refine-logs/contiguous_cf_pareto_protocol.json"
+        parent_protocol = PROJECT_ROOT / (
+            "refine-logs/contiguous_cf_pareto_protocol_legacy_v1.json"
         )
         parent_protocol_sha = hashlib.sha256(parent_protocol.read_bytes()).hexdigest()
         parent_results_sha = (

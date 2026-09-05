@@ -79,7 +79,7 @@ def _validate_signal(name: str, signal: Mapping[int, float], ids: tuple[int, ...
 
 def allocate_coverage_fidelity(
     attention: Mapping[int, float],
-    accessibility: Mapping[int, float],
+    accessibility: Mapping[int, float] | None,
     segments: Sequence[SegmentSpec],
     *,
     middle_kv_fraction: float,
@@ -113,7 +113,12 @@ def allocate_coverage_fidelity(
     eligible = tuple(item for item in ordered if item.eligible)
     eligible_ids = tuple(item.segment_id for item in eligible)
     _validate_signal("attention", attention, eligible_ids)
-    _validate_signal("accessibility", accessibility, eligible_ids)
+    if use_accessibility:
+        if accessibility is None:
+            raise CoverageFidelityError(
+                "accessibility is required when use_accessibility is enabled"
+            )
+        _validate_signal("accessibility", accessibility, eligible_ids)
 
     units: dict[int, int] = {}
     for item in ordered:
@@ -139,9 +144,17 @@ def allocate_coverage_fidelity(
         )
 
     attention_values = [float(attention[item.segment_id]) for item in eligible]
-    accessibility_values = [float(accessibility[item.segment_id]) for item in eligible]
     attention_ranks = dict(zip(eligible_ids, _rank01(attention_values)))
-    accessibility_ranks = dict(zip(eligible_ids, _rank01(accessibility_values)))
+    accessibility_ranks = (
+        dict(
+            zip(
+                eligible_ids,
+                _rank01([float(accessibility[item.segment_id]) for item in eligible]),
+            )
+        )
+        if use_accessibility and accessibility is not None
+        else {segment_id: 0.0 for segment_id in eligible_ids}
+    )
 
     protected_bytes = sum(item.kv_bytes for item in ordered if item.protected)
     eligible_full_bytes = sum(item.kv_bytes for item in eligible)

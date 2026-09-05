@@ -13,10 +13,23 @@ from typing import Mapping, Sequence
 import numpy as np
 import torch
 
+from experiments.phase2.e3_v2.attention_probe import collect_attention_token_probe
+from experiments.phase2.e3_v2.attention_probe_cache import (
+    ATTENTION_PROBE_AGGREGATION,
+    ATTENTION_PROBE_CACHE_SCHEMA,
+    get_or_create_attention_probe,
+    retained_positions_sha256,
+)
 from experiments.phase2.e3_v2.c3_protocol import (
     C3_SCHEMA,
     load_c3_protocol,
     pareto_protocol_view,
+)
+from experiments.phase2.e3_v2.chunkkv_adapter import (
+    CHUNKKV_ADAPTER_SCHEMA,
+    CHUNKKV_CHUNK_SIZE,
+    build_chunkkv_plan,
+    make_chunkkv_intervention,
 )
 from experiments.phase2.e3_v2.context_query import (
     full_kv_intervention,
@@ -40,15 +53,6 @@ from experiments.phase2.e3_v2.oracle import (
     OracleContractError,
     build_segment_catalog,
 )
-from experiments.phase2.e3_v2.query_accessibility import (
-    collect_hybrid_query_token_probe,
-)
-from experiments.phase2.e3_v2.query_probe_cache import (
-    QUERY_PROBE_AGGREGATION,
-    QUERY_PROBE_CACHE_SCHEMA,
-    get_or_create_query_probe,
-    retained_positions_sha256,
-)
 from experiments.phase2.e3_v2.real_model_preflight import (
     REFERENCE_BACKEND,
     _force_torch_reference_backend,
@@ -62,7 +66,6 @@ from experiments.phase2.e3_v2.run_coverage_fidelity import (
     _cleanup_cuda,
     _eligible_action_counts,
     _pair_summary,
-    restrict_eligible_signals,
 )
 from experiments.phase2.e3_v2.run_discovery import _build_samples
 from experiments.phase2.e3_v2.run_end_task import (
@@ -84,9 +87,9 @@ RESULTS_FILENAME = "pareto_results.jsonl"
 SUMMARY_FILENAME = "pareto_summary.json"
 SYSTEMS = (
     "contiguous_cf",
+    "chunkkv",
     "global_fixed_chunk_topk",
     "raw_alpha_exact_slack",
-    "scattered_cf",
     "contiguous_sparse_only",
     "full_kv_reference",
 )
@@ -130,8 +133,8 @@ def load_pareto_protocol(path: Path) -> tuple[dict, str]:
         for name, stage in stages.items()
     }
     expected_comparisons = [
+        ["contiguous_cf", "chunkkv"],
         ["contiguous_cf", "global_fixed_chunk_topk"],
-        ["contiguous_cf", "scattered_cf"],
     ]
     if (
         payload.get("schema_version") != PROTOCOL_SCHEMA
@@ -150,6 +153,10 @@ def load_pareto_protocol(path: Path) -> tuple[dict, str]:
             "allocator": "attention_led",
             "sparse_selector": "max_mass_window",
             "sparse_width": 16,
+            "chunkkv_chunk_size": 10,
+            "chunkkv_observation": "query_suffix_attention",
+            "chunkkv_layer_policy": "independent_per_full_layer_shared_across_kv_heads",
+            "chunkkv_partial_chunk": "fixed_prefix_of_next_ranked_chunk",
             "raw_slack_selector": "global_top_tokens_slack",
             "global_fixed_chunk_width": 16,
             "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
@@ -318,6 +325,7 @@ def _generate_system(
     max_new_tokens,
 ):
     started = time.perf_counter()
+    prompt_started = started
     state = run_post_intervention_prompt(
         model,
         prompt,
@@ -325,18 +333,23 @@ def _generate_system(
         recurrent_layer_indices=recurrent_layers,
         intervention=intervention,
     )
+    prompt_seconds = time.perf_counter() - prompt_started
     resident_bytes = get_active_kv_bytes(state.cache, list(attention_layers))
+    decode_started = time.perf_counter()
     answer = generate_greedy(
         model,
         tokenizer,
         state,
         max_new_tokens=max_new_tokens,
     )
+    decode_seconds = time.perf_counter() - decode_started
     payload = {
         **score_generated_text(answer.text, sample),
         "generated_text": answer.text,
         "generated_token_ids": [int(value) for value in answer.token_ids[0].tolist()],
         "post_query_resident_kv_bytes": int(resident_bytes),
+        "prompt_intervention_seconds": prompt_seconds,
+        "decode_seconds": decode_seconds,
         "system_elapsed_seconds": time.perf_counter() - started,
     }
     del state
@@ -350,7 +363,15 @@ def resolve_pareto_stage_set(
     stage_sets = protocol.get("stage_sets", STAGE_SETS)
     if stage_set not in stage_sets:
         raise OracleContractError(f"unknown Pareto stage set: {stage_set}")
-    stage_names = tuple(stage_sets[stage_set])
+    stage_spec = stage_sets[stage_set]
+    if isinstance(stage_spec, Mapping):
+        stage_names = tuple(stage_spec.get("stages", ()))
+        requested_budgets = tuple(
+            float(value) for value in stage_spec.get("budget_fractions", ())
+        )
+    else:
+        stage_names = tuple(stage_spec)
+        requested_budgets = ()
     if not stage_names or any(
         stage not in protocol["stages"] for stage in stage_names
     ):
@@ -382,7 +403,30 @@ def resolve_pareto_stage_set(
         "full_kv_reference"
     }:
         raise OracleContractError("Pareto stage contains unsupported system subset")
-    return stage_names, systems, equal_byte_systems, next(iter(budgets_by_stage))
+    stage_budgets = next(iter(budgets_by_stage))
+    if requested_budgets:
+        if not set(requested_budgets) <= set(stage_budgets):
+            raise OracleContractError("stage-set budgets are not in the frozen stage")
+        budgets = requested_budgets
+    else:
+        budgets = stage_budgets
+    return stage_names, systems, equal_byte_systems, budgets
+
+
+def _manifest_stage_spec(protocol: Mapping, stage_set: str) -> tuple[str, tuple[float, ...]]:
+    stage_spec = protocol.get("stage_sets", STAGE_SETS)[stage_set]
+    if not isinstance(stage_spec, Mapping):
+        return stage_set, resolve_pareto_stage_set(protocol, stage_set)[3]
+    manifest_group = stage_spec.get("manifest_group")
+    manifest_budgets = tuple(
+        float(value) for value in stage_spec.get("manifest_budget_fractions", ())
+    )
+    if not isinstance(manifest_group, str) or not manifest_group or not manifest_budgets:
+        raise OracleContractError("staged Pareto execution lacks manifest identity")
+    requested = resolve_pareto_stage_set(protocol, stage_set)[3]
+    if not set(requested) <= set(manifest_budgets):
+        raise OracleContractError("staged Pareto budgets escape manifest package")
+    return manifest_group, manifest_budgets
 
 
 def run(args: argparse.Namespace) -> dict:
@@ -396,6 +440,9 @@ def run(args: argparse.Namespace) -> dict:
         raise OracleContractError("model identity disagrees with Pareto protocol")
 
     stage_names, systems, equal_byte_systems, fractions = resolve_pareto_stage_set(
+        protocol, args.stage_set
+    )
+    manifest_stage_set, manifest_fractions = _manifest_stage_spec(
         protocol, args.stage_set
     )
     method = protocol["method"]
@@ -413,7 +460,7 @@ def run(args: argparse.Namespace) -> dict:
             "model_revision": args.model_revision,
             "protocol_sha256": protocol_sha,
             "probe_cache_dir": str(probe_cache_dir),
-            "stage_set": args.stage_set,
+            "stage_set": manifest_stage_set,
             "max_new_tokens": protocol["max_new_tokens"],
             "inference_seed": protocol["inference_seed"],
             "recurrent_backend": REFERENCE_BACKEND,
@@ -428,15 +475,16 @@ def run(args: argparse.Namespace) -> dict:
             "systems": list(systems),
             "equal_byte_systems": list(equal_byte_systems),
             "primary_comparisons": protocol["primary_comparisons"],
-            "budget_fractions": list(fractions),
+            "budget_fractions": list(manifest_fractions),
             "allocator_schema": ALLOCATION_SCHEMA,
+            "chunkkv_adapter_schema": CHUNKKV_ADAPTER_SCHEMA,
             "fixed_chunk_selector": GLOBAL_FIXED_CHUNK_SELECTOR,
             "method": method,
             "stages": list(stage_names),
             "candidate_search": False,
             "continuation_gate": False,
-            "query_probe_cache_schema": QUERY_PROBE_CACHE_SCHEMA,
-            "query_probe_aggregation": QUERY_PROBE_AGGREGATION,
+            "query_probe_cache_schema": ATTENTION_PROBE_CACHE_SCHEMA,
+            "query_probe_aggregation": ATTENTION_PROBE_AGGREGATION,
         },
         model=model_identity,
         project_root=PROJECT_ROOT,
@@ -516,31 +564,30 @@ def run(args: argparse.Namespace) -> dict:
         del context_outputs
         _cleanup_cuda()
 
-        cached_probe = get_or_create_query_probe(
+        cached_probe = get_or_create_attention_probe(
             probe_cache_dir,
             model_identity=model_identity,
             prompt=prompt,
             attention_layer_indices=attention_layers,
-            recurrent_layer_indices=recurrent_layers,
             segments=segments,
             segment_length=stage_config["segment_length"],
-            collector=lambda: collect_hybrid_query_token_probe(
+            collector=lambda: collect_attention_token_probe(
                 model,
                 prompt,
                 attention_layer_indices=attention_layers,
-                recurrent_layer_indices=recurrent_layers,
                 segments=segments,
-                segment_length=stage_config["segment_length"],
             ),
         )
         probe = cached_probe.result
         query_probe_provenance = cached_probe.provenance()
         attention = probe.alpha.as_dict()
-        accessibility = probe.accessibility.field_dict("read_share")
         token_attention_mass = tuple(float(value) for value in probe.token_attention_mass)
-        allocator_attention, allocator_accessibility = restrict_eligible_signals(
-            attention, accessibility, segments
-        )
+        layer_token_attention_mass = probe.layer_scores()
+        allocator_attention = {
+            segment.segment_id: float(attention[segment.segment_id])
+            for segment in segments
+            if segment.eligible
+        }
         del probe
         _cleanup_cuda()
         sample_prepare_seconds = time.perf_counter() - sample_prepare_started
@@ -593,13 +640,13 @@ def run(args: argparse.Namespace) -> dict:
             budget_started = time.perf_counter()
             raw_selection = select_equal_byte_segments(
                 attention,
-                accessibility,
+                None,
                 segments,
                 middle_kv_fraction=fraction,
             )
             exact_plan = allocate_coverage_fidelity(
                 allocator_attention,
-                allocator_accessibility,
+                None,
                 segments,
                 middle_kv_fraction=fraction,
                 sparse_width=method["sparse_width"],
@@ -608,7 +655,7 @@ def run(args: argparse.Namespace) -> dict:
             )
             sparse_plan = allocate_coverage_fidelity(
                 allocator_attention,
-                allocator_accessibility,
+                None,
                 segments,
                 middle_kv_fraction=fraction,
                 sparse_width=method["sparse_width"],
@@ -642,13 +689,6 @@ def run(args: argparse.Namespace) -> dict:
                     context_tokens=prompt.context_tokens,
                     target_context_charged_bytes=exact_plan.total_charged_bytes,
                 ),
-                "scattered_cf": build_retained_position_plan(
-                    exact_plan,
-                    segments,
-                    token_attention_mass,
-                    context_tokens=prompt.context_tokens,
-                    sparse_selector="top_tokens",
-                ),
                 "contiguous_sparse_only": build_retained_position_plan(
                     sparse_plan,
                     segments,
@@ -657,16 +697,32 @@ def run(args: argparse.Namespace) -> dict:
                     sparse_selector="max_mass_window",
                 ),
             }
+            chunkkv_plan = build_chunkkv_plan(
+                segments,
+                layer_token_attention_mass,
+                context_tokens=prompt.context_tokens,
+                target_context_charged_bytes=exact_plan.total_charged_bytes,
+                context_token_kv_bytes=token_unit_bytes,
+                observation_query_tokens=prompt.query_tokens,
+                chunk_size=CHUNKKV_CHUNK_SIZE,
+            )
             if len(
                 {
                     plan.context_charged_bytes
-                    for plan in position_plans.values()
+                    for plan in (*position_plans.values(), chunkkv_plan)
                 }
             ) != 1:
                 raise OracleContractError(
                     "Pareto position plans are not context-byte matched"
                 )
 
+            interventions = {
+                name: make_coverage_fidelity_intervention(
+                    position_plans[name], attention_layers, name=name
+                )
+                for name in position_plans
+            }
+            interventions["chunkkv"] = make_chunkkv_intervention(chunkkv_plan)
             generated = {
                 name: _generate_system(
                     model,
@@ -674,9 +730,7 @@ def run(args: argparse.Namespace) -> dict:
                     prompt,
                     attention_layers,
                     recurrent_layers,
-                    make_coverage_fidelity_intervention(
-                        position_plans[name], attention_layers, name=name
-                    ),
+                    interventions[name],
                     sample,
                     protocol["max_new_tokens"],
                 )
@@ -720,6 +774,7 @@ def run(args: argparse.Namespace) -> dict:
                         exact_plan, protected_ids
                     ),
                 },
+                "chunkkv": chunkkv_plan.to_dict(),
                 "global_fixed_chunk_topk": {
                     "chunk_width": method["global_fixed_chunk_width"],
                     "boundary_slack_tokens": (
@@ -738,13 +793,6 @@ def run(args: argparse.Namespace) -> dict:
                         "raw_alpha_exact_slack"
                     ].to_dict(),
                 },
-                "scattered_cf": {
-                    "allocation": exact_plan.to_dict(),
-                    "retention": position_plans["scattered_cf"].to_dict(),
-                    "action_counts": _eligible_action_counts(
-                        exact_plan, protected_ids
-                    ),
-                },
                 "contiguous_sparse_only": {
                     "allocation": sparse_plan.to_dict(),
                     "retention": position_plans[
@@ -757,9 +805,10 @@ def run(args: argparse.Namespace) -> dict:
             }
             plans = {name: all_plans[name] for name in equal_byte_systems}
             for name, plan_payload in plans.items():
-                plan_payload["active_positions_sha256"] = retained_positions_sha256(
-                    position_plans[name].active_positions
-                )
+                if name != "chunkkv":
+                    plan_payload["active_positions_sha256"] = retained_positions_sha256(
+                        position_plans[name].active_positions
+                    )
             row = {
                 "stage": stage,
                 "sample_id": sample.sample_id,
@@ -800,10 +849,16 @@ def run(args: argparse.Namespace) -> dict:
         for stage, sample in cases
         for fraction in fractions
     }
-    if {
+    actual_keys = {
         (row["stage"], row["sample_id"], float(row["budget_fraction"]))
         for row in rows
-    } != expected_keys:
+    }
+    allowed_keys = {
+        (stage, sample.sample_id, fraction)
+        for stage, sample in cases
+        for fraction in manifest_fractions
+    }
+    if not expected_keys <= actual_keys or not actual_keys <= allowed_keys:
         raise OracleContractError("Pareto run did not complete the selected package")
     rows.sort(
         key=lambda row: (
@@ -815,7 +870,10 @@ def run(args: argparse.Namespace) -> dict:
     )
     summary = {
         "schema_version": RESULT_SCHEMA,
-        "status": "complete",
+        "status": "complete" if actual_keys == allowed_keys else "stage_complete",
+        "completed_budget_fractions": sorted(
+            {float(row["budget_fraction"]) for row in rows}
+        ),
         "scope": (
             "operational_smoke_excluded_from_claims"
             if args.stage_set in {"smoke", "preflight"}

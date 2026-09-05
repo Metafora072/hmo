@@ -1,0 +1,3713 @@
+{
+  "dataset_order": [
+    "narrativeqa",
+    "qasper",
+    "multifieldqa_en",
+    "hotpotqa",
+    "2wikimqa",
+    "musique"
+  ],
+  "dataset_source": {
+    "archive_sha256": "cb45b11a4133c6bc1d6a44b0f8e701335ff1e543195db1103472e575857f7f64",
+    "archive_type": "zip",
+    "metric_revision": "2e00731f8d0bff23dc4325161044d0ed8af94c1e",
+    "repository": "zai-org/LongBench",
+    "revision": "5e628be450b7e67fb7ae6e201bd6d8f7056f7672"
+  },
+  "datasets": {
+    "2wikimqa": {
+      "cases": [
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16158,
+          "index": 78,
+          "query_tokens": 53,
+          "record_sha256": "ce669eccf5a4d9a54ff8afefdab69cb1d2aa57a909340d91805982c40a793ff1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15937,
+          "index": 93,
+          "query_tokens": 52,
+          "record_sha256": "e76bc1595b423f1fa61abaab1579196cc289014b96a087232b8caffdfa71f58b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15701,
+          "index": 10,
+          "query_tokens": 59,
+          "record_sha256": "c1a26fac2ba4032391ba7eedab21ec4e270e0989e829bac2ba54d36c8ffa08d3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15247,
+          "index": 85,
+          "query_tokens": 58,
+          "record_sha256": "2d33fbf6ad77bb107aae404a79523dc85ffddb34569e6733186b53f2cf198f1f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15024,
+          "index": 126,
+          "query_tokens": 63,
+          "record_sha256": "9cde5336b77fd9c158b53eabb3e1deeb1bc4c1839f6c1e9dcf05784146f47c99"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15007,
+          "index": 15,
+          "query_tokens": 50,
+          "record_sha256": "3cfa20550235cf5426d0f85522228ac3a19b209ed6a15c21c547b888ed85f450"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14993,
+          "index": 50,
+          "query_tokens": 51,
+          "record_sha256": "16833f6623360babe53230f3f59437d1c6b2f3680ca2a3170b17b0297f2b8e9d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14955,
+          "index": 98,
+          "query_tokens": 54,
+          "record_sha256": "354b3b7b670b2b9bb00d9567364946031439164f89289d18dbb11292d2ea91e5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14908,
+          "index": 172,
+          "query_tokens": 56,
+          "record_sha256": "a9593b8aba9f8df7924d2e21187ee1cd3a957ec6e22b209b6364dbd6100d354a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14792,
+          "index": 160,
+          "query_tokens": 51,
+          "record_sha256": "5d24e43f07960f0f8593a1d24c9688af8914fd70950bb15791d17df5beeb7e2a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14729,
+          "index": 104,
+          "query_tokens": 48,
+          "record_sha256": "9cc25533eccf1799b69a8fe46f6eadc7826ef029d358c7a997b2a7df77b30512"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14606,
+          "index": 130,
+          "query_tokens": 54,
+          "record_sha256": "a99217f69eb3a48179c273f01070e0e98cabb1496bc14dac2b45bb3a6da4a5c1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13634,
+          "index": 88,
+          "query_tokens": 51,
+          "record_sha256": "d7bae62550179d3ba1074b2c654508b5c89a487caeffddee1a5ea3488110ef9a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13629,
+          "index": 151,
+          "query_tokens": 60,
+          "record_sha256": "dc6a1410d5e3f79b7c1fe5930b8905d29203b6546203a6ad2c0811508f6153d6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13591,
+          "index": 153,
+          "query_tokens": 52,
+          "record_sha256": "288e09d1e121279c8a62e70114ee2d5e3504b1ea8bb2f3b3f87e5bccbaef42e0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13341,
+          "index": 176,
+          "query_tokens": 61,
+          "record_sha256": "a58767ad34916bbbcdbd8295039724141a62ed7a83a54163fd7a01aab959aab8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13111,
+          "index": 174,
+          "query_tokens": 54,
+          "record_sha256": "ff48ca01d32e6e9c07054aff75f508589cd8985a5b0af365436aca3d68daf4bd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13086,
+          "index": 22,
+          "query_tokens": 57,
+          "record_sha256": "10355e13ff7a6623113d1ca3a72e445292cdea05d45fed592894bb225dc19a35"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13045,
+          "index": 196,
+          "query_tokens": 51,
+          "record_sha256": "49225420830cbaa727540ebd4702abce4059d27f98b93c2080286b4c27f3a8b7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12998,
+          "index": 137,
+          "query_tokens": 51,
+          "record_sha256": "342ae6a9c6fd3de135fd63a5b8be883a9a5895e082f38308524ecd331741cc13"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12615,
+          "index": 76,
+          "query_tokens": 51,
+          "record_sha256": "7e7ed8eeadad060e3710e29fd9dc6ad53272da45b287a1104ac32485f7a91a14"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12575,
+          "index": 154,
+          "query_tokens": 56,
+          "record_sha256": "231f9dca76c190fef73868048918c707fa4bf5ead06f264f669a689db71fa47e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12369,
+          "index": 42,
+          "query_tokens": 53,
+          "record_sha256": "6bc8b0f3c277f8418d6072e528c4218fafeb84cce26e84d1c4d1492ae8e3c1e0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12196,
+          "index": 96,
+          "query_tokens": 53,
+          "record_sha256": "287cbb9a865ae6fda02b7529b1808efe71089ce98fbba0f33fb6661a1e9930de"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11622,
+          "index": 3,
+          "query_tokens": 60,
+          "record_sha256": "62611bb00e464b0b8e38a674c97ec6c5b7a2f9d222dd8ddaeb6b748f5c40376e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11563,
+          "index": 142,
+          "query_tokens": 59,
+          "record_sha256": "dd413f13406670a01c956fdda0063e50580413befe5ab5b768c5e413006d87ec"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11437,
+          "index": 177,
+          "query_tokens": 50,
+          "record_sha256": "cddce17772da68bff9f3d2d3c0dc81fe66bcc89a99ff752a44cda9a941ad8ae6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11371,
+          "index": 60,
+          "query_tokens": 55,
+          "record_sha256": "fb4a68d40019acb22714f11642be79047d6e8ecc4cb63d8c71b640977e67fedc"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11300,
+          "index": 7,
+          "query_tokens": 48,
+          "record_sha256": "85caad220a10f05361b1d1155266e5c0e3fdd920295225a301f855de1e041fac"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11165,
+          "index": 21,
+          "query_tokens": 52,
+          "record_sha256": "d278ba1d45bb31321523765ec6e89f396f9028551d37efc2981d2242700daf0b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11100,
+          "index": 115,
+          "query_tokens": 58,
+          "record_sha256": "bbb0e0010cc4af7eaf61db6c274758e53eca5aec9d6213d5431371532ce89c3c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10766,
+          "index": 168,
+          "query_tokens": 56,
+          "record_sha256": "778aab67b0d96a1ccb18abb4ded8dbf7d12302b1a02e0b3fe44838410426b2e7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10522,
+          "index": 57,
+          "query_tokens": 55,
+          "record_sha256": "dfc55e2726796f00c394aef1bd078a407395e90ca79fb34310955dc590db6948"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10317,
+          "index": 162,
+          "query_tokens": 60,
+          "record_sha256": "2279009e2e423ff81a50e86a905e3528604543b7baf15718d3efa1bbee41f0bb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10064,
+          "index": 45,
+          "query_tokens": 55,
+          "record_sha256": "083a5dbf0ab713958ac462ea127fa1ed9d5a61d01a8c203fb69c4bc2959996db"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9983,
+          "index": 38,
+          "query_tokens": 59,
+          "record_sha256": "2d4a18beca7a13ab404d220551962288d473a47a75b0569bd5aa6daa7bdac47f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9875,
+          "index": 175,
+          "query_tokens": 55,
+          "record_sha256": "811686169ee4230b10287a759b0b0aa314329f75ef73f8e64c683064cf2e79a8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9815,
+          "index": 159,
+          "query_tokens": 61,
+          "record_sha256": "7735272ddf1bfb4c936e3a00da026f801feed07170ca71cb72c2e147561344b1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9767,
+          "index": 145,
+          "query_tokens": 65,
+          "record_sha256": "b8e1a99aeb88398ab4ce0e0ee1c1a2ad442a2d128983b0c359bcaeaf0dff530f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9764,
+          "index": 190,
+          "query_tokens": 53,
+          "record_sha256": "cbaf4fbc85d6baee432ea26647959de28fda8564a8a5226a01225e198fa60e74"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9701,
+          "index": 113,
+          "query_tokens": 60,
+          "record_sha256": "6a88cfcc5c180e782052b4dc5f832f3e2d58d16fe847704f89e0dd396ee45ac9"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9699,
+          "index": 24,
+          "query_tokens": 58,
+          "record_sha256": "c190af3204049cf391dfc8bfbd765f0fdbf510bd3958ee20db4a644ffb8101fa"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9495,
+          "index": 91,
+          "query_tokens": 51,
+          "record_sha256": "858094ef5072c62761589052f210630150afdbf25c60c792ffc52738d24367fd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9003,
+          "index": 23,
+          "query_tokens": 54,
+          "record_sha256": "1c020ef677b85145f4414e32de7083ede8f0ea3a6468977a5f48fc72d84b6830"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8823,
+          "index": 31,
+          "query_tokens": 47,
+          "record_sha256": "4af586eb1306a692eaf67c65f06c6fbc6046018ef2cd4636f507bb3d07442761"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8740,
+          "index": 87,
+          "query_tokens": 55,
+          "record_sha256": "1d4911d841922ec7554b63b052635343636d1c544442e0ff6f570688f006ac30"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8686,
+          "index": 86,
+          "query_tokens": 55,
+          "record_sha256": "f7726a12b44c281a0e56ba14fa83ee06b437676742b660e1ef857dbb93442afe"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8649,
+          "index": 90,
+          "query_tokens": 56,
+          "record_sha256": "cb7cff4cbbfa1eb9621ae3f5e30d25cc8f235c776c35fcedd4e60dee58966c91"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8624,
+          "index": 17,
+          "query_tokens": 65,
+          "record_sha256": "28034021d408ce518bebdf10167d2436068b0160c1e22f90b07525571ab687d8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8503,
+          "index": 43,
+          "query_tokens": 56,
+          "record_sha256": "72add9060e013c4b146ae118cde5a34bd88113559a18b87762088ee35dea308d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8437,
+          "index": 83,
+          "query_tokens": 58,
+          "record_sha256": "6f90e72e12577e6272d5cbdab372fd98cd204f94c90ccfbe101528cca65a6d40"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8301,
+          "index": 124,
+          "query_tokens": 59,
+          "record_sha256": "20fbf40010818082fd98426200da9a4966de8011a0dbe76802a0aa1e192aa0bf"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8289,
+          "index": 184,
+          "query_tokens": 53,
+          "record_sha256": "00c09510dc13b5f1d00457ea17e358a0392c9bed2571e82c330f8c0fb25da21b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8194,
+          "index": 156,
+          "query_tokens": 52,
+          "record_sha256": "4f7e64970a8e57b9fe63a63d5fdfaeb9d72a5c317848d74220e58835363b7ffe"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8069,
+          "index": 65,
+          "query_tokens": 57,
+          "record_sha256": "de9ff7ed7c4b1088635e97ef130173fcc64afb1b838c076cd656693ab9d06333"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8052,
+          "index": 95,
+          "query_tokens": 56,
+          "record_sha256": "3dc83ae322a565f6e1dd0d924c7daa4c6c4d54ea57b78b06f487d51af38965ca"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8027,
+          "index": 63,
+          "query_tokens": 48,
+          "record_sha256": "00f7a9f634f830feb86b2d828eeb1c3c9113c38c96510ffbca8652539242e292"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8020,
+          "index": 171,
+          "query_tokens": 53,
+          "record_sha256": "0002b12cb481ba7b6ec3e466350afa0b26d6c3c36a61a1b8fa8fc5b427af612a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8005,
+          "index": 71,
+          "query_tokens": 52,
+          "record_sha256": "f1579a6f4f126f63931504b8304aff31f07e0a4ed22350916d3fd240396cece4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7917,
+          "index": 9,
+          "query_tokens": 50,
+          "record_sha256": "bf52c581435d3d8ceeacf4300d7bcf0aa9c51b68d8caead447df9c161f6e50a3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7914,
+          "index": 125,
+          "query_tokens": 59,
+          "record_sha256": "e2153fcb1214c19352028ac0d65a55cb8d51730eb47eae0aa76cfe17495a469b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7909,
+          "index": 5,
+          "query_tokens": 51,
+          "record_sha256": "51090dbd9745cef5042bfb7ca0111434fddeab6cc6889465db839b4a99cadf18"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7845,
+          "index": 117,
+          "query_tokens": 51,
+          "record_sha256": "e935c6ecca66a326bf70dc491865f5d5348bbaf8abcdc208e596f33d18b2558f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7773,
+          "index": 4,
+          "query_tokens": 61,
+          "record_sha256": "f5d41157ff3eb476dace9c3a52b447d7cd1cf1a4e8ceec32ec5596b1217e54b4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7772,
+          "index": 51,
+          "query_tokens": 53,
+          "record_sha256": "5bc389f8d0216a73fba55588507f7d9b9e9475a9c9d1246bf2cc9f70529368fb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7762,
+          "index": 6,
+          "query_tokens": 61,
+          "record_sha256": "742511fe4036ccdb54ab90e2e7cb5c642da007ec363931f7047e0793f71beb0e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7602,
+          "index": 181,
+          "query_tokens": 54,
+          "record_sha256": "5e925b8e44201c67eaa2523b2c219215359ef81e98e5cbe6609471ef1d5dd946"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7588,
+          "index": 155,
+          "query_tokens": 56,
+          "record_sha256": "22cb07ee041cfd73656136c258cd7afefecd877bacd71aec6b1e93bfa454ca4f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7553,
+          "index": 141,
+          "query_tokens": 51,
+          "record_sha256": "9760a22052f555b7e8a7b1577ae781c0e69d2f554a92c379bcf786332de55798"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7525,
+          "index": 29,
+          "query_tokens": 52,
+          "record_sha256": "62e1731b4a0699c610c3af877bdeab837f1ee5dd6b55a9cd5eda26033eecf206"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7484,
+          "index": 30,
+          "query_tokens": 58,
+          "record_sha256": "27aa3287e1c13ec2d4a7202b7d5c94621c07079e224d6aa57aad991a120eb7fd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7355,
+          "index": 0,
+          "query_tokens": 51,
+          "record_sha256": "9fee1942e71e0d1d22d4bac60709567ab6be49cdc082ba07d9413f3703e03fe9"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7264,
+          "index": 92,
+          "query_tokens": 48,
+          "record_sha256": "67e2ead1d200a96ecbd24d101971a967c691b429d6b01e8a72c0d95979fa064b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7253,
+          "index": 144,
+          "query_tokens": 50,
+          "record_sha256": "1f1f7d29171a7d36ddb5bc4803b9d26bc184a7c9f1da5d6b71b2ef9ad8029953"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7240,
+          "index": 136,
+          "query_tokens": 50,
+          "record_sha256": "3fb476ed9c9dd38fe40c293384910287a7d8ac1c5f4703055d2c0ba8421096e2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7235,
+          "index": 39,
+          "query_tokens": 51,
+          "record_sha256": "433b34cf84211df816e22541790207aaa836309641992239adcf80648c80e66f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7224,
+          "index": 36,
+          "query_tokens": 59,
+          "record_sha256": "31b3a1b89c8b032346a6f50af90c5e6fd657924aa066d95a5132a61cd6f704d7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7218,
+          "index": 40,
+          "query_tokens": 56,
+          "record_sha256": "907839262526f7b571ad8297fb6f489022b10bd58abf862bdd6fc7097ae539fe"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7114,
+          "index": 28,
+          "query_tokens": 50,
+          "record_sha256": "f9cc298b1c07741ec369bfa1262bc0e6e4daa452cfe0ac854d9f222dfc047f2c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7069,
+          "index": 1,
+          "query_tokens": 53,
+          "record_sha256": "43cfc9385a5fda6869cc20a78c27c2f7a7544c6f0a86a168cb9757ec784e8300"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7055,
+          "index": 82,
+          "query_tokens": 54,
+          "record_sha256": "05cbff75b98991789511af77b9205c06c5d3bc9d75ac9faf640971bb6a26752b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6982,
+          "index": 72,
+          "query_tokens": 57,
+          "record_sha256": "d53d5af37f3ae95c42fccb003029ee3ac3a607c0fe3b6298aac8988924929343"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6941,
+          "index": 14,
+          "query_tokens": 50,
+          "record_sha256": "d4adc589e42b5efc762562e620a1bff0445c178d15e32fa75b956609e48bfeae"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6935,
+          "index": 103,
+          "query_tokens": 55,
+          "record_sha256": "2c0d6e1d97b202322bb60f47ca8eaf5af63e46e9c0da4199ad59df2882fa2b14"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6926,
+          "index": 128,
+          "query_tokens": 50,
+          "record_sha256": "de4edfe49b4482669fb5e750a770e63acd53c9ad725562fca8a89daaa2a7deb7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6895,
+          "index": 114,
+          "query_tokens": 52,
+          "record_sha256": "ef0f83244e5d434207cfd7f4af2c163abd2c08d87a60b965ec92323aa0a3de8e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6855,
+          "index": 195,
+          "query_tokens": 51,
+          "record_sha256": "cc37147f2c4ceb172be92f3a69c570d16339e36c05bb1550c60fe61e3f9a8205"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6828,
+          "index": 123,
+          "query_tokens": 55,
+          "record_sha256": "9233a2334a91550a1b219b0691a114eaa3e7d67d277974c3562717cc4583df0f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6801,
+          "index": 2,
+          "query_tokens": 50,
+          "record_sha256": "c4fbfc3889ff297a7ea648a1717e5e235089575ff58edcd34877b7c0637bf0fc"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6798,
+          "index": 193,
+          "query_tokens": 57,
+          "record_sha256": "cc9b8f31992bb108bb2af272a92954a0591904b99af1bc323c9c92de6d2e6819"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6796,
+          "index": 138,
+          "query_tokens": 56,
+          "record_sha256": "db6952a0743473e2702a6b9734b072409f579f0f3a27308a23c9a42f71d856db"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6752,
+          "index": 149,
+          "query_tokens": 50,
+          "record_sha256": "50ad7f5c340160bfe7429b8c896c9aaa0e0de2b0a4431ecff15a10cbbc989b32"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6730,
+          "index": 135,
+          "query_tokens": 69,
+          "record_sha256": "028414a9c01cbfa24edf5f5b43732ea5274792f7ac4e9a429a85b94802f399c1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6727,
+          "index": 194,
+          "query_tokens": 53,
+          "record_sha256": "ec54f4384e1b5291f450af79463dc7caf65d5ab12ad9e6c9fe68f95fd70e0d7f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6716,
+          "index": 163,
+          "query_tokens": 54,
+          "record_sha256": "950d6b246e1ce8c2e0657806dd9676f9b41af4fad2af4c6290c158f26a33e6c3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6712,
+          "index": 152,
+          "query_tokens": 52,
+          "record_sha256": "3c698468d4f98165cf4d3c985dfcdced25e0251de9b3d3c2b27af2a910b8e06e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6709,
+          "index": 81,
+          "query_tokens": 57,
+          "record_sha256": "adc1a8d201db8d51a434711230bb2d41673fd0dc4104844b62d1d952e1b85dcd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6637,
+          "index": 100,
+          "query_tokens": 52,
+          "record_sha256": "de54d975606bda165394cb84a7d6e2ab3c8970dd5f021aa27efc0f448171d66b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6554,
+          "index": 34,
+          "query_tokens": 55,
+          "record_sha256": "ad2ca59aad79ee77a43431eb24b387828685d1d50dfe6866e8412300483c14e5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6552,
+          "index": 110,
+          "query_tokens": 55,
+          "record_sha256": "e295160e742b3d1839a460d08a797e9d82145b552901daa978f7737aee8b7ad2"
+        }
+      ],
+      "eligible_count": 195,
+      "member": "data/2wikimqa.jsonl",
+      "official_metric": "qa_f1_score",
+      "record_count": 200
+    },
+    "hotpotqa": {
+      "cases": [
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16302,
+          "index": 88,
+          "query_tokens": 60,
+          "record_sha256": "7e234420b4203783e871fe8c8836d3c7281e9b036b254e25569a188d030923ac"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16285,
+          "index": 180,
+          "query_tokens": 70,
+          "record_sha256": "96353007be33c9fa294de68cd5bc11c62e19143350e65fb9a57504588084d85a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16249,
+          "index": 86,
+          "query_tokens": 57,
+          "record_sha256": "b3ac24a2d64678394dbca3570ef5e106113ed44e7eb6de92a00ee57c7d0190c5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16233,
+          "index": 36,
+          "query_tokens": 58,
+          "record_sha256": "8c8d2b9de73ab1477edafe5eeb69e5877c5f8abe4513dbe07e48db3c2f6168ac"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16126,
+          "index": 146,
+          "query_tokens": 50,
+          "record_sha256": "34e172a5d1b1657a03f20f7567cd52fa7af026edf5a24f3a3c85db1f2c619a9d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16104,
+          "index": 21,
+          "query_tokens": 50,
+          "record_sha256": "3ccfafd9300dfe8542d4e02e83dcc9872854dee8e93a2c44a956566b33bda184"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16082,
+          "index": 19,
+          "query_tokens": 62,
+          "record_sha256": "35e91f39451f05e4236be402feec996b002daf2e8993b00a58dea239d199ec5d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16064,
+          "index": 112,
+          "query_tokens": 64,
+          "record_sha256": "68cf5aea7820d5d6da26013bf85cb7cd203daa4e9303468d8f2ed6eda8c82b91"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16062,
+          "index": 170,
+          "query_tokens": 54,
+          "record_sha256": "3be21462f31c222df749278f33f95d68eb4ec5dc11492071e497313e4cc47a0a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16030,
+          "index": 65,
+          "query_tokens": 48,
+          "record_sha256": "592e9d20bb1c239515a50c61eb6935b91266ca58c233b837511b2094cfdb01ad"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15974,
+          "index": 12,
+          "query_tokens": 67,
+          "record_sha256": "60d516336e66de88e086625dbbd79b7c82578c4c24f49eb9d6731823f1abc7bd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15970,
+          "index": 186,
+          "query_tokens": 50,
+          "record_sha256": "ab4117414f1a000deb47a90847907efb25a82da94b560b58f374058e4ff28b1f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15960,
+          "index": 62,
+          "query_tokens": 63,
+          "record_sha256": "0404363077f382bd2eedeb9a8ce01f22d248c2c77d4229f4a8dd4135b3fe49fe"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15942,
+          "index": 105,
+          "query_tokens": 49,
+          "record_sha256": "b91e2d67a24a5e3d57b0584ba82f6cc6b5cfe689b0a82c8dc38fe7d2c54a19e1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15940,
+          "index": 189,
+          "query_tokens": 53,
+          "record_sha256": "f658334e059dba33f59d0910604a7fcc815a5f428ec026bdef3778dc8893d732"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15921,
+          "index": 77,
+          "query_tokens": 52,
+          "record_sha256": "02af9ae6aa5f0179c202d64d61b6c7a655708fc9e2e9c7a0a90ceba0405cdbe8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15915,
+          "index": 58,
+          "query_tokens": 59,
+          "record_sha256": "51c713513c6ccf67ce82fab322ce7a1311f7665c78d03c1bcfa757c56d957981"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15912,
+          "index": 71,
+          "query_tokens": 61,
+          "record_sha256": "ac3f1d627745151f6280b09d21692d0e10be868dfc6cbf60b2479e6dc9f1f3c2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15871,
+          "index": 104,
+          "query_tokens": 57,
+          "record_sha256": "b29ff3e2385267392dfb57ac694bac2966cc1f094dfd9ad67b92056d2e606a9e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15866,
+          "index": 124,
+          "query_tokens": 55,
+          "record_sha256": "bdca11635590e3d41a67470a8faf65271b1a47ba817d0fb0e8cb04fc4d67d003"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15816,
+          "index": 143,
+          "query_tokens": 54,
+          "record_sha256": "604afe88384c7eb0808f2f92d5b7c5e8cfa26fd3d6c40b94836b4d582eb82521"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15791,
+          "index": 6,
+          "query_tokens": 52,
+          "record_sha256": "478ece8c483a38723c69e4b19a635d93ac38037b9887d4ca684e9ba0cbe0bfbb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15765,
+          "index": 5,
+          "query_tokens": 60,
+          "record_sha256": "0a280005c821087a32daff73a516303e60e778a5d21dced35ec9dfb71a25b665"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15518,
+          "index": 76,
+          "query_tokens": 66,
+          "record_sha256": "e34fc158efd1007b6b816a98c778c33caa11629e1d660fc1583189d7aa4d324f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15431,
+          "index": 49,
+          "query_tokens": 68,
+          "record_sha256": "fe0f598708f527a6251459680a3ca3956b9f9fc105497233eebb8138a80d567a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15416,
+          "index": 123,
+          "query_tokens": 55,
+          "record_sha256": "58b4a6ffbca1b1d9c3711fd6eaa8cfb22ce05e826f65235b072614ef51564731"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15353,
+          "index": 31,
+          "query_tokens": 60,
+          "record_sha256": "dbbac2bf2b130e7f6171e17744b4ef0bcee60b8cbb89bfb3ce2598c322542cab"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15323,
+          "index": 52,
+          "query_tokens": 50,
+          "record_sha256": "702d91611e4b2c928d4d632e4449671f3808e14f7c957ad956af047239584975"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15301,
+          "index": 190,
+          "query_tokens": 50,
+          "record_sha256": "7e525661e9469a400f9b3e56254f8f4d94ea19faed8458c374a4801ba679c014"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15249,
+          "index": 56,
+          "query_tokens": 58,
+          "record_sha256": "ca06f4f1dd4d9eee0fa24b1745b551318c04042a432f0a1297b69db90bc15e79"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15235,
+          "index": 101,
+          "query_tokens": 61,
+          "record_sha256": "ccd8f64d6ab214718c7b524fd64a16204fc140e4b8cbc75a6f4068dafb14605f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15171,
+          "index": 150,
+          "query_tokens": 57,
+          "record_sha256": "3f9b43b1d8fb80d9765c54a230d125cf2a41684cf3f648ffc34f96799b2b1886"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15139,
+          "index": 32,
+          "query_tokens": 58,
+          "record_sha256": "fd4ed29e19b62f9f8df5800ca3bcc0ce81e0d1d82c64032b7fe39ac06657aa7d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15102,
+          "index": 4,
+          "query_tokens": 52,
+          "record_sha256": "96897eff9a554e414504e326e0421d5f5378338e029d27f485369d45bcab23b3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15092,
+          "index": 169,
+          "query_tokens": 61,
+          "record_sha256": "ee0c45f8f7326ae2593197b684d82dab94142d74d802955702bc1809f78391d0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15024,
+          "index": 82,
+          "query_tokens": 63,
+          "record_sha256": "0162805a81d4318d59e144a9fde32ed4032a7b8fa4d02a5ff6ba59cf262160ad"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14998,
+          "index": 34,
+          "query_tokens": 58,
+          "record_sha256": "650f9a23002f2190b7b3bf2637983f1712345211f137a71c0aaf31e3af93c31f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14837,
+          "index": 196,
+          "query_tokens": 62,
+          "record_sha256": "d8625b1f4d6609991ce94a195d02e5e39b72380f06ada3427c58855848ec85d6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14656,
+          "index": 24,
+          "query_tokens": 56,
+          "record_sha256": "70704039183afeb54446439023a2cf2762b99f9623245ee0c75f608ccfd4853f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14612,
+          "index": 116,
+          "query_tokens": 56,
+          "record_sha256": "8cccb474aa45ea9ea619b5a077d0a8447bbd01f25543d3b0d7796ad6453546ff"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14600,
+          "index": 174,
+          "query_tokens": 65,
+          "record_sha256": "d85520c9ecd3c96996df966c436523756f96f1aa7e9ab2faf550f58a9b53f3b3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14598,
+          "index": 113,
+          "query_tokens": 50,
+          "record_sha256": "f5898cd60595882e92a9581a0dc7a98f181fee32ed9ad89faec3b4ae46eeed3a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14574,
+          "index": 45,
+          "query_tokens": 54,
+          "record_sha256": "6e20e4f87f8a55bb7bc7cf932bc9bb8f93474d1f56acc804aa1ae5887439a570"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14571,
+          "index": 172,
+          "query_tokens": 55,
+          "record_sha256": "7b7cbaae60597666adeddc79bad62377c18e37d772981cdfd676f2b8525a1be9"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14552,
+          "index": 18,
+          "query_tokens": 63,
+          "record_sha256": "0fe73656f1682fe118d2ad3dedccb3da64f70cbc90431c52a555a14109c69b7a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14410,
+          "index": 132,
+          "query_tokens": 61,
+          "record_sha256": "900ccb5aa80cd4333cdec842faa6724ef093c3146cfc5095a5c353806ef48fda"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14396,
+          "index": 122,
+          "query_tokens": 55,
+          "record_sha256": "0a5273f21c2e395942a5014d7c315f7242759e314519bf7d1737d70a788e19d0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14326,
+          "index": 140,
+          "query_tokens": 56,
+          "record_sha256": "8433829bb032063ba71de0de2161f8562b2ee454db7eb7a36a139ce9487dbf31"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14206,
+          "index": 130,
+          "query_tokens": 53,
+          "record_sha256": "ed0fca061a788695ad40070010ae8092b28ec06d6c619e11375f0f59d968de55"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14200,
+          "index": 70,
+          "query_tokens": 46,
+          "record_sha256": "a89bc9e6b1292f2c39addbb577372b055dcaa41b23e4747f314795d9b9834092"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14158,
+          "index": 63,
+          "query_tokens": 46,
+          "record_sha256": "bc50424e868f372b0422319312e2f1ac96ec774eac410aed2fecfb263d2e6fbf"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13955,
+          "index": 37,
+          "query_tokens": 62,
+          "record_sha256": "5ab68d5e09e88d8e9ef0775b7d14a8cf3bfc8caf97fcf633ece2ba057d777433"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13842,
+          "index": 147,
+          "query_tokens": 59,
+          "record_sha256": "ca25f63adf7549ef46b42e2b0d749ac4e7a675291665e9e6576248f5a5b7f1eb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13816,
+          "index": 177,
+          "query_tokens": 62,
+          "record_sha256": "f47845ddfba91c9dd03d23bd3385bf8cd333d610c9a8a1b0381c8b14a1139c19"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13811,
+          "index": 55,
+          "query_tokens": 51,
+          "record_sha256": "d9428582f173fea4594c9518d05a967c630ab5d74c32dec6bd33921660cc6d7f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13753,
+          "index": 66,
+          "query_tokens": 68,
+          "record_sha256": "07ff6d0c72ad5473c9697f7f094cc156bc731d6d644b54bb80e46d7f1978f29a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13534,
+          "index": 68,
+          "query_tokens": 50,
+          "record_sha256": "b05097e45e2bfcfd192247035cc2029618ed11521bf173b32acad29c9044a991"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13386,
+          "index": 8,
+          "query_tokens": 71,
+          "record_sha256": "3aa43a6344ab9b5221e0b66c97b92700d638d2c182060b2c3055e23bb4ba42f1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13382,
+          "index": 97,
+          "query_tokens": 57,
+          "record_sha256": "87b5d2d57c768f4acb4695b802f0e27546dd661c6ef383f0634091af72be9b97"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13008,
+          "index": 15,
+          "query_tokens": 56,
+          "record_sha256": "7f24dfe27d3101ad1f293b4fb2a58c3f9d928b897f0216b3d6d07aac66bd530d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12899,
+          "index": 67,
+          "query_tokens": 59,
+          "record_sha256": "c37642888962e3efdbf23e2a104116ae25971c9665e5c09217e65a9d2de711bd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12890,
+          "index": 118,
+          "query_tokens": 57,
+          "record_sha256": "df7e1991a99db404af5590bb112417b056dd82e2c09b04884cac888bfdec25e6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12854,
+          "index": 184,
+          "query_tokens": 51,
+          "record_sha256": "7daa0450f81d812ff55d40c4515ac1587fe17db1d04994c27bb4be5937c5a23b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12821,
+          "index": 42,
+          "query_tokens": 63,
+          "record_sha256": "e53c14c1375e9f81884df63af9296e80c30d814de5057ab05ea94400ca4978a4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12742,
+          "index": 73,
+          "query_tokens": 51,
+          "record_sha256": "56af0fa1f3a72c78374956f9aa72bcbd3c06199ba3dd0b3471bd3cc33fcad1ed"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12740,
+          "index": 153,
+          "query_tokens": 73,
+          "record_sha256": "e53e43920ce3df7175abf979fdd5716027167b2af0cc7b7ca99f13da12fa5e39"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12565,
+          "index": 182,
+          "query_tokens": 59,
+          "record_sha256": "256d423eb63a0573c70ecc38807c0e7eefd633c3039efa6b66b3b6926dcd0080"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12427,
+          "index": 102,
+          "query_tokens": 79,
+          "record_sha256": "4f64477d0e41e671ca2ab2e20f2641751c5b880b1a352eb7fb8d9ad35be9a9c1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12423,
+          "index": 135,
+          "query_tokens": 57,
+          "record_sha256": "ff01fe84cef77a4f8032331116bc856a007d0ccbf72768c3e8dfab16656fef82"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12399,
+          "index": 183,
+          "query_tokens": 53,
+          "record_sha256": "3a1449e6aa4a4bc21797c24a529e6073b45216d7b7628907686138663f03df4a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12360,
+          "index": 125,
+          "query_tokens": 48,
+          "record_sha256": "a5ed829afaa1c073c0685df63704a6117b51ad4cca3636fd0208e611ee81c57d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12357,
+          "index": 115,
+          "query_tokens": 48,
+          "record_sha256": "d4798bbce7f32ac15b502291c0a890651c3e3e4e2a4ffafd6dbcc56a5c6b9d84"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12277,
+          "index": 90,
+          "query_tokens": 57,
+          "record_sha256": "cf3447866821a69897a4506e4b8c6016641e2147b889c225db637acd3e09e906"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12164,
+          "index": 131,
+          "query_tokens": 50,
+          "record_sha256": "cd789dc1edb80792999a03b3cc02517fd73c94c627327dd5db34dd61496ca445"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12060,
+          "index": 74,
+          "query_tokens": 53,
+          "record_sha256": "fc7076a4f95a5144a856c67259722b3270c41a7dcf18e446cf6456b87198111d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12051,
+          "index": 59,
+          "query_tokens": 49,
+          "record_sha256": "4e46e2ee235b950bbba9fa4e65d1c9a709cce2994307f84c46cfd8c34dcb3461"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12035,
+          "index": 109,
+          "query_tokens": 49,
+          "record_sha256": "37094bec2a451d0fdb7ab78fc3708672af8cee562714429cbde84c5ef25eebca"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11879,
+          "index": 148,
+          "query_tokens": 61,
+          "record_sha256": "d2243696fe16ebb6454e03a0872733d5b4fc35c80136ee072abf1ac1baa50e5f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11774,
+          "index": 0,
+          "query_tokens": 56,
+          "record_sha256": "f247e5c684ee49d32d40a13589040a74aba69be4b32feb97dfe280a9c6f82c68"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11767,
+          "index": 160,
+          "query_tokens": 61,
+          "record_sha256": "d2c2e403308cdf2efc28ab876f366484308d3a453430dbd97da0122b5b10bd0b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11687,
+          "index": 94,
+          "query_tokens": 51,
+          "record_sha256": "3802d77b93ac63d257cbf78a9148a50c46af258f93945508b03099bc251de551"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11668,
+          "index": 23,
+          "query_tokens": 54,
+          "record_sha256": "dc8b5da8755573cc0f2aaaa80b1081063290d7be11d9ba849e259f6931750519"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11598,
+          "index": 162,
+          "query_tokens": 48,
+          "record_sha256": "907800acd7ce5fc8093cbbca58ede2c412ebb338e3caa82516d7b62d73c810ed"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11512,
+          "index": 20,
+          "query_tokens": 59,
+          "record_sha256": "90a200e07f9b27b74a5ca2cb12e57bf41269420fdd317144243efcfd11baab67"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11458,
+          "index": 161,
+          "query_tokens": 63,
+          "record_sha256": "ab63f15544c88c36de9871571c2ee886c62ef79bc0d0fa4e07607db30d10499a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11407,
+          "index": 46,
+          "query_tokens": 58,
+          "record_sha256": "4e25c4726728f4eb56e9ee790717508e65d8f836656564d6f01a862089259743"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11349,
+          "index": 158,
+          "query_tokens": 57,
+          "record_sha256": "f8b451bc82e5a06f459899590b4b7df2c4bcaaa9f4b2bfd41f3233aa22d5bfe0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11261,
+          "index": 192,
+          "query_tokens": 50,
+          "record_sha256": "516dfb0241480085c53ed5252a805749a1305467221bff6540b357b7a2f78c2d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10910,
+          "index": 13,
+          "query_tokens": 54,
+          "record_sha256": "4bc7495575b737f27ac6322e1263401a5e0b9397c61556ef044acdb0c91c5138"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10899,
+          "index": 195,
+          "query_tokens": 63,
+          "record_sha256": "ad53bc8f7bbb2c5781177dfcb0bbfd23a6d4092c469f1c8cecf15572f91eb779"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10836,
+          "index": 89,
+          "query_tokens": 58,
+          "record_sha256": "5b9ca5d905271eae047bc3580eaff0615855663d4572715ec2eede1a33b7ff16"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10378,
+          "index": 48,
+          "query_tokens": 52,
+          "record_sha256": "252b10b6be89b6cafb18c1fbd79b80858cf12e3c4ddb32b5137593747149cde7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10332,
+          "index": 47,
+          "query_tokens": 56,
+          "record_sha256": "d4640f28d0f3ea3c8c4833d7e942dc099cf6a31e92ebe04111c99da6d5e1cd34"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10180,
+          "index": 98,
+          "query_tokens": 60,
+          "record_sha256": "f422302a47ac63469164adc647b8ac91c187fd13bdd27ce6f0d2d505f7ac0081"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10079,
+          "index": 80,
+          "query_tokens": 55,
+          "record_sha256": "c09d521891120118db6be6c022917e46fdd7237bda6aef7b14dc8bee3b33d58c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9970,
+          "index": 27,
+          "query_tokens": 52,
+          "record_sha256": "701bf316565038be40b5b1aece4b7d723d007c8b09b77e30e2281bafff71f684"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9918,
+          "index": 25,
+          "query_tokens": 90,
+          "record_sha256": "6f1faaeb85a519e0526776d6bbb536e3b6858f00f4e029580c949967a5b25bc5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9861,
+          "index": 188,
+          "query_tokens": 52,
+          "record_sha256": "5b6714f76930694822b9309e7502da52811feb3e717a84fe10b584093727e814"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9495,
+          "index": 83,
+          "query_tokens": 58,
+          "record_sha256": "2cff5b85c546700dcccb5220610c0e3081d5557a6b1672f6ed4dc12e1d6b6aa3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9474,
+          "index": 103,
+          "query_tokens": 61,
+          "record_sha256": "cd94484d1bf68573066b06e9517fcda2763f20ed6e1cf89dcce2cfba251d9ff0"
+        }
+      ],
+      "eligible_count": 135,
+      "member": "data/hotpotqa.jsonl",
+      "official_metric": "qa_f1_score",
+      "record_count": 200
+    },
+    "multifieldqa_en": {
+      "cases": [
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 15760,
+          "index": 75,
+          "query_tokens": 55,
+          "record_sha256": "4a14b6f35fe04d6ea4313ea759f05835974ca0c752ff994b20890e410a45df59"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14859,
+          "index": 9,
+          "query_tokens": 51,
+          "record_sha256": "170f9a03c7198e90df177a34a8e60b568d1a8811b10abce6317b5fc2fc039a1f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14859,
+          "index": 12,
+          "query_tokens": 56,
+          "record_sha256": "8a9ed41aebe9b69b9568469cf2bb4f427459cd0dec3d3d3d925a7d4c02248fef"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14859,
+          "index": 90,
+          "query_tokens": 50,
+          "record_sha256": "3fea1f0a54bf06c1c59ff81ca4b16528191393adc430be2f7738037bb80c2938"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13882,
+          "index": 51,
+          "query_tokens": 60,
+          "record_sha256": "53582be8d4d18b5d308b765b56d24c970dec2d25204dcf4db551cdd79b721fec"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13651,
+          "index": 60,
+          "query_tokens": 57,
+          "record_sha256": "4c264618688b59f811a062bfe37882f4624995a29cf23bfc3e53d5a9c1e99fbc"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13651,
+          "index": 74,
+          "query_tokens": 53,
+          "record_sha256": "6705a78d4aa5dc792d27bcd3937d92294455fe8d5ee646c35fccc17c4b75a312"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 13542,
+          "index": 27,
+          "query_tokens": 59,
+          "record_sha256": "5c7d08f7dfdfc42783bf951e08007bfde11cf5a7a91da9209d7f56861f856ce8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13420,
+          "index": 116,
+          "query_tokens": 57,
+          "record_sha256": "5b9abef41505b5dd36e9faf07ad04ce8f8dd31eb76ce1ef04662c775f37420e8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13121,
+          "index": 99,
+          "query_tokens": 47,
+          "record_sha256": "21ee4c1b79ac54d4a74f88399b9dda48d03902ce5d0422f8c0411efc81874866"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13016,
+          "index": 94,
+          "query_tokens": 54,
+          "record_sha256": "f08a09ecaba2bf9efaea2a93751a49331863a5fc0e4994bba976eadd66683d41"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 12885,
+          "index": 134,
+          "query_tokens": 55,
+          "record_sha256": "dfd7bd331c1c88a5e4139368e5172b0eeafd68603dccfe1fc535caf6b1bbc57d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12816,
+          "index": 85,
+          "query_tokens": 55,
+          "record_sha256": "21b6d5d76b8a29e15444d4278b15878a323ce97831d761edc7f866142ede052e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12185,
+          "index": 3,
+          "query_tokens": 50,
+          "record_sha256": "b9141094fa040098e0ce289a22888af69165e73ff5c5238594edfa175f06b561"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11739,
+          "index": 61,
+          "query_tokens": 53,
+          "record_sha256": "e69ea9df31a8cb5f78cbfd407a755f06d0d1e4726341a77a96563399e710cb13"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 11513,
+          "index": 97,
+          "query_tokens": 63,
+          "record_sha256": "fcfd06eb1ced1aa042decd56c666c5b7c7d78bee160bbeaa163f202250cc08d9"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 11513,
+          "index": 135,
+          "query_tokens": 54,
+          "record_sha256": "e3656929279a675506e2e094253aa91aeba62e14221c051d3c77677c09cbea9d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11401,
+          "index": 1,
+          "query_tokens": 51,
+          "record_sha256": "1d49c265ea039773d9119639b825dab016f3654e82f8538f62d5aa661b3e7575"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11375,
+          "index": 142,
+          "query_tokens": 56,
+          "record_sha256": "da9d020d7cd9c7a7ed790c18b0f114e9472964373a59805b1ac5ef7c513b657a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11186,
+          "index": 133,
+          "query_tokens": 58,
+          "record_sha256": "b9f3419671fb9336684c2c8e8fc58527ce7ec11e9d38620ab427da5e8b204e2c"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 11028,
+          "index": 5,
+          "query_tokens": 57,
+          "record_sha256": "679574fcf901f9c28633c4bca3b99cba0183245214b5b4e8a1da86fbc00906d4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10935,
+          "index": 24,
+          "query_tokens": 61,
+          "record_sha256": "16bd4711a2985d809f0b69e5aecfa0e9d121151505f3e3367f8f199597993836"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10618,
+          "index": 66,
+          "query_tokens": 50,
+          "record_sha256": "777a95c2e3b93813c1922d48b0943ff20cc0c896ff492005691864a8d8125ecd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10427,
+          "index": 115,
+          "query_tokens": 50,
+          "record_sha256": "760242f0a300d3224966b68e686094020c6d46917c6412572fd51e3629cb202d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10427,
+          "index": 137,
+          "query_tokens": 59,
+          "record_sha256": "9b9c998a1a0996b6d8725de8ab6c1b8cf230dfbfe11b59d4413e6e9d8268decb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10238,
+          "index": 18,
+          "query_tokens": 54,
+          "record_sha256": "11d23956080f6ca158a18803d94ce9e6ac8831bab93d54e2f16b964d7e44f34f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9965,
+          "index": 11,
+          "query_tokens": 50,
+          "record_sha256": "2c3597d58474acfe10d7bc1fac8346f853b60a912d8003e32bada6343175e907"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9965,
+          "index": 114,
+          "query_tokens": 51,
+          "record_sha256": "226b369a43a1df182318aa4ed449e511289216ea01c6bfb73657292a384b69be"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9965,
+          "index": 149,
+          "query_tokens": 50,
+          "record_sha256": "8cb4976f2f4fb8cf049427dc9b77d7ef494628da5b192fdb9f10940d61db5b81"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9918,
+          "index": 43,
+          "query_tokens": 49,
+          "record_sha256": "f660a114f86fbe0bac1e46c4a33e0f0b62d92dc2d68676f0a171d342098e8f5c"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 9772,
+          "index": 72,
+          "query_tokens": 66,
+          "record_sha256": "fa6c84270cc5366b3bab18c9a25aebef4659c9d147c285593295bd946378c9ad"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9676,
+          "index": 105,
+          "query_tokens": 54,
+          "record_sha256": "2ae29e606159662f91494304dedff89b4dcdfa524f26a6c5035078c8378eb08b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9637,
+          "index": 45,
+          "query_tokens": 59,
+          "record_sha256": "f953de1c229f8019e3bfd60747023b5f1e09528c5aa92a558dc9eddce45c6ebb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9623,
+          "index": 14,
+          "query_tokens": 55,
+          "record_sha256": "d905862879bd82afcd8c93738291fb99df81181c99c41c0cdce1ec8c9b14e3fc"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9623,
+          "index": 104,
+          "query_tokens": 52,
+          "record_sha256": "7a2e58fba4bbaa6cf0e9907498ee4ed49727afc3f9d28d52a6d953265759948a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9492,
+          "index": 10,
+          "query_tokens": 65,
+          "record_sha256": "fbcc61bbc3d20168a486de828c7870755a07fe0a1db328189b468be50283dde8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9492,
+          "index": 125,
+          "query_tokens": 65,
+          "record_sha256": "3fd14b4a1b2a5fee120ed4b315b4836f8aaeaa6eb6b1f8aa0c1484302d341aed"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 9446,
+          "index": 26,
+          "query_tokens": 55,
+          "record_sha256": "42551b7f6e74205896bc1cdd7e4d2de5f79e828ea6c332efad0c3c502f9d7c67"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 9446,
+          "index": 109,
+          "query_tokens": 52,
+          "record_sha256": "1d19645cca9b2f7a6352c45ee794c27ec2eb542c2fde94770b7898914319c7f6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9350,
+          "index": 92,
+          "query_tokens": 53,
+          "record_sha256": "90a9ea7a4e3d08eee21031fdb47b7c766888ce15f7d18fe1c184f2d970b18b33"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9311,
+          "index": 117,
+          "query_tokens": 54,
+          "record_sha256": "560203f7889e0308a3a10314dc15161238376c5f5dae9df4fa21402f11f3a08a"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 9283,
+          "index": 37,
+          "query_tokens": 58,
+          "record_sha256": "90a67946b19d573c89819f0a65586f94c530ce6654f7f53fc5fb6dd88c8792aa"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 9140,
+          "index": 17,
+          "query_tokens": 52,
+          "record_sha256": "0f7c15e0dc9ad04c502d95a25f2f86580ebe13cb62a500e3958e4e1b24ea9fb2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9117,
+          "index": 102,
+          "query_tokens": 53,
+          "record_sha256": "c046f91918e05814dc197319c30d6af7d6bb6630185103c5b5f4368a9258f7de"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9117,
+          "index": 129,
+          "query_tokens": 49,
+          "record_sha256": "db360afaf494c28953aba4ff02177899e979ec2f03e3d1315359930c4802846f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9039,
+          "index": 118,
+          "query_tokens": 54,
+          "record_sha256": "d1e73e19c3b67dddef998df0adac85207f2c2cba3e282293de245b3c29a06073"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8949,
+          "index": 106,
+          "query_tokens": 54,
+          "record_sha256": "66bb1fe33a4d5cbeef1fcaf9d9127a051d0b5c6e0355699951eb14573266f08a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8938,
+          "index": 145,
+          "query_tokens": 66,
+          "record_sha256": "0a858c1fa27c54e671873266a791a8d76ec5e6db8c0a12181e902c4603c85393"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8799,
+          "index": 73,
+          "query_tokens": 56,
+          "record_sha256": "54d85ab5a0a55ae99a0e08ba38c461baddfe9768ce1bfc87121be0d3936cfa30"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 8733,
+          "index": 110,
+          "query_tokens": 50,
+          "record_sha256": "5bca67f89b9ac4a9ef69b84e0cc868930ac77a7ccd15913a8695d49a807e3434"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 8657,
+          "index": 67,
+          "query_tokens": 52,
+          "record_sha256": "3b34e0509076c94b3984d42355dc77348c4a5bf443f48affd959ce83485d64d9"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8655,
+          "index": 29,
+          "query_tokens": 48,
+          "record_sha256": "f1d69d608330852c29e4b9fa818750785ab964677272238d339bc8268c4f98a8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8654,
+          "index": 52,
+          "query_tokens": 61,
+          "record_sha256": "ca1613f99ec98c97b407b83f8e5ba2f0f8c187c847e5f4364c47bb52c0fb9d7f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8603,
+          "index": 136,
+          "query_tokens": 56,
+          "record_sha256": "10f0b7990b1b4f1eeef61f73e5b997ab18c3ae7f59dff173a4e814273380b39f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8469,
+          "index": 147,
+          "query_tokens": 52,
+          "record_sha256": "9ab110bba9d55dda78807717458441b3420973278dfc02180592d3e0f90166d1"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 8445,
+          "index": 65,
+          "query_tokens": 57,
+          "record_sha256": "bd94238fa0bf01ffae36075f2a37f71021f62e24a31f244be86a3c20c3ca452b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8418,
+          "index": 44,
+          "query_tokens": 55,
+          "record_sha256": "847a7f82ba723f57fe9a040777e332c93a368b92f9e50033d9f85197a387207a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8385,
+          "index": 80,
+          "query_tokens": 49,
+          "record_sha256": "453e87c88c2387f19d7df2927ed3dec3bffdfa8586e341a3283be2144087c3a9"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 8300,
+          "index": 2,
+          "query_tokens": 55,
+          "record_sha256": "ba0c85965ad0a6192d967acc6b949f0216fbe7fca07b81021d141a7284a8cff5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8246,
+          "index": 6,
+          "query_tokens": 49,
+          "record_sha256": "63566a3f037bbedd9a619d2c860a7cc3ed2a5f218650d689cad58a88a26b01f1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8246,
+          "index": 13,
+          "query_tokens": 49,
+          "record_sha256": "3ff5a59be7582c58d11eaff724042a99398e9fd67c039c24ebd6fa7bb58f9c63"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8230,
+          "index": 112,
+          "query_tokens": 61,
+          "record_sha256": "b3295f0d4212cfcef3f655b5603178050354139653cb58e010413c571df14592"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 8029,
+          "index": 148,
+          "query_tokens": 51,
+          "record_sha256": "01fe1165c0feb988716f5b166c18632a0973e520cd7335f5b8958df145af79d4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8021,
+          "index": 108,
+          "query_tokens": 51,
+          "record_sha256": "2091c1360c8c50bc41d8a70257f03e48a24cef3db251a6d9d5f91973e5f148e4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8018,
+          "index": 89,
+          "query_tokens": 53,
+          "record_sha256": "fe57d9d8077c6d7c1b00a14d0bb35f1e57c49c9567330056d222254cc1f69caf"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7973,
+          "index": 16,
+          "query_tokens": 51,
+          "record_sha256": "eaf66d40e7238bf0211dab72f2df87d2f73bbfe5d85f60a130632ec49788bc6b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7793,
+          "index": 32,
+          "query_tokens": 53,
+          "record_sha256": "068b206d3cf6cbf0843ad73e15959dcfa3a3d926f24ce204483ea2a229656184"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7757,
+          "index": 28,
+          "query_tokens": 54,
+          "record_sha256": "01d82105bb8a6a0fa21d571859abd84f65807c4ddf07adc7559ab615eb89d885"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7656,
+          "index": 4,
+          "query_tokens": 61,
+          "record_sha256": "9290aab9fe1c12513cd56b65659c11d46dcf7873755f394416a567ad9fe1f496"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7656,
+          "index": 47,
+          "query_tokens": 53,
+          "record_sha256": "2fcb1e629bfea255deaed257b5c8d8903e867545ba9f1164f8909e3cfa580491"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 7531,
+          "index": 128,
+          "query_tokens": 49,
+          "record_sha256": "763f7003cc1606b6025944b14271b506491461c206dc7e620dbbaf85587a84ec"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7505,
+          "index": 21,
+          "query_tokens": 51,
+          "record_sha256": "5345c1c8b9a1b3540153adc91d168fd4941222b2ab2c5e66fa93be4f3c6abbd5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7505,
+          "index": 79,
+          "query_tokens": 58,
+          "record_sha256": "327ee962206314d45365b662a8d7272ec46d4b90f1fc0beb5173864cf8251fb8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7456,
+          "index": 139,
+          "query_tokens": 55,
+          "record_sha256": "ee3532ba0b0019712da96c9ca40704961cf8dc8e154245d4ff48fd8723671625"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 7195,
+          "index": 81,
+          "query_tokens": 52,
+          "record_sha256": "9f323691dea9726eef9c9bf8dcbf0502760332713786f8ae40b624b2c3dc7b15"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7107,
+          "index": 121,
+          "query_tokens": 49,
+          "record_sha256": "6a30d3642ea07935568f3276467a25d19be83f76d46af83ff315bac775bfee44"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 7033,
+          "index": 35,
+          "query_tokens": 58,
+          "record_sha256": "553028d7746204f414cb6dbc0c3d129fb09bf499f24d0ec44abb9f2642cc33dc"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7023,
+          "index": 34,
+          "query_tokens": 56,
+          "record_sha256": "15453c201eb5d7e6a391a4371b338f6939d63fb0b16c4f8088794856ef3465ce"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7023,
+          "index": 124,
+          "query_tokens": 57,
+          "record_sha256": "5f65dca04e60d679d4326e35b8dd254d5b4a1f8152d04d99c0356223d944d6a8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7023,
+          "index": 127,
+          "query_tokens": 53,
+          "record_sha256": "a8952c83e9b96a457d7dded1ee2f6bdf1a9d96435e9b6fceed1255cd2b3ed165"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6973,
+          "index": 100,
+          "query_tokens": 55,
+          "record_sha256": "53d12e1a2f438c2fa061396631f685dd95d4741cd2b84412c1176ff7108a68c3"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 6626,
+          "index": 31,
+          "query_tokens": 52,
+          "record_sha256": "81de4c002f782fbeb9350778cea59d99c56bc56747c746c9d8146c10518e974f"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 6626,
+          "index": 88,
+          "query_tokens": 50,
+          "record_sha256": "d8de8309b49a6f253a0eab9cc48cd5c73eb9a16a81c453c0d48716f78d6145c5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6434,
+          "index": 42,
+          "query_tokens": 58,
+          "record_sha256": "35aff151c3e295c5127379d00c515bffd7cd268b9c036fc2684fa7d72f98b2a1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6428,
+          "index": 25,
+          "query_tokens": 58,
+          "record_sha256": "efad7d19b7992fd5f0d488b071dc8128c5e21e768907c12b2ed23f785d385a97"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6428,
+          "index": 46,
+          "query_tokens": 53,
+          "record_sha256": "72e4bf1932f609f8b103dc72572e5b7e59905bd3a63e972c7110e5ca0ee9fcaf"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6264,
+          "index": 77,
+          "query_tokens": 53,
+          "record_sha256": "e4099e07825846baff6de56a7eb0bbff36f9cee903f6b17b98921b45c7f4f555"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 6087,
+          "index": 38,
+          "query_tokens": 53,
+          "record_sha256": "205a547c0eeba7f6b95ddba642af33155577644aee10e270e9a1a0bcb5509ced"
+        },
+        {
+          "boundary_shift_characters": 2,
+          "context_tokens": 6087,
+          "index": 123,
+          "query_tokens": 53,
+          "record_sha256": "384003554ce40c8995a7bc358227a6d1db1cb984ea7d99a9523a6f1bf56eb939"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5876,
+          "index": 95,
+          "query_tokens": 59,
+          "record_sha256": "eddfcbd0f7c4ac31ddaf1793377887d85990a4e076a1d14f4fa5524142f7d5ac"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5743,
+          "index": 138,
+          "query_tokens": 50,
+          "record_sha256": "e64713c18a5b32355cbeda43d6acde56d6e550d623b3bc97b31e09feabfb3aff"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5734,
+          "index": 33,
+          "query_tokens": 51,
+          "record_sha256": "bf31122fd5ec65e73387431c3ca1514d85aad64db6f8bfcdf07d2b5fbbf811ff"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5709,
+          "index": 22,
+          "query_tokens": 54,
+          "record_sha256": "ba761e38a6424f43378255fa41c06def8d5e41c9a77282b759e2415c7cec514a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5557,
+          "index": 69,
+          "query_tokens": 55,
+          "record_sha256": "f2ddb722d465cdf64fe170692e815849c8cf093e7f8974be90990c46cb66c3a4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5524,
+          "index": 101,
+          "query_tokens": 50,
+          "record_sha256": "b755f03845a845af639d5377926d55510ed46eb09799a72fe1d93312b325317f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5329,
+          "index": 126,
+          "query_tokens": 51,
+          "record_sha256": "9971b6e7f26d7f4d41e9a27083617c3b79a3b531e9b080fb5667f8089a3c7dbc"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5197,
+          "index": 82,
+          "query_tokens": 61,
+          "record_sha256": "a1dae08f42c9245508ea9f80c909442af321efc1f229995a82dc4fde59d9f666"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5153,
+          "index": 23,
+          "query_tokens": 54,
+          "record_sha256": "bccae14bc8dca0f7eef42c33b24efd69ec187e581d3c304112cc37704883464f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5090,
+          "index": 84,
+          "query_tokens": 49,
+          "record_sha256": "573e56233b581611a46d93b814c38c29ecbdf7aea66a5e1ad7ab9f8f7710d6cb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4964,
+          "index": 53,
+          "query_tokens": 54,
+          "record_sha256": "1c13cdcce2f693983bdfa88b1d8e6a4d87582bd0d6cb6bfa03ab36ad1077d071"
+        }
+      ],
+      "eligible_count": 149,
+      "member": "data/multifieldqa_en.jsonl",
+      "official_metric": "qa_f1_score",
+      "record_count": 150
+    },
+    "musique": {
+      "cases": [
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16379,
+          "index": 151,
+          "query_tokens": 50,
+          "record_sha256": "0f1dca6214b5e39e25dd923fba8ffe5a96c89af94760f742aedecd319f946c5e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16338,
+          "index": 86,
+          "query_tokens": 52,
+          "record_sha256": "52d063d33ddc67936dd9dd13b4d0402ce1418b1c242ce0a35d748f959e109afa"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16330,
+          "index": 93,
+          "query_tokens": 59,
+          "record_sha256": "21392bedc7f61238a5d25e496f92336b831d4edff132cfbbea4db4f80190bf29"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16319,
+          "index": 195,
+          "query_tokens": 52,
+          "record_sha256": "d21a08f3223d3cd980403706afd8f207aa9dae6d506597f6b0f2510f8e16c7a8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16309,
+          "index": 131,
+          "query_tokens": 56,
+          "record_sha256": "02ca1ac920420478af0455e61778d424de904aaa62df9899ec2c083a4b6171ca"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16248,
+          "index": 27,
+          "query_tokens": 72,
+          "record_sha256": "1294aafcb2fbbbb6017575aff5c28a075be2590250bc8e50e30ce5e183c82ca4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16206,
+          "index": 165,
+          "query_tokens": 52,
+          "record_sha256": "12ca20ff9b50c3cf93ae92b57fb4e96f1fe64e2ef9b7b373fe4a84722af9c2db"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16128,
+          "index": 29,
+          "query_tokens": 49,
+          "record_sha256": "fdcf9ef9f07152d5532e20e355e0e518b790776659e63527e2a3265959d1d2f1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16103,
+          "index": 118,
+          "query_tokens": 57,
+          "record_sha256": "925c3a254bc977e7b0015b1c53d1b3b30f9df9fc1a2fc993a7a7e71c3b2412e5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16049,
+          "index": 155,
+          "query_tokens": 50,
+          "record_sha256": "13c5a8506e0d2dcd1e5ef86505ea4c4567f3102116a8a273419b6c309d9fd728"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 16027,
+          "index": 121,
+          "query_tokens": 67,
+          "record_sha256": "59967c7b8215004be501102878b14ca3752e0210e00f863541a96b76bcd3985b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15909,
+          "index": 174,
+          "query_tokens": 57,
+          "record_sha256": "050cf1233d19e2212dc3438e8f6e2d4d4bd181fb5f9836dbadb6b1fa6d752611"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15899,
+          "index": 90,
+          "query_tokens": 54,
+          "record_sha256": "e68f6bac65aaa414673e86b310415d8cc0b8a41022c6e78e8fa94ead3cda3aa2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15875,
+          "index": 70,
+          "query_tokens": 63,
+          "record_sha256": "9cc051036e6686dcda694c05217e9337a79129f9df7eebac0623f4862cba3ac6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15872,
+          "index": 167,
+          "query_tokens": 54,
+          "record_sha256": "e27bb7b7ab2bcc91fd269b4afcda25a4cc8da68860cf07f6477fb171977e70e1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15805,
+          "index": 138,
+          "query_tokens": 47,
+          "record_sha256": "ce9adfb49fd41f89b81f314c47416df877730cab6f5892d10279d9896e68dfcf"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15798,
+          "index": 172,
+          "query_tokens": 61,
+          "record_sha256": "e005130c47b2fe18561d4508dba7d51946825bf01c555cda96b9504a3b0ad508"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15769,
+          "index": 8,
+          "query_tokens": 53,
+          "record_sha256": "846a28f01dfb5039234fb3a9877ea1549fa7d8d75bdca619071ede6f0211ec62"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15742,
+          "index": 193,
+          "query_tokens": 62,
+          "record_sha256": "4899dc1239e2dd4032d1ca0a39986f1c5ca57866af25cacf2de436c2a2f61b45"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15686,
+          "index": 61,
+          "query_tokens": 54,
+          "record_sha256": "a4b776bf86e845e48477ea428273f77b57e9bb44d511b33588d1a93fedbf634a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15672,
+          "index": 97,
+          "query_tokens": 65,
+          "record_sha256": "1156be5eaf137e4121183b0cc8c6270b852738f0cb1c84e10ae506e3cce5699e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15636,
+          "index": 33,
+          "query_tokens": 58,
+          "record_sha256": "7d9fe96af8e71ce9185085b2bb71c6ef1e3245d5e3c4252366a99124ab3f9ad7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15484,
+          "index": 55,
+          "query_tokens": 51,
+          "record_sha256": "2cf1c70c4b9388eba781d2ae65725658d02ddb558a12b1095c652270e14f07ef"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15362,
+          "index": 114,
+          "query_tokens": 56,
+          "record_sha256": "d45f71d2e1fcd71351160bdf1c21f79d9405438ec00c5a79f80878b26c758302"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15231,
+          "index": 42,
+          "query_tokens": 59,
+          "record_sha256": "c090cf17c117d3f504137fafdd17600003251ab7d3292bc6d75c3055e08b0195"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15097,
+          "index": 40,
+          "query_tokens": 59,
+          "record_sha256": "7694a001fa0c3965a609ddb0e9e8ed8a884846031cfb0d68fbc2af2c77216c05"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15068,
+          "index": 91,
+          "query_tokens": 58,
+          "record_sha256": "e3324882cec7f821f0c9f0d2466e824c514bde6345c83a0cda55b4186f641e26"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14806,
+          "index": 170,
+          "query_tokens": 67,
+          "record_sha256": "9e316b05678728ad66cc0f06eb7647b88b2ac2b826de40109f8022c82f87746e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14664,
+          "index": 56,
+          "query_tokens": 52,
+          "record_sha256": "e34c6457ae63bef79cf7a165a95beaf37a5c628fb36198fd3729ee0dcec8b161"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 14469,
+          "index": 76,
+          "query_tokens": 55,
+          "record_sha256": "7a99950dbae8d80e360390bd990f637950d37c8ada19476eb63e271caf31ab91"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13923,
+          "index": 35,
+          "query_tokens": 50,
+          "record_sha256": "68266de75b07dabf2d009fed3db37543a507f51037e0bf415232f69bddf72527"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13874,
+          "index": 190,
+          "query_tokens": 56,
+          "record_sha256": "b8628ea397fbbc04d5ab66bd5b2d7eef0258e700f813b46132ead691afe4c595"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13310,
+          "index": 14,
+          "query_tokens": 56,
+          "record_sha256": "80e6934783208148beca04be5026b6aaa7008a012dc41e551d087bb2b91063e0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13243,
+          "index": 144,
+          "query_tokens": 48,
+          "record_sha256": "7faef02287e169372c04b890176f17f2178f712c449fb182ce27fd045a9c2b39"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13131,
+          "index": 166,
+          "query_tokens": 52,
+          "record_sha256": "6fb63c38245ec9f2f6b817cf8965797b06d07f9bc597682f34f47cfe41a114d0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13057,
+          "index": 120,
+          "query_tokens": 58,
+          "record_sha256": "688407e56b16d03a84fdac35bb1602784ad55d4b80e634cdeef13c44d443931d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11773,
+          "index": 37,
+          "query_tokens": 50,
+          "record_sha256": "e592f6faf94f568735da5efd76b8b0e0d94ffda33bf73cb351ec920d6331f48a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11708,
+          "index": 122,
+          "query_tokens": 55,
+          "record_sha256": "adf4ce72ee433967ac9bd1d6a38807146e8987c8c0c551f2d8e6cd249fa924eb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11657,
+          "index": 60,
+          "query_tokens": 58,
+          "record_sha256": "017bd8e984b92be85e78e047b7e98722bde0a70cf8aaea768e17fb710a94b4d0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11078,
+          "index": 30,
+          "query_tokens": 59,
+          "record_sha256": "329b4f123d8369659135ad5e326c7e33d1a497a717e3fe4567dbcd724e79e072"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10671,
+          "index": 52,
+          "query_tokens": 51,
+          "record_sha256": "74795cd7e2f52ae72fec066db4b0f4cd8760963a7764f21a64a3d81adbad155f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9480,
+          "index": 108,
+          "query_tokens": 56,
+          "record_sha256": "d6abc37b658e436db2898cfa1cdfa6d351cfc037f9ad464b2b9386d2f4f93da2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8243,
+          "index": 191,
+          "query_tokens": 53,
+          "record_sha256": "e8faa8cb25e0e038b2474490c63aef07e9ec3afd6379a4c17481f7790a732f1d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7835,
+          "index": 135,
+          "query_tokens": 50,
+          "record_sha256": "c1b2d442281ae2321d0ca4889cbb6be2a31add336310d5684e3d37cf6663d2ce"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6830,
+          "index": 68,
+          "query_tokens": 52,
+          "record_sha256": "6e44464d84705a69b7c9390450940a3f209ea37f81e31aad7e272c38e0dd28b3"
+        }
+      ],
+      "eligible_count": 45,
+      "member": "data/musique.jsonl",
+      "official_metric": "qa_f1_score",
+      "record_count": 200
+    },
+    "narrativeqa": {
+      "cases": [
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 5,
+          "query_tokens": 66,
+          "record_sha256": "877b59ddd663f7e812095c13fd3b2819d9972366849b1934df54bb5151428fe5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 20,
+          "query_tokens": 61,
+          "record_sha256": "eb2da74d2ac553e83e651b8714e7e1665300412096606a66ecb5df0f90f0dcf5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 37,
+          "query_tokens": 56,
+          "record_sha256": "6987925bf148cddd3e0cf71d3ec32a036ba0e5cd409204c8d8223301301f92a5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 64,
+          "query_tokens": 59,
+          "record_sha256": "6323f07c59d863b626c58287702a5c7036792979c2ec113aa4d2fe3cb2a3bce4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 76,
+          "query_tokens": 60,
+          "record_sha256": "1cf61348551975b3cf7c6ec99759b375cea50a9a531240cea702c83445fc5801"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 84,
+          "query_tokens": 60,
+          "record_sha256": "a1863ea1f9d0e70f1bd01fb16f0fd0f6e87b069473f31255d341b39f1b26f4c2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 108,
+          "query_tokens": 58,
+          "record_sha256": "7163b8c74c4da85ff855bc3330e415473a26629b1e1215456fffb54321a3cb02"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 134,
+          "query_tokens": 61,
+          "record_sha256": "e85fdba5a916e9f2687f4527fcd894c13fa0ecad58391737af147bae496c2d3d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 157,
+          "query_tokens": 58,
+          "record_sha256": "6ad3225f515049d5988ac7098b6f70f20dc7ac28e4730a9708d72bb3ef605aae"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 192,
+          "query_tokens": 60,
+          "record_sha256": "d1bf7b55d08f85d4b55c5a2b06a35103eca7869794965b3d9bd457077735cf3f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 195,
+          "query_tokens": 52,
+          "record_sha256": "54d098d9f0da55a0427764918079f593039cb3d28b02135614867144fab8aef2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 13701,
+          "index": 196,
+          "query_tokens": 54,
+          "record_sha256": "dd6be91ff148695756b615d013e800108a5ef5d271751c536cff8cedbf26716a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12191,
+          "index": 34,
+          "query_tokens": 54,
+          "record_sha256": "f65fcf22f1acb4d4dc6125d87de8171a4b7540ca9514bd4393eedeaed6ca704f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12191,
+          "index": 44,
+          "query_tokens": 60,
+          "record_sha256": "b8d8991c55064568ec6f5dc2428dfd5332c8f99991e8340352d88f8cf2b7afe7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12191,
+          "index": 58,
+          "query_tokens": 53,
+          "record_sha256": "1d299e23ae05d48195535a95720bbd6fca7298c039fecbc3417cd8eb7edaed49"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12191,
+          "index": 66,
+          "query_tokens": 54,
+          "record_sha256": "9fa519c23c3cb31778e9cd00148731b605d08bec25e14e81fa6bf2af1f517700"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12191,
+          "index": 95,
+          "query_tokens": 55,
+          "record_sha256": "31cf0efce2a226664b16611c636412061e8eba33d45449c5287911ec3a69ea5b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12191,
+          "index": 104,
+          "query_tokens": 55,
+          "record_sha256": "63425afad715ef76dd244cdcea16062f2d938353a2f033483bb0689928244df3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 12191,
+          "index": 135,
+          "query_tokens": 57,
+          "record_sha256": "77541d39b9e7f9cdbd4090510de1f04ae2f9165df0d937c692b9aedb6dab75e5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 13,
+          "query_tokens": 62,
+          "record_sha256": "161bc028f0214a0b9744e6738d1ae437bddf881e2b90a1eb0add5824089a9bf6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 14,
+          "query_tokens": 57,
+          "record_sha256": "2970cd2cdcfc88bb93d58d5fea8a03dd60d0fe8b690aea061b0332e047bd4fb6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 70,
+          "query_tokens": 55,
+          "record_sha256": "7932767f958a916b5e5e62c77ad3016af5515c111171b3010930cc8769f45d58"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 96,
+          "query_tokens": 64,
+          "record_sha256": "ac6e7bfd6c5b7a1e0a1e4e4fb0d95997b7ccfdc3194bca6597a04ccd44d2aa4a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 97,
+          "query_tokens": 53,
+          "record_sha256": "0c6ddb7c64c37dd83ac61ff4069f4311e8178f413f5fee676ed0044b9c7a0bb0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 120,
+          "query_tokens": 60,
+          "record_sha256": "9304a5a8916b198b9f7c45e31dc64ec16a5f891d13e6290a556ea53af3c66378"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 126,
+          "query_tokens": 64,
+          "record_sha256": "1f41914791239d115d0e24e7f415cda4c76e9d01b426724455b8950c593a0fff"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 136,
+          "query_tokens": 59,
+          "record_sha256": "4564f3bdb9305c232e877b748a7ccff48e0b049211288e1983a1cd100f39d1b1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 145,
+          "query_tokens": 61,
+          "record_sha256": "cf4096202100aca7fa65585e1ec3cbd099eba618fde909fe500b2a14a4004d29"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 160,
+          "query_tokens": 56,
+          "record_sha256": "133a17f041e860e323a1f29f59465597e0290660c3e2abfef20d0cb1e2d5a988"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 162,
+          "query_tokens": 63,
+          "record_sha256": "fe39e14686e5cc7d18f40fcd79d02cde7f00c6dc3b8224de4f0285a00d75455c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11547,
+          "index": 171,
+          "query_tokens": 58,
+          "record_sha256": "61957e98ce69a48e40700ccbb50b4bf16b036b9fe93e5d3b4b79b0fa02b1d03b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 12,
+          "query_tokens": 62,
+          "record_sha256": "87caddb5c708d07dc060ba8b3ae6df33d14f2a4e0b207233e0bd0dd85911691c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 61,
+          "query_tokens": 52,
+          "record_sha256": "a964113da45edb2484dd26db6a4cf5896834b980c34729be32f1a2683db71325"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 77,
+          "query_tokens": 64,
+          "record_sha256": "1c2d2377c503330cf8412040fe1383ce63bf54d11743ce3553aa302465ab4760"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 94,
+          "query_tokens": 60,
+          "record_sha256": "83d1be2d056436c296b5f816dfc91b74d24e6689692d49f293652ac136bc1495"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 119,
+          "query_tokens": 52,
+          "record_sha256": "808f299759e2822ea13ff2c1dfaadff521b972960f1f58bc56f2af447f1bff45"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 137,
+          "query_tokens": 59,
+          "record_sha256": "abeecc85b4dfe614dfa7490099da52888c12816bd6e8a78a36aa75ba96b632af"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 139,
+          "query_tokens": 54,
+          "record_sha256": "4c6e7192a6b5a6a6a67c5971b00e26924a3cceaa22d3edc99e06175843b329c5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 153,
+          "query_tokens": 58,
+          "record_sha256": "ba2ff3cde867d58750e141750908aa0308da4a5880aa2176af0a6642a2d2ea2a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 164,
+          "query_tokens": 54,
+          "record_sha256": "d277cad11f82068a0b48541f3f6c11e2f7d1fe6cda3d8d0a288e8bbd69d93f39"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 166,
+          "query_tokens": 54,
+          "record_sha256": "cd4da51fea0bc9d6c736a23efcf2d1a79552f7d8b7fd3b5fcdcbe312b753824b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 11383,
+          "index": 183,
+          "query_tokens": 67,
+          "record_sha256": "79c6968ee5ab483fac814724755a41364c52fc80984e57c2bc91a599c8ba7c87"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 3,
+          "query_tokens": 56,
+          "record_sha256": "dc128d53cb6667eff803990b249a82a844a774579e3500e1cb9cd8fbda52d9a9"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 19,
+          "query_tokens": 55,
+          "record_sha256": "e6df144b25c10b7156312140f025dd7366ac43e11ec767c39554b12aa234a902"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 23,
+          "query_tokens": 57,
+          "record_sha256": "f4f584f0a38988b0e26e16c896294991a994e01bed12686f72f102bab3b5c113"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 26,
+          "query_tokens": 58,
+          "record_sha256": "29d89b3155361338fe8431213d6f5e78c64e6582e0257693338b6ba6ed8d2fac"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 42,
+          "query_tokens": 53,
+          "record_sha256": "e856acbf8f3023baeacf474a016dbb1b31dd96fbf80149908c2f3cff81b91123"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 73,
+          "query_tokens": 60,
+          "record_sha256": "b9b8696ebb2ca19dc99810dad33dfb258d475f71ac5034a500746c5f0ae621fb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 85,
+          "query_tokens": 61,
+          "record_sha256": "decd0d74677ef0a5ffe6c7cb55fd73b07fb7e7bd45335547c7307e311b910d64"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 93,
+          "query_tokens": 65,
+          "record_sha256": "d1129fe540216b11f7624d089192f667b41505b40250e69ae71f11b83a421503"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 125,
+          "query_tokens": 56,
+          "record_sha256": "bf575e0f2d392cf59cb0d8797dae38cbc0415e03b52bbad21306f2e830d96481"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 147,
+          "query_tokens": 58,
+          "record_sha256": "2067451712aafeae40fb5d4ed0ebff5708126de7652b8ec9a4d6f9facbf6a574"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9171,
+          "index": 186,
+          "query_tokens": 61,
+          "record_sha256": "8c8af0932a8e5c8b9b7e7cf16c24fb264147086a438f4a2deb1c222c2341e359"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8683,
+          "index": 2,
+          "query_tokens": 52,
+          "record_sha256": "2f821450fdc4c7f9f157e45868d8fcbeee9d885d8f1ede837ee0853c39920022"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8683,
+          "index": 9,
+          "query_tokens": 58,
+          "record_sha256": "90e23bb084ad71f79e8e9711cdbdb184b8d43c7578c63c08d3e28f95a5caa0db"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8683,
+          "index": 60,
+          "query_tokens": 52,
+          "record_sha256": "a0bb83dc4a41a676c1a96554955cdc326ba5556597d2cda615e9791a56300230"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8683,
+          "index": 148,
+          "query_tokens": 55,
+          "record_sha256": "0061cdea445afdbf6561cf842ccb68282ca60530e80c99e6d4e0a879f3eeee3e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8683,
+          "index": 156,
+          "query_tokens": 52,
+          "record_sha256": "c449018aa3c8159491f74b93d2ed21421c85507e1889a1394624e5ccc48441f6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8683,
+          "index": 170,
+          "query_tokens": 56,
+          "record_sha256": "65dc3b97cb514abb9f24063b3e7922e1e837b21986422bcce6315b7712511501"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8683,
+          "index": 184,
+          "query_tokens": 52,
+          "record_sha256": "12f808b73269e735db7979f9748f2c821c3e1c11a3bd36c439eb8cfa5ca38e1c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8683,
+          "index": 188,
+          "query_tokens": 56,
+          "record_sha256": "14176e9ccb71f8906285c6c16c784f9014045ab8ee7242312d0fe3911ec01dbb"
+        }
+      ],
+      "eligible_count": 61,
+      "member": "data/narrativeqa.jsonl",
+      "official_metric": "qa_f1_score",
+      "record_count": 200
+    },
+    "qasper": {
+      "cases": [
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 15869,
+          "index": 16,
+          "query_tokens": 98,
+          "record_sha256": "0a9beb0a8fbf0cc02e39c936dd25007ea84f5e7af342f3176cf8757c686435d3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10635,
+          "index": 35,
+          "query_tokens": 95,
+          "record_sha256": "5410c8f37135debed4988f7456990795557ee789585b8e53f09657156c32744a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10325,
+          "index": 113,
+          "query_tokens": 95,
+          "record_sha256": "5fce75aa6cfa7908ea1621e04f2adc9ec3a30dba397abdc6a0888dc569ce59b3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 10321,
+          "index": 67,
+          "query_tokens": 102,
+          "record_sha256": "6a32e2e2f17a966afff9ccc344e98a0fae964c7eb347cc3f8a34183ef606c0df"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9868,
+          "index": 73,
+          "query_tokens": 96,
+          "record_sha256": "db879e8c8bda358bfa90041938161ef01ac8b177a08c2bc11aa19fea5632a537"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9868,
+          "index": 196,
+          "query_tokens": 97,
+          "record_sha256": "37460a1312e6943ed925f92db764268e55b8de0b2502d8f2382486c597898dd6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9255,
+          "index": 27,
+          "query_tokens": 101,
+          "record_sha256": "dbc50f6af6f606f5be0026602acb3be71369642bd085ba0848e3676bb315f28e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 9255,
+          "index": 118,
+          "query_tokens": 99,
+          "record_sha256": "33693a7f9c7321c8c44d3c05293037aff94adfe1d6ff28fd1125a596818869f7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8734,
+          "index": 13,
+          "query_tokens": 97,
+          "record_sha256": "4638363bdb46cfda22ddadbc13d2a58f4bc5b82c4a67cb559b490ce6a94dfb54"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8634,
+          "index": 178,
+          "query_tokens": 109,
+          "record_sha256": "c0b0826b8310625b673b990f3153aeea3109abfcf8de843f77736232396b9fe4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8194,
+          "index": 127,
+          "query_tokens": 97,
+          "record_sha256": "0498c20ce8d25691076489db2895847d0a3943bd39ada22d521596874de25a23"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8069,
+          "index": 133,
+          "query_tokens": 98,
+          "record_sha256": "b11824d73bf20b0ee70d922d7e9e78a8a567ce2067766e6f46a2c214754bf221"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 8034,
+          "index": 190,
+          "query_tokens": 98,
+          "record_sha256": "a7c0f983b4b0c396f6c42f41a5f3390c30dbf8c713f185a49a8142d99fe6e962"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7975,
+          "index": 112,
+          "query_tokens": 96,
+          "record_sha256": "f22a92d18bd315414b1808142ef84ae8320d2f02350475694703a0e5a10763f0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7903,
+          "index": 21,
+          "query_tokens": 101,
+          "record_sha256": "340f71f72a28b1bb5e1867095ede014c96018cfad35d647b0fc0bd26030b1750"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7903,
+          "index": 33,
+          "query_tokens": 96,
+          "record_sha256": "7f03e18c56922f4abd42c1f4e4cccb8d399e2a6f2873976d1f223b9bd79b90c6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7531,
+          "index": 24,
+          "query_tokens": 97,
+          "record_sha256": "0a3edf52fc7c5878d817fbcce364a175c12cb71267557936f5cb8646d86cf1a4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7531,
+          "index": 100,
+          "query_tokens": 95,
+          "record_sha256": "96c10ce954df8c3ede7f2d9891152cdca5c831b8d23907cfe70767adfc3c4828"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7301,
+          "index": 140,
+          "query_tokens": 103,
+          "record_sha256": "98158d89ba514f16d548596a2d9301085b35ea10aaf574875a16be9804c0f74f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 7040,
+          "index": 40,
+          "query_tokens": 97,
+          "record_sha256": "03a1c2b768ba66fc4c7482a5c7616cc8409c11474723f515d79dd80405ed340a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6814,
+          "index": 128,
+          "query_tokens": 98,
+          "record_sha256": "c840cde030efe6a38b58971fa00ef2afcb5c64c8a77a0237ee237a1028e0d1f3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6814,
+          "index": 199,
+          "query_tokens": 100,
+          "record_sha256": "c29438068743c112bd4549884746d046723ef353344faf39d8e978c3cad2d044"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6800,
+          "index": 44,
+          "query_tokens": 97,
+          "record_sha256": "03bfd36963aa9ef81ca354c9b24794e46a31287dc6ec7d416dc9d5dd795efcc1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6719,
+          "index": 88,
+          "query_tokens": 96,
+          "record_sha256": "7a3648a35aca7920bff2ea372944016ed7bda710439d1825745a0e7346946714"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6688,
+          "index": 170,
+          "query_tokens": 102,
+          "record_sha256": "2a16cb2c831e2377d0934b267d385d3339c6be9ead1dff0ab601efd1e7d1bf0b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6633,
+          "index": 184,
+          "query_tokens": 97,
+          "record_sha256": "feb83e08a18ff8135d4f36f5797bfcfc682ac6e3537c14525a6489dec3ea6508"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6622,
+          "index": 72,
+          "query_tokens": 94,
+          "record_sha256": "5d7ea704b342a0d8bcc6039355a87344dcf1a4b8b21e97b22b9ea838e56146a5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6620,
+          "index": 98,
+          "query_tokens": 98,
+          "record_sha256": "64a6fa09d8dc1677414879d39edecfb87977dbde493ce84007b1fdf715727193"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6603,
+          "index": 58,
+          "query_tokens": 98,
+          "record_sha256": "17cf371c3b65e9b99fd0054aed42481ba620ba2ec20b8ea4590d0bf9980f0572"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6571,
+          "index": 158,
+          "query_tokens": 96,
+          "record_sha256": "be9663b47266ef0834e92149acc9b7b64573a1055b3312e7e923401b230203c2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6544,
+          "index": 7,
+          "query_tokens": 97,
+          "record_sha256": "67e57630efeb1ab08e476ef5ef18ba927b6683e772df2650ffacae7218514fb8"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6401,
+          "index": 148,
+          "query_tokens": 97,
+          "record_sha256": "33594ac4815e34fa2a62598e60827dd56bd48ad92a24c95377b9ced7e876e81b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6318,
+          "index": 136,
+          "query_tokens": 96,
+          "record_sha256": "42febc9de636ba24917aded0c5e364a0bb9e5ac8c675ce1b73a6acde568f116a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6243,
+          "index": 176,
+          "query_tokens": 99,
+          "record_sha256": "abc200cff6a737a4bbc8df1c1323d6410b400c343aa286d4d0cff8869ad603bb"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6203,
+          "index": 91,
+          "query_tokens": 95,
+          "record_sha256": "15856ce6a1b503e19d9c166da84a35d7ec5d7065c9097b8d763910310ee3deef"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6203,
+          "index": 175,
+          "query_tokens": 97,
+          "record_sha256": "56a8c9c04a93c89c877e1bf81660e4c7152f652a43011b8353df2084551990db"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6133,
+          "index": 106,
+          "query_tokens": 99,
+          "record_sha256": "8f4a81337044ffa37bac7aaa274cd7b292716129fea0294837827aad2eb87d6e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 6133,
+          "index": 181,
+          "query_tokens": 94,
+          "record_sha256": "a135f94055d38f8c2b6eb362a7059aa0df2b4672ca294f85c0e76d2f916d65a4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5954,
+          "index": 155,
+          "query_tokens": 98,
+          "record_sha256": "97384bcdbc9c61e146cf4bb77573a61584aa9e7b73b131b3164e14172a8ba176"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5940,
+          "index": 19,
+          "query_tokens": 95,
+          "record_sha256": "a4e9c373c8d865866e49c34aa897579eba56cb22b0c2b2a5fced6cd5601fc16d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5940,
+          "index": 174,
+          "query_tokens": 99,
+          "record_sha256": "be8b5cb93c84fe30f36dc40f7c8ed3041c312e53fcf514ba281436fe7309a440"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5904,
+          "index": 51,
+          "query_tokens": 95,
+          "record_sha256": "8e17a9b77b0c909011d0ca106773460b0e82f920111ab2db7bbbc2f3783f9638"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5900,
+          "index": 101,
+          "query_tokens": 100,
+          "record_sha256": "767708f1111bdfbcea1641ae7001784fb403318c0a850d6c4e45f88fb783d77e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5865,
+          "index": 97,
+          "query_tokens": 96,
+          "record_sha256": "7d5b3db706fa3e44fab0ea1331d8fc3f3164cf037618a8ae74a0f950a96eb6f5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5865,
+          "index": 195,
+          "query_tokens": 97,
+          "record_sha256": "84f1db8a3f24efa548c9b8fb69e8bc4f3c22b879d7cdf407e0931a8f54af2c8f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5865,
+          "index": 197,
+          "query_tokens": 96,
+          "record_sha256": "0ec4c31f05180816e2651ff3d4c90329594ad6df8f52473157fdbdf19db5c478"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5818,
+          "index": 32,
+          "query_tokens": 101,
+          "record_sha256": "017f56899c77eb38114a3bc71e7db88d895b48d880aa3193a7e94c25007a50f4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5818,
+          "index": 84,
+          "query_tokens": 99,
+          "record_sha256": "d403c455dca4f015ef6a6f5824b7261ace08b5654ecbb44c956d50bb7527f18c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5814,
+          "index": 41,
+          "query_tokens": 108,
+          "record_sha256": "333735107f811b5f5049ad635d293d900b07398ad095dc23d46cb320c18afefd"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5805,
+          "index": 74,
+          "query_tokens": 98,
+          "record_sha256": "9ffa72f96c4c44b5e65d43f28f1fd69b71f339add1182bbb37c7930cdf5f373c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5787,
+          "index": 157,
+          "query_tokens": 98,
+          "record_sha256": "b13600fec620c89e00431ed9935db6f83e5e4ddf4368af9a4dd7f62514b91d3d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5783,
+          "index": 161,
+          "query_tokens": 98,
+          "record_sha256": "4b058089ac75750af112a329d53d0f3754e3680862e343358bbf9a46fe935f2d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5745,
+          "index": 39,
+          "query_tokens": 96,
+          "record_sha256": "e56158d9f6db97ddc4765bb430db8eea13bf27e28fd8452f566efea0116a1ff7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5737,
+          "index": 6,
+          "query_tokens": 99,
+          "record_sha256": "dce057f96bd6353b5bbef2b96a54453cfa0b09fdce55eec0d4743bf4fb91c356"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5711,
+          "index": 142,
+          "query_tokens": 108,
+          "record_sha256": "b3315d3f15726fe4fd9f70076e334b7f76d7de1476c319df226aa351fa8733c3"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5704,
+          "index": 80,
+          "query_tokens": 108,
+          "record_sha256": "1d09fa9d44e54f7898872cebf9e405ad4f39b94121aab6eee8eb5c3ae12cc59f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5699,
+          "index": 125,
+          "query_tokens": 107,
+          "record_sha256": "dc8e1b1dcac04dff0fa1fc3e011daeb4e0cd3d357e90f6b34fd32d520a671719"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5699,
+          "index": 145,
+          "query_tokens": 101,
+          "record_sha256": "cbf9e62e445e8c153cca1961db2d729faa4ec9309e83edff0cdc73fe17f2fab2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5699,
+          "index": 151,
+          "query_tokens": 95,
+          "record_sha256": "dbcaf597be5b71b0b7ca03ae00d27bd5df5db782a1594d71c5ca577d5a93ea8c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5688,
+          "index": 124,
+          "query_tokens": 97,
+          "record_sha256": "b185da58944d3aa1ae27ed590ccfc831e8a58b7ec10228771337a62c2624d632"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5662,
+          "index": 90,
+          "query_tokens": 96,
+          "record_sha256": "adefde9a0d7c324c56afcc8ea4e2b45c0ae31124eb4535a87f4d37b1fbebd3c0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5594,
+          "index": 38,
+          "query_tokens": 97,
+          "record_sha256": "492cf7437dedde0310a8516fdf5ba5ef88219ce97be401e949a63915b4012567"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5578,
+          "index": 70,
+          "query_tokens": 98,
+          "record_sha256": "fa4f7dc907ec6cb453e31bd1671d8a15465684cdb9eba85b2b1c96853ece00d4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5549,
+          "index": 49,
+          "query_tokens": 99,
+          "record_sha256": "6f2f677850489937faf522e5e14576b9e704b7dce521128f2644f7c994f4dd44"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5506,
+          "index": 194,
+          "query_tokens": 103,
+          "record_sha256": "3238b2d8ffe59ee165992c357db34f11570ea2e14e843e19f15e49d95c693719"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5427,
+          "index": 5,
+          "query_tokens": 101,
+          "record_sha256": "0821c92feeddfab1e7b56551afefbaf8d87f7d3f818da3f65a77d31e747cf354"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5427,
+          "index": 110,
+          "query_tokens": 97,
+          "record_sha256": "b8418d6c04f999118f8110181da397472e7793ae674cd21ba878bccce9ee667b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5416,
+          "index": 85,
+          "query_tokens": 98,
+          "record_sha256": "8483468d2d3237e0db6c882f4ff895c14629f2ee65d2a61b793f4a7c8ecd1053"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5369,
+          "index": 29,
+          "query_tokens": 97,
+          "record_sha256": "f93cd46697254ee64fe5165331fd4c5448c5ead2eb3aee01a19378c62489cbb9"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5369,
+          "index": 167,
+          "query_tokens": 98,
+          "record_sha256": "8c0a44abfe0865c09be2846a831e29f013879f6c8d19a6bbb036c23bacc5b6f1"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5350,
+          "index": 23,
+          "query_tokens": 96,
+          "record_sha256": "3c77c89b993a945724e8b61e12e8cebb4dbb3aad7f31139ddfa7f6ff463e24c2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5332,
+          "index": 153,
+          "query_tokens": 97,
+          "record_sha256": "32600a6f45bec91611c2fd483e0e40988de178549a5dcc0edacecc2651ff67a6"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5324,
+          "index": 77,
+          "query_tokens": 97,
+          "record_sha256": "4a2a6fd0df81a1a87c40bd99858642a40a967102447eb9adca0c606b8427c59e"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5324,
+          "index": 143,
+          "query_tokens": 101,
+          "record_sha256": "92ad2e15da0058d6df064cda46950add9a1a4cda8ff8c4261eea4d081bded2f2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5300,
+          "index": 9,
+          "query_tokens": 96,
+          "record_sha256": "e6302ff79f0e20ce24ff4c9ba01d8280bcd397de007a20a288038e7370e67d34"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5254,
+          "index": 141,
+          "query_tokens": 108,
+          "record_sha256": "942f985fcb05136758174d39adfd2b0369b05606c02ee24a2602ef4164859b97"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5239,
+          "index": 183,
+          "query_tokens": 98,
+          "record_sha256": "bea31006d512facd74d4a6c6111ec3db87431898eaefd4959dd7f1be9adcddee"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5188,
+          "index": 22,
+          "query_tokens": 94,
+          "record_sha256": "4ad18f6289072a7ed53c0a7d4bf5ea9d7df907f52ac4b27445af637f722a8610"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5188,
+          "index": 63,
+          "query_tokens": 96,
+          "record_sha256": "99704f838957b4b2eebf004c9148c3584d28c2fd8d7f4ff7015a21436f82908a"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5180,
+          "index": 66,
+          "query_tokens": 97,
+          "record_sha256": "7245fd154f09d780d68ac0d4e98b609210d39cbd640bd92af970b500e0c2b908"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5180,
+          "index": 111,
+          "query_tokens": 97,
+          "record_sha256": "9130db3fd548ab8b5a80c6e20d1167efc0efb8b69c6cf69f10d22a021c913b9c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5168,
+          "index": 17,
+          "query_tokens": 98,
+          "record_sha256": "f098c5e93fa19ccbac5347c0f20cd639ee38e66d2084965f8c2ff558923a50b5"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5168,
+          "index": 171,
+          "query_tokens": 98,
+          "record_sha256": "fece97d585b9b9d8f439aa559b40b1501309c8175bad291190c74974efeb29ff"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5141,
+          "index": 165,
+          "query_tokens": 99,
+          "record_sha256": "6c961845b8e7f64c889775d425248a89b61c03dd576dd92a8747fca371cdc42c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5127,
+          "index": 87,
+          "query_tokens": 99,
+          "record_sha256": "932cabfd093d698ed160467cbc3bc8bcace57995f26f5806bc8086f94c12796d"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5127,
+          "index": 182,
+          "query_tokens": 100,
+          "record_sha256": "a35d1470c962e346521cacf62c9cc95bc5eae65b6ca5d9c9355cf320979d1cf0"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5122,
+          "index": 55,
+          "query_tokens": 100,
+          "record_sha256": "c677d25d1d6bf941989d87bf9e1deaa54524c47b5b1ea896f158025bd2915164"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5094,
+          "index": 18,
+          "query_tokens": 96,
+          "record_sha256": "71613884751afe98eae3b7248211b16e0699465d76f4e48a9ec1ccb74591fa5b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5094,
+          "index": 123,
+          "query_tokens": 99,
+          "record_sha256": "e72302acf47a608f7250138b33707bbc582f6d864deb37ba8143696214fc8dc7"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 5094,
+          "index": 189,
+          "query_tokens": 97,
+          "record_sha256": "78252de583e055a7976c8d1e62f9f5785385f001b52345ed741c203fdd60b989"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4953,
+          "index": 160,
+          "query_tokens": 99,
+          "record_sha256": "c283b3035580644e17e85427a5d58e50615f510645aaa35f37982d0cd2a36ab9"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4940,
+          "index": 25,
+          "query_tokens": 98,
+          "record_sha256": "c6f1931e8527b462dd41cf403a6840a7511fb57006a1892a859dfc88662b34c4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4940,
+          "index": 177,
+          "query_tokens": 98,
+          "record_sha256": "28210ba24627ac0f46769af6dad5484690fdbcd487767716888f19c6c38a3198"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4834,
+          "index": 135,
+          "query_tokens": 101,
+          "record_sha256": "5f44c9ec741d45a622ebfdc2c24c2dd303ccb1e591b809fe418be31d2225af2b"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4795,
+          "index": 56,
+          "query_tokens": 96,
+          "record_sha256": "13c0ac1071825ccb46abe0867a60fa73907fff6df00c5cc34f0bd09428ea54d2"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4780,
+          "index": 14,
+          "query_tokens": 97,
+          "record_sha256": "3eea88668e0bbe8d7d82c16ba5e6136ae3e34fbaf50d4761c39e684c82ba1d11"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4757,
+          "index": 94,
+          "query_tokens": 96,
+          "record_sha256": "e352053f67d991691a289116562128c7de505c499ff6652914fc8f3d81332e1c"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4684,
+          "index": 31,
+          "query_tokens": 98,
+          "record_sha256": "0e6a618812f910f94c75a965b73ede093efe96957a86165be69de44c4c7ce79f"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4680,
+          "index": 45,
+          "query_tokens": 99,
+          "record_sha256": "c9c338901b0dfd003f13160e5c1a00078cd4213f3ad06624055da60f089099f4"
+        },
+        {
+          "boundary_shift_characters": 0,
+          "context_tokens": 4656,
+          "index": 34,
+          "query_tokens": 104,
+          "record_sha256": "164d5190a9e815977c0abf091377e43594720b816f71323b4ce7d757d9be1c72"
+        }
+      ],
+      "eligible_count": 197,
+      "member": "data/qasper.jsonl",
+      "official_metric": "qa_f1_score",
+      "record_count": 200
+    }
+  },
+  "equal_byte_systems": [
+    "contiguous_cf",
+    "chunkkv",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack"
+  ],
+  "execution": {
+    "case_filtering_after_outcomes": false,
+    "continuation_gate": false,
+    "continuation_is_precommitted_prefix": true,
+    "prefix100_case_count": 506,
+    "prefix100_generation_cells": 2530,
+    "prefix50_case_count": 295,
+    "prefix50_generation_cells": 1475,
+    "resume_after_interruption": true
+  },
+  "frozen_at": "2026-09-05T06:37:48.669085+00:00",
+  "generation": {
+    "decoding": "greedy",
+    "inference_seed": 20261018,
+    "max_new_tokens": {
+      "2wikimqa": 32,
+      "hotpotqa": 32,
+      "multifieldqa_en": 64,
+      "musique": 32,
+      "narrativeqa": 128,
+      "qasper": 128
+    }
+  },
+  "method": {
+    "allocator": "attention_led",
+    "chunkkv_chunk_size": 10,
+    "chunkkv_layer_policy": "independent_per_full_layer_shared_across_kv_heads",
+    "chunkkv_observation": "query_suffix_attention",
+    "chunkkv_partial_chunk": "fixed_prefix_of_next_ranked_chunk",
+    "global_fixed_chunk_slack": "prefix_of_next_ranked_chunk",
+    "global_fixed_chunk_width": 16,
+    "protected_prefix_segments": 1,
+    "protected_suffix_segments": 1,
+    "raw_slack_selector": "global_top_tokens_slack",
+    "segment_length": 256,
+    "sparse_selector": "max_mass_window",
+    "sparse_width": 16
+  },
+  "middle_kv_fraction": 0.1,
+  "model_id": "Qwen/Qwen3.5-9B",
+  "model_revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "primary_comparisons": [
+    [
+      "contiguous_cf",
+      "chunkkv"
+    ],
+    [
+      "contiguous_cf",
+      "global_fixed_chunk_topk"
+    ],
+    [
+      "contiguous_cf",
+      "raw_alpha_exact_slack"
+    ],
+    [
+      "contiguous_cf",
+      "full_kv_reference"
+    ]
+  ],
+  "primary_metric": "official_qa_f1",
+  "purpose": "broad_native_non_augmented_real_task_main_table",
+  "schema_version": "hmo.native_longbench_six_task_protocol.v1",
+  "secondary_metrics": [
+    "normalized_answer_contains",
+    "normalized_exact_match"
+  ],
+  "selection": {
+    "augmentation": false,
+    "boundary_alignment": "if_one_token_crosses_the_semantic_context_boundary_move_that_complete_token_into_memory_context",
+    "max_memory_context_tokens": 16384,
+    "maximum_samples_per_dataset": 100,
+    "min_memory_context_tokens": 1,
+    "outcome_conditioned_selection": false,
+    "record_sha256_semantics": "sha256_of_raw_jsonl_record_bytes_without_line_ending",
+    "rule": "longest_exact_serialized_memory_context_within_inclusive_token_band_then_record_index",
+    "source_context_unchanged": true,
+    "truncation": false
+  },
+  "stage_sets": {
+    "prefix100": {
+      "manifest_group": "prefix100",
+      "manifest_per_dataset_prefix": 100,
+      "per_dataset_prefix": 100
+    },
+    "prefix50": {
+      "manifest_group": "prefix100",
+      "manifest_per_dataset_prefix": 100,
+      "per_dataset_prefix": 50
+    }
+  },
+  "status": "frozen_before_outcomes",
+  "systems": [
+    "contiguous_cf",
+    "chunkkv",
+    "global_fixed_chunk_topk",
+    "raw_alpha_exact_slack",
+    "full_kv_reference"
+  ]
+}
